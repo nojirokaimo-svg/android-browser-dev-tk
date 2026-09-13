@@ -111,6 +111,26 @@
         "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java"
       ],
       "sha256": "72156b05b961ca6d5b7f670f62fe966f1de1b153e24fabc956e1931063acb68c"
+    },
+    {
+      "id": "kiwi-tab-switcher",
+      "name": "Kiwi-style selectable tab switcher modes with unchanged default",
+      "patch": "100-kiwi-tab-switcher.patch",
+      "files": [
+        "chrome/android/chrome_java_resources.gni",
+        "chrome/android/chrome_java_sources.gni",
+        "chrome/android/java/res/layout/radio_button_group_tabswitcher_preference.xml",
+        "chrome/android/java/res/xml/main_preferences.xml",
+        "chrome/android/java/res/xml/tabswitcher_preferences.xml",
+        "chrome/android/java/src/org/chromium/chrome/browser/settings/RadioButtonGroupTabSwitcherPreference.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java",
+        "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java",
+        "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListCoordinator.java",
+        "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java",
+        "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java",
+        "titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java"
+      ],
+      "sha256": "433c3721c185066ed01115fc2a42c1369e2a2eee0665fa27c4df7c858611a0cc"
     }
   ]
 }
