@@ -20,10 +20,17 @@ fi
 if [[ "$PHASE" != "compile" ]]; then
 mkdir -p "$BUILD_ROOT"
 if [[ ! -d "$TITANIUM_DIR/.git" ]]; then
-  git clone "$TITANIUM_REPOSITORY" "$TITANIUM_DIR"
+  # A resume job restores out/Default before preparing the pinned source tree.
+  # Populate the repository in place so the restored Ninja checkpoint remains
+  # untouched even though its parent directory is already non-empty.
+  mkdir -p "$TITANIUM_DIR"
+  git -C "$TITANIUM_DIR" init
+fi
+if ! git -C "$TITANIUM_DIR" remote get-url origin >/dev/null 2>&1; then
+  git -C "$TITANIUM_DIR" remote add origin "$TITANIUM_REPOSITORY"
 fi
 git -C "$TITANIUM_DIR" fetch --depth 1 origin "$TITANIUM_COMMIT"
-git -C "$TITANIUM_DIR" checkout --detach "$TITANIUM_COMMIT"
+git -C "$TITANIUM_DIR" checkout --detach --force "$TITANIUM_COMMIT"
 git -C "$TITANIUM_DIR" submodule update --init --recursive --depth 1
 test "$(git -C "$TITANIUM_DIR/vanadium" rev-parse HEAD)" = "$VANADIUM_COMMIT"
 
