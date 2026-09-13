@@ -97,6 +97,20 @@
         "chrome/browser/resources/extensions/manager.css"
       ],
       "sha256": "2f319818ef2a4ee3f2c94210f5fc8b11555ae8c556e68073b3930311f39b6e0c"
+    },
+    {
+      "id": "black-statusbar-full-backup",
+      "name": "Pure-black dark status bar and manual full browser-state backup",
+      "patch": "090-black-statusbar-full-backup.patch",
+      "files": [
+        "chrome/android/chrome_java_sources.gni",
+        "chrome/android/java/AndroidManifest.xml",
+        "chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java"
+      ],
+      "sha256": "72156b05b961ca6d5b7f670f62fe966f1de1b153e24fabc956e1931063acb68c"
     }
   ]
 }

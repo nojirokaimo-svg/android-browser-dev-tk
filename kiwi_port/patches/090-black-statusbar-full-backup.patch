@@ -1,0 +1,585 @@
+diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
+--- a/chrome/android/chrome_java_sources.gni
++++ b/chrome/android/chrome_java_sources.gni
+@@ -226,6 +226,7 @@ chrome_java_sources = [
+   "java/src/org/chromium/chrome/browser/backup/BoolPrefBackupSerializer.java",
+   "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
+   "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
++  "java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
+   "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
+   "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
+   "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
+diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -238,6 +238,11 @@ found in the LICENSE file.
+              Since this activity (shown in the launcher) and the application
+              (shown in Android's Settings/Apps list) share the same label, we
+              do not specify one here to allow it to inherit from the app. -->
++        <activity
++            android:name="org.chromium.chrome.browser.backup.KiwiFullBackupActivity"
++            android:theme="@style/Theme.Chromium.Settings"
++            android:exported="false">
++        </activity>
+         <activity android:name="org.chromium.chrome.browser.document.ChromeLauncherActivity"
+             android:theme="@style/LauncherTheme"
+             android:relinquishTaskIdentity="true"
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
+@@ -19,5 +19,6 @@ import org.chromium.chrome.browser.accessibility.hierarchysnapshotter.HierarchyS
+ import org.chromium.chrome.browser.app.notifications.ContextualNotificationPermissionRequesterImpl;
+ import org.chromium.chrome.browser.background_task_scheduler.ChromeBackgroundTaskFactory;
++import org.chromium.chrome.browser.backup.KiwiFullBackupActivity;
+ import org.chromium.chrome.browser.base.SplitCompatApplication;
+ import org.chromium.chrome.browser.crash.ChromePureJavaExceptionReporter;
+ import org.chromium.chrome.browser.customtabs.CustomTabsConnection;
+@@ -48,6 +49,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {
+         super.onCreate();
+ 
+         if (SplitCompatApplication.isBrowserProcess()) {
++            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());
+             FontPreloader.getInstance().load(getApplication());
+ 
+             // Registers the extensions for all protos which would be in the Chrome split, whether
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
+--- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
+@@ -39,6 +39,7 @@ import org.chromium.build.annotations.Nullable;
+ import org.chromium.chrome.R;
+ import org.chromium.chrome.browser.appearance.settings.AppearanceSettingsFragment;
+ import org.chromium.chrome.browser.autofill.settings.SettingsNavigationHelper;
++import org.chromium.chrome.browser.backup.KiwiFullBackupActivity;
+ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFragment;
+ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsMediator;
+ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsReferrer;
+@@ -347,6 +348,21 @@ public class MainSettings extends ChromeBaseSettingsFragment
+         mManagedPreferenceDelegate = createManagedPreferenceDelegate();
+ 
+         SettingsUtils.addPreferencesFromResource(this, R.xml.main_preferences);
++        boolean isJapanese = java.util.Locale.getDefault().getLanguage().equals("ja");
++        Preference fullBackupPreference = new Preference(getStyledContext());
++        fullBackupPreference.setKey("kiwi_full_backup");
++        fullBackupPreference.setTitle(isJapanese ? "フルバックアップ / 復元" : "Full backup / restore");
++        fullBackupPreference.setSummary(
++                isJapanese
++                        ? "ブックマーク、閲覧履歴、ダウンロード履歴、タブ状態などを保存"
++                        : "Back up bookmarks, browsing/download history, tabs and browser state");
++        fullBackupPreference.setOrder(Integer.MAX_VALUE - 10);
++        fullBackupPreference.setOnPreferenceClickListener(
++                preference -> {
++                    startActivity(new Intent(requireContext(), KiwiFullBackupActivity.class));
++                    return true;
++                });
++        getPreferenceScreen().addPreference(fullBackupPreference);
+ 
+         IdentityManager identityManager =
+                 IdentityServicesProvider.get().getIdentityManager(getProfile());
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java b/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
+@@ -500,6 +500,12 @@ public class StatusBarColorController
+     /** Update the color of the status bar. */
+     public void updateStatusBarColor() {
+         @ColorInt int statusBarColor = calculateFinalStatusBarColor();
++        int nightMode =
++                mActivity.getResources().getConfiguration().uiMode
++                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
++        if (nightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
++            statusBarColor = Color.BLACK;
++        }
+         setStatusBarColor(
+                 mEdgeToEdgeSystemBarColorHelper,
+                 mActivity,
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java
+new file mode 100644
+--- /dev/null
++++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java
+@@ -0,0 +1,487 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.backup;
++
++import android.app.Activity;
++import android.app.AlarmManager;
++import android.app.PendingIntent;
++import android.content.Context;
++import android.content.Intent;
++import android.graphics.Color;
++import android.net.Uri;
++import android.os.Bundle;
++import android.os.Process;
++import android.os.SystemClock;
++import android.view.Gravity;
++import android.view.View;
++import android.widget.Button;
++import android.widget.LinearLayout;
++import android.widget.TextView;
++import android.widget.Toast;
++
++import org.chromium.build.annotations.NullMarked;
++import org.chromium.build.annotations.Nullable;
++
++import java.io.BufferedInputStream;
++import java.io.BufferedOutputStream;
++import java.io.File;
++import java.io.FileInputStream;
++import java.io.FileOutputStream;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.nio.charset.StandardCharsets;
++import java.text.SimpleDateFormat;
++import java.util.Arrays;
++import java.util.Comparator;
++import java.util.Date;
++import java.util.Locale;
++import java.util.zip.ZipEntry;
++import java.util.zip.ZipInputStream;
++import java.util.zip.ZipOutputStream;
++
++/**
++ * Manual full browser-state backup for Titanium-Kiwi.
++ *
++ * <p>The archive contains the Chromium profile directory and Android tab persistence directory.
++ * That covers bookmarks, browsing/download history, open tab state, extensions and profile data.
++ * Public files previously downloaded by the user are intentionally not copied.
++ */
++@NullMarked
++public final class KiwiFullBackupActivity extends Activity {
++    private static final int CREATE_BACKUP_REQUEST = 7341;
++    private static final int RESTORE_BACKUP_REQUEST = 7342;
++    private static final String ARCHIVE_MARKER = "titanium-kiwi-backup.properties";
++    private static final String CHROME_ROOT = "app_chrome";
++    private static final String TABS_ROOT = "app_tabs";
++    private static final String PENDING_ARCHIVE = "titanium-kiwi-restore.pending.zip";
++    private static final String RESTORE_WORK = "titanium-kiwi-restore-work";
++    private static final long MAX_RESTORE_BYTES = 8L * 1024L * 1024L * 1024L;
++
++    @Override
++    protected void onCreate(@Nullable Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        getWindow().setStatusBarColor(Color.BLACK);
++        getWindow().setNavigationBarColor(Color.BLACK);
++        getWindow()
++                .getDecorView()
++                .setSystemUiVisibility(
++                        getWindow().getDecorView().getSystemUiVisibility()
++                                & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
++                                & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
++        setTitle(isJapanese() ? "フルバックアップ / 復元" : "Full backup / restore");
++        setContentView(createContentView());
++    }
++
++    private View createContentView() {
++        LinearLayout root = new LinearLayout(this);
++        root.setOrientation(LinearLayout.VERTICAL);
++        root.setGravity(Gravity.CENTER_HORIZONTAL);
++        root.setPadding(dp(24), dp(32), dp(24), dp(24));
++        root.setBackgroundColor(Color.BLACK);
++
++        TextView description = new TextView(this);
++        description.setTextColor(Color.WHITE);
++        description.setTextSize(16);
++        description.setText(
++                isJapanese()
++                        ? "ブックマーク、閲覧履歴、ダウンロード履歴、開いているタブとタブ状態をZIPに保存します。\n"
++                                + "ダウンロード済みファイル本体は含みません。"
++                        : "Saves bookmarks, browsing/download history, open tabs and tab state "
++                                + "to a ZIP archive.\nDownloaded files themselves are not included.");
++        LinearLayout.LayoutParams textParams =
++                new LinearLayout.LayoutParams(
++                        LinearLayout.LayoutParams.MATCH_PARENT,
++                        LinearLayout.LayoutParams.WRAP_CONTENT);
++        textParams.setMargins(0, 0, 0, dp(24));
++        root.addView(description, textParams);
++
++        Button backup = new Button(this);
++        backup.setText(isJapanese() ? "バックアップを作成" : "Create backup");
++        backup.setOnClickListener(view -> chooseBackupDestination());
++        root.addView(
++                backup,
++                new LinearLayout.LayoutParams(
++                        LinearLayout.LayoutParams.MATCH_PARENT,
++                        LinearLayout.LayoutParams.WRAP_CONTENT));
++
++        Button restore = new Button(this);
++        restore.setText(isJapanese() ? "バックアップから復元" : "Restore backup");
++        restore.setOnClickListener(view -> chooseRestoreArchive());
++        LinearLayout.LayoutParams restoreParams =
++                new LinearLayout.LayoutParams(
++                        LinearLayout.LayoutParams.MATCH_PARENT,
++                        LinearLayout.LayoutParams.WRAP_CONTENT);
++        restoreParams.setMargins(0, dp(12), 0, 0);
++        root.addView(restore, restoreParams);
++        return root;
++    }
++
++    private int dp(int value) {
++        return Math.round(value * getResources().getDisplayMetrics().density);
++    }
++
++    private static boolean isJapanese() {
++        return Locale.getDefault().getLanguage().equals("ja");
++    }
++
++    private void chooseBackupDestination() {
++        String stamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
++        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
++        intent.addCategory(Intent.CATEGORY_OPENABLE);
++        intent.setType("application/zip");
++        intent.putExtra(Intent.EXTRA_TITLE, "Titanium-Kiwi-backup-" + stamp + ".zip");
++        startActivityForResult(intent, CREATE_BACKUP_REQUEST);
++    }
++
++    private void chooseRestoreArchive() {
++        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
++        intent.addCategory(Intent.CATEGORY_OPENABLE);
++        intent.setType("application/zip");
++        startActivityForResult(intent, RESTORE_BACKUP_REQUEST);
++    }
++
++    @Override
++    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
++        super.onActivityResult(requestCode, resultCode, data);
++        if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
++        Uri uri = data.getData();
++        if (requestCode == CREATE_BACKUP_REQUEST) {
++            createBackup(uri);
++        } else if (requestCode == RESTORE_BACKUP_REQUEST) {
++            stageRestore(uri);
++        }
++    }
++
++    private void createBackup(Uri uri) {
++        Toast.makeText(
++                        this,
++                        isJapanese() ? "バックアップを作成中…" : "Creating backup…",
++                        Toast.LENGTH_SHORT)
++                .show();
++        new Thread(
++                        () -> {
++                            try {
++                                writeBackup(uri);
++                                showToast(
++                                        isJapanese()
++                                                ? "バックアップが完了しました"
++                                                : "Backup completed");
++                            } catch (IOException exception) {
++                                showToast(
++                                        (isJapanese() ? "バックアップ失敗: " : "Backup failed: ")
++                                                + exception.getMessage());
++                            }
++                        },
++                        "KiwiBackupWriter")
++                .start();
++    }
++
++    private void writeBackup(Uri uri) throws IOException {
++        OutputStream output = getContentResolver().openOutputStream(uri, "w");
++        if (output == null) throw new IOException("Unable to open destination");
++        try (ZipOutputStream zip =
++                new ZipOutputStream(new BufferedOutputStream(output, 1024 * 1024))) {
++            ZipEntry marker = new ZipEntry(ARCHIVE_MARKER);
++            zip.putNextEntry(marker);
++            String metadata =
++                    "format=1\npackage="
++                            + getPackageName()
++                            + "\ncreated="
++                            + System.currentTimeMillis()
++                            + "\n";
++            zip.write(metadata.getBytes(StandardCharsets.UTF_8));
++            zip.closeEntry();
++            zipDirectory(zip, getDir("chrome", Context.MODE_PRIVATE), CHROME_ROOT);
++            zipDirectory(zip, getDir("tabs", Context.MODE_PRIVATE), TABS_ROOT);
++        }
++    }
++
++    private static void zipDirectory(ZipOutputStream zip, File root, String archiveRoot)
++            throws IOException {
++        String canonicalRoot = root.getCanonicalPath() + File.separator;
++        addDirectoryEntry(zip, archiveRoot + "/");
++        zipChildren(zip, root, archiveRoot, canonicalRoot);
++    }
++
++    private static void zipChildren(
++            ZipOutputStream zip, File directory, String archivePath, String canonicalRoot)
++            throws IOException {
++        File[] children = directory.listFiles();
++        if (children == null) return;
++        Arrays.sort(children, Comparator.comparing(File::getName));
++        for (File child : children) {
++            String name = child.getName();
++            if (name.startsWith("Singleton")) continue;
++            if (child.isDirectory() && isDiscardableCacheDirectory(name)) continue;
++            String canonical = child.getCanonicalPath();
++            if (!canonical.startsWith(canonicalRoot)) continue;
++            String entryName = archivePath + "/" + name;
++            if (child.isDirectory()) {
++                addDirectoryEntry(zip, entryName + "/");
++                zipChildren(zip, child, entryName, canonicalRoot);
++            } else if (child.isFile()) {
++                ZipEntry entry = new ZipEntry(entryName);
++                entry.setTime(child.lastModified());
++                zip.putNextEntry(entry);
++                try (InputStream input =
++                        new BufferedInputStream(new FileInputStream(child), 1024 * 1024)) {
++                    copy(input, zip);
++                }
++                zip.closeEntry();
++            }
++        }
++    }
++
++    private static boolean isDiscardableCacheDirectory(String name) {
++        return name.equals("Cache")
++                || name.equals("Code Cache")
++                || name.equals("GPUCache")
++                || name.equals("GrShaderCache")
++                || name.equals("DawnCache");
++    }
++
++    private static void addDirectoryEntry(ZipOutputStream zip, String name) throws IOException {
++        zip.putNextEntry(new ZipEntry(name));
++        zip.closeEntry();
++    }
++
++    private void stageRestore(Uri uri) {
++        Toast.makeText(
++                        this,
++                        isJapanese() ? "バックアップを確認中…" : "Checking backup…",
++                        Toast.LENGTH_SHORT)
++                .show();
++        new Thread(
++                        () -> {
++                            File pending = new File(getNoBackupFilesDir(), PENDING_ARCHIVE);
++                            File temporary = new File(getNoBackupFilesDir(), PENDING_ARCHIVE + ".tmp");
++                            deleteRecursively(temporary);
++                            try (InputStream input = getContentResolver().openInputStream(uri);
++                                    OutputStream output =
++                                            new BufferedOutputStream(
++                                                    new FileOutputStream(temporary), 1024 * 1024)) {
++                                if (input == null) throw new IOException("Unable to open backup");
++                                copy(input, output);
++                            } catch (IOException exception) {
++                                deleteRecursively(temporary);
++                                showToast(
++                                        (isJapanese() ? "復元準備に失敗: " : "Restore failed: ")
++                                                + exception.getMessage());
++                                return;
++                            }
++                            try {
++                                validateArchive(temporary);
++                                deleteRecursively(pending);
++                                if (!temporary.renameTo(pending)) {
++                                    throw new IOException("Unable to stage restore archive");
++                                }
++                                runOnUiThread(this::restartForRestore);
++                            } catch (IOException exception) {
++                                deleteRecursively(temporary);
++                                showToast(
++                                        (isJapanese() ? "無効なバックアップ: " : "Invalid backup: ")
++                                                + exception.getMessage());
++                            }
++                        },
++                        "KiwiBackupRestoreStage")
++                .start();
++    }
++
++    private static void validateArchive(File archive) throws IOException {
++        boolean marker = false;
++        boolean chrome = false;
++        boolean tabs = false;
++        try (ZipInputStream zip =
++                new ZipInputStream(new BufferedInputStream(new FileInputStream(archive)))) {
++            ZipEntry entry;
++            while ((entry = zip.getNextEntry()) != null) {
++                String name = entry.getName();
++                if (!isSafeArchiveName(name)) throw new IOException("Unsafe entry");
++                if (name.equals(ARCHIVE_MARKER)) marker = true;
++                if (name.equals(CHROME_ROOT + "/") || name.startsWith(CHROME_ROOT + "/")) {
++                    chrome = true;
++                }
++                if (name.equals(TABS_ROOT + "/") || name.startsWith(TABS_ROOT + "/")) tabs = true;
++                zip.closeEntry();
++            }
++        }
++        if (!marker || !chrome || !tabs) throw new IOException("Missing Titanium-Kiwi data");
++    }
++
++    private static boolean isSafeArchiveName(String name) {
++        if (name.isEmpty() || name.startsWith("/") || name.indexOf('\\') >= 0) return false;
++        String[] parts = name.split("/");
++        for (String part : parts) {
++            if (part.equals("..")) return false;
++        }
++        return name.equals(ARCHIVE_MARKER)
++                || name.equals(CHROME_ROOT)
++                || name.equals(CHROME_ROOT + "/")
++                || name.startsWith(CHROME_ROOT + "/")
++                || name.equals(TABS_ROOT)
++                || name.equals(TABS_ROOT + "/")
++                || name.startsWith(TABS_ROOT + "/");
++    }
++
++    private void restartForRestore() {
++        Toast.makeText(
++                        this,
++                        isJapanese() ? "再起動して復元します" : "Restarting to restore backup",
++                        Toast.LENGTH_SHORT)
++                .show();
++        Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
++        if (launch == null) {
++            showToast(isJapanese() ? "再起動できません" : "Unable to restart browser");
++            return;
++        }
++        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
++        PendingIntent pendingIntent =
++                PendingIntent.getActivity(
++                        this,
++                        7343,
++                        launch,
++                        PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
++        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
++        alarmManager.set(
++                AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 800, pendingIntent);
++        finishAffinity();
++        Process.killProcess(Process.myPid());
++    }
++
++    /** Restores a staged archive before the browser profile is opened. */
++    public static void restorePendingBackupIfAny(Context context) {
++        File pending = new File(context.getNoBackupFilesDir(), PENDING_ARCHIVE);
++        if (!pending.isFile()) return;
++        File work = new File(context.getNoBackupFilesDir(), RESTORE_WORK);
++        File failed = new File(context.getNoBackupFilesDir(), PENDING_ARCHIVE + ".failed");
++        deleteRecursively(work);
++        deleteRecursively(failed);
++        try {
++            validateArchive(pending);
++            if (!work.mkdirs() && !work.isDirectory()) {
++                throw new IOException("Unable to create restore workspace");
++            }
++            extractArchive(pending, work);
++            swapRestoredRoots(context, work);
++            deleteRecursively(pending);
++        } catch (IOException exception) {
++            android.util.Log.e("KiwiBackup", "Full restore failed", exception);
++            pending.renameTo(failed);
++        } finally {
++            deleteRecursively(work);
++        }
++    }
++
++    private static void extractArchive(File archive, File work) throws IOException {
++        long total = 0;
++        String workPath = work.getCanonicalPath() + File.separator;
++        try (ZipInputStream zip =
++                new ZipInputStream(new BufferedInputStream(new FileInputStream(archive)))) {
++            ZipEntry entry;
++            byte[] buffer = new byte[1024 * 1024];
++            while ((entry = zip.getNextEntry()) != null) {
++                String name = entry.getName();
++                if (name.equals(ARCHIVE_MARKER)) {
++                    zip.closeEntry();
++                    continue;
++                }
++                if (!isSafeArchiveName(name)) throw new IOException("Unsafe entry");
++                File target = new File(work, name);
++                if (!target.getCanonicalPath().startsWith(workPath)) {
++                    throw new IOException("Archive path escaped restore directory");
++                }
++                if (entry.isDirectory()) {
++                    if (!target.mkdirs() && !target.isDirectory()) {
++                        throw new IOException("Unable to create restore directory");
++                    }
++                } else {
++                    File parent = target.getParentFile();
++                    if (parent == null || (!parent.mkdirs() && !parent.isDirectory())) {
++                        throw new IOException("Unable to create restore parent");
++                    }
++                    try (OutputStream output =
++                            new BufferedOutputStream(new FileOutputStream(target), 1024 * 1024)) {
++                        int count;
++                        while ((count = zip.read(buffer)) != -1) {
++                            total += count;
++                            if (total > MAX_RESTORE_BYTES) {
++                                throw new IOException("Backup is too large");
++                            }
++                            output.write(buffer, 0, count);
++                        }
++                    }
++                }
++                zip.closeEntry();
++            }
++        }
++    }
++
++    private static void swapRestoredRoots(Context context, File work) throws IOException {
++        File dataDir = new File(context.getApplicationInfo().dataDir);
++        File actualChrome = new File(dataDir, CHROME_ROOT);
++        File actualTabs = new File(dataDir, TABS_ROOT);
++        File restoredChrome = new File(work, CHROME_ROOT);
++        File restoredTabs = new File(work, TABS_ROOT);
++        if (!restoredChrome.isDirectory() || !restoredTabs.isDirectory()) {
++            throw new IOException("Backup roots are missing");
++        }
++        File rollbackChrome = new File(context.getNoBackupFilesDir(), CHROME_ROOT + ".rollback");
++        File rollbackTabs = new File(context.getNoBackupFilesDir(), TABS_ROOT + ".rollback");
++        deleteRecursively(rollbackChrome);
++        deleteRecursively(rollbackTabs);
++        boolean chromeMoved = false;
++        boolean tabsMoved = false;
++        try {
++            if (actualChrome.exists()) {
++                moveOrThrow(actualChrome, rollbackChrome);
++                chromeMoved = true;
++            }
++            if (actualTabs.exists()) {
++                moveOrThrow(actualTabs, rollbackTabs);
++                tabsMoved = true;
++            }
++            moveOrThrow(restoredChrome, actualChrome);
++            moveOrThrow(restoredTabs, actualTabs);
++            deleteRecursively(rollbackChrome);
++            deleteRecursively(rollbackTabs);
++        } catch (IOException exception) {
++            deleteRecursively(actualChrome);
++            deleteRecursively(actualTabs);
++            if (chromeMoved && rollbackChrome.exists()) rollbackChrome.renameTo(actualChrome);
++            if (tabsMoved && rollbackTabs.exists()) rollbackTabs.renameTo(actualTabs);
++            throw exception;
++        }
++    }
++
++    private static void moveOrThrow(File from, File to) throws IOException {
++        if (!from.renameTo(to)) {
++            throw new IOException("Unable to move " + from.getName());
++        }
++    }
++
++    private static void copy(InputStream input, OutputStream output) throws IOException {
++        byte[] buffer = new byte[1024 * 1024];
++        int count;
++        while ((count = input.read(buffer)) != -1) {
++            output.write(buffer, 0, count);
++        }
++    }
++
++    private static void deleteRecursively(File file) {
++        if (!file.exists()) return;
++        if (file.isDirectory()) {
++            File[] children = file.listFiles();
++            if (children != null) {
++                for (File child : children) deleteRecursively(child);
++            }
++        }
++        file.delete();
++    }
++
++    private void showToast(String message) {
++        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_LONG).show());
++    }
++}
