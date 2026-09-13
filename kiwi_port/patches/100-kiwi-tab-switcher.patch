@@ -1,0 +1,480 @@
+diff --git a/chrome/android/chrome_java_resources.gni b/chrome/android/chrome_java_resources.gni
+--- a/chrome/android/chrome_java_resources.gni
++++ b/chrome/android/chrome_java_resources.gni
+@@ -550,6 +550,7 @@ chrome_java_resources = [
+   "java/res/layout/powered_by_chrome_footer.xml",
+   "java/res/layout/radio_button_group_homepage_preference.xml",
++  "java/res/layout/radio_button_group_tabswitcher_preference.xml",
+   "java/res/layout/reader_mode_bottom_sheet.xml",
+   "java/res/layout/reader_mode_prefs_bottom_content.xml",
+   "java/res/layout/reader_mode_prefs_bottom_content_with_toggle_links.xml",
+@@ -650,6 +651,7 @@ chrome_java_resources = [
+   "java/res/xml/legal_information_preferences.xml",
+   "java/res/xml/main_preferences.xml",
++  "java/res/xml/tabswitcher_preferences.xml",
+   "java/res/xml/personalize_google_services_preferences.xml",
+   "java/res/xml/privacy_preferences.xml",
+   "java/res/xml/search_widget_info.xml",
+diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
+--- a/chrome/android/chrome_java_sources.gni
++++ b/chrome/android/chrome_java_sources.gni
+@@ -1068,6 +1068,8 @@ chrome_java_sources = [
+ 
+   # LINT.ThenChange(//components/browser_ui/settings/android/java/src/org/chromium/components/browser_ui/settings/search/SettingsIndexData.java:MainSettingsClassName)
+   "java/src/org/chromium/chrome/browser/settings/MultiColumnSettings.java",
++  "java/src/org/chromium/chrome/browser/settings/RadioButtonGroupTabSwitcherPreference.java",
++  "java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java",
+   "java/src/org/chromium/chrome/browser/settings/MultiColumnTitleUpdater.java",
+   "java/src/org/chromium/chrome/browser/settings/SelectionDecoration.java",
+   "java/src/org/chromium/chrome/browser/settings/SettingsActivity.java",
+diff --git a/chrome/android/java/res/layout/radio_button_group_tabswitcher_preference.xml b/chrome/android/java/res/layout/radio_button_group_tabswitcher_preference.xml
+new file mode 100644
+--- /dev/null
++++ b/chrome/android/java/res/layout/radio_button_group_tabswitcher_preference.xml
+@@ -0,0 +1,82 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Based on Kiwi Browser's tab switcher settings layout. -->
++<LinearLayout
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content"
++    android:orientation="vertical"
++    android:focusable="false">
++
++    <org.chromium.components.browser_ui.widget.RadioButtonWithDescriptionLayout
++        android:id="@+id/radio_button_group"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content">
++
++        <org.chromium.components.browser_ui.widget.RadioButtonWithDescription
++            android:id="@+id/radio_button_default"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:minHeight="@dimen/min_touch_target_size"
++            android:paddingTop="@dimen/settings_item_default_padding"
++            android:paddingBottom="@dimen/settings_item_default_padding" />
++
++        <org.chromium.components.browser_ui.widget.RadioButtonWithDescription
++            android:id="@+id/radio_button_original"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:minHeight="@dimen/min_touch_target_size"
++            android:paddingTop="@dimen/settings_item_default_padding"
++            android:paddingBottom="@dimen/settings_item_default_padding" />
++
++        <org.chromium.components.browser_ui.widget.RadioButtonWithDescription
++            android:id="@+id/radio_button_horizontal"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:minHeight="@dimen/min_touch_target_size"
++            android:paddingTop="@dimen/settings_item_default_padding"
++            android:paddingBottom="@dimen/settings_item_default_padding" />
++
++        <org.chromium.components.browser_ui.widget.RadioButtonWithDescription
++            android:id="@+id/radio_button_classic"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:minHeight="@dimen/min_touch_target_size"
++            android:paddingTop="@dimen/settings_item_default_padding"
++            android:paddingBottom="@dimen/settings_item_default_padding" />
++
++        <org.chromium.components.browser_ui.widget.RadioButtonWithDescription
++            android:id="@+id/radio_button_grid"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:minHeight="@dimen/min_touch_target_size"
++            android:paddingTop="@dimen/settings_item_default_padding"
++            android:paddingBottom="@dimen/settings_item_default_padding" />
++
++        <org.chromium.components.browser_ui.widget.RadioButtonWithDescription
++            android:id="@+id/radio_button_list"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:minHeight="@dimen/min_touch_target_size"
++            android:paddingTop="@dimen/settings_item_default_padding"
++            android:paddingBottom="@dimen/settings_item_default_padding" />
++
++        <org.chromium.components.browser_ui.widget.RadioButtonWithDescription
++            android:id="@+id/radio_button_desktop"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:minHeight="@dimen/min_touch_target_size"
++            android:paddingTop="@dimen/settings_item_default_padding"
++            android:paddingBottom="@dimen/settings_item_default_padding" />
++
++    </org.chromium.components.browser_ui.widget.RadioButtonWithDescriptionLayout>
++</LinearLayout>
+diff --git a/chrome/android/java/res/xml/main_preferences.xml b/chrome/android/java/res/xml/main_preferences.xml
+--- a/chrome/android/java/res/xml/main_preferences.xml
++++ b/chrome/android/java/res/xml/main_preferences.xml
+@@ -98,6 +98,11 @@ found in the LICENSE file.
+         android:key="appearance"
+         android:order="23"
+         android:title="@string/appearance_settings" />
++    <Preference
++        android:fragment="org.chromium.chrome.browser.settings.TabSwitcherSettings"
++        android:key="tabswitcher"
++        android:order="24"
++        android:title="タブの切り替え" />
+     <Preference
+         android:fragment="org.chromium.chrome.browser.glic.GlicSettings"
+         android:key="glic"
+diff --git a/chrome/android/java/res/xml/tabswitcher_preferences.xml b/chrome/android/java/res/xml/tabswitcher_preferences.xml
+new file mode 100644
+--- /dev/null
++++ b/chrome/android/java/res/xml/tabswitcher_preferences.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
++    <org.chromium.chrome.browser.settings.RadioButtonGroupTabSwitcherPreference
++        android:key="tabswitcher_radio_group"
++        android:persistent="false" />
++</PreferenceScreen>
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/RadioButtonGroupTabSwitcherPreference.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/RadioButtonGroupTabSwitcherPreference.java
+new file mode 100644
+--- /dev/null
++++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/RadioButtonGroupTabSwitcherPreference.java
+@@ -0,0 +1,160 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.settings;
++
++import android.app.Activity;
++import android.app.AlertDialog;
++import android.content.Context;
++import android.content.SharedPreferences;
++import android.util.AttributeSet;
++import android.widget.RadioGroup;
++
++import androidx.preference.Preference;
++import androidx.preference.PreferenceViewHolder;
++
++import org.chromium.base.ContextUtils;
++import org.chromium.build.annotations.NullMarked;
++import org.chromium.build.annotations.Nullable;
++import org.chromium.chrome.R;
++import org.chromium.chrome.browser.lifetime.ApplicationLifetime;
++import org.chromium.components.browser_ui.widget.RadioButtonWithDescription;
++import org.chromium.components.browser_ui.widget.RadioButtonWithDescriptionLayout;
++
++import java.util.Locale;
++
++/** Kiwi-compatible tab switcher selector. */
++@NullMarked
++public final class RadioButtonGroupTabSwitcherPreference extends Preference
++        implements RadioGroup.OnCheckedChangeListener {
++    public static final String PREF_ACTIVE_TAB_SWITCHER = "active_tabswitcher";
++
++    private @Nullable Activity mActivity;
++    private @Nullable PreferenceViewHolder mHolder;
++
++    public RadioButtonGroupTabSwitcherPreference(Context context, AttributeSet attrs) {
++        super(context, attrs);
++        setLayoutResource(R.layout.radio_button_group_tabswitcher_preference);
++    }
++
++    public void setActivity(Activity activity) {
++        mActivity = activity;
++    }
++
++    @Override
++    public void onBindViewHolder(PreferenceViewHolder holder) {
++        super.onBindViewHolder(holder);
++        mHolder = holder;
++
++        RadioButtonWithDescription choiceDefault = button(holder, R.id.radio_button_default);
++        RadioButtonWithDescription choiceOriginal = button(holder, R.id.radio_button_original);
++        RadioButtonWithDescription choiceHorizontal = button(holder, R.id.radio_button_horizontal);
++        RadioButtonWithDescription choiceClassic = button(holder, R.id.radio_button_classic);
++        RadioButtonWithDescription choiceGrid = button(holder, R.id.radio_button_grid);
++        RadioButtonWithDescription choiceList = button(holder, R.id.radio_button_list);
++        RadioButtonWithDescription choiceDesktop = button(holder, R.id.radio_button_desktop);
++
++        choiceDefault.setPrimaryText("Default");
++        choiceOriginal.setPrimaryText("Original (vertical, same as old Chromium)");
++        choiceHorizontal.setPrimaryText("Horizontal (same as old Chromium)");
++        choiceClassic.setPrimaryText("Vertical (supports tab group)");
++        choiceGrid.setPrimaryText("Grid (supports tab group)");
++        choiceList.setPrimaryText("List");
++        choiceDesktop.setPrimaryText("Desktop (like on a computer)");
++
++        String current =
++                ContextUtils.getAppSharedPreferences()
++                        .getString(PREF_ACTIVE_TAB_SWITCHER, "default");
++        switch (current) {
++            case "original" -> choiceOriginal.setChecked(true);
++            case "horizontal" -> choiceHorizontal.setChecked(true);
++            case "classic" -> choiceClassic.setChecked(true);
++            case "grid" -> choiceGrid.setChecked(true);
++            case "list" -> choiceList.setChecked(true);
++            case "desktop" -> choiceDesktop.setChecked(true);
++            default -> choiceDefault.setChecked(true);
++        }
++
++        RadioButtonWithDescriptionLayout group =
++                (RadioButtonWithDescriptionLayout) holder.findViewById(R.id.radio_button_group);
++        group.setOnCheckedChangeListener(this);
++    }
++
++    @Override
++    public void onCheckedChanged(RadioGroup group, int checkedId) {
++        PreferenceViewHolder holder = mHolder;
++        if (holder == null) return;
++
++        String selected;
++        if (button(holder, R.id.radio_button_original).isChecked()) {
++            selected = "original";
++        } else if (button(holder, R.id.radio_button_horizontal).isChecked()) {
++            selected = "horizontal";
++        } else if (button(holder, R.id.radio_button_classic).isChecked()) {
++            selected = "classic";
++        } else if (button(holder, R.id.radio_button_grid).isChecked()) {
++            selected = "grid";
++        } else if (button(holder, R.id.radio_button_list).isChecked()) {
++            selected = "list";
++        } else if (button(holder, R.id.radio_button_desktop).isChecked()) {
++            selected = "desktop";
++        } else {
++            selected = "default";
++        }
++
++        SharedPreferences prefs = ContextUtils.getAppSharedPreferences();
++        if (selected.equals(prefs.getString(PREF_ACTIVE_TAB_SWITCHER, "default"))) return;
++        prefs.edit().putString(PREF_ACTIVE_TAB_SWITCHER, selected).apply();
++        showRelaunchDialog();
++    }
++
++    private RadioButtonWithDescription button(PreferenceViewHolder holder, int id) {
++        return (RadioButtonWithDescription) holder.findViewById(id);
++    }
++
++    private void showRelaunchDialog() {
++        Activity activity = mActivity;
++        if (activity == null || activity.isFinishing()) return;
++        boolean ja = Locale.getDefault().getLanguage().equals("ja");
++        new AlertDialog.Builder(activity)
++                .setTitle(ja ? "再起動して適用" : "Restart to apply")
++                .setMessage(
++                        ja
++                                ? "タブ切り替え方式を変更しました。今すぐブラウザを再起動しますか？"
++                                : "The tab switcher mode was changed. Restart the browser now?")
++                .setPositiveButton(
++                        ja ? "再起動" : "Restart",
++                        (dialog, which) -> ApplicationLifetime.terminate(true))
++                .setNegativeButton(android.R.string.cancel, null)
++                .show();
++    }
++}
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
+new file mode 100644
+--- /dev/null
++++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
+@@ -0,0 +1,51 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.settings;
++
++import android.os.Bundle;
++
++import org.chromium.base.supplier.MonotonicObservableSupplier;
++import org.chromium.base.supplier.ObservableSuppliers;
++import org.chromium.base.supplier.SettableMonotonicObservableSupplier;
++import org.chromium.build.annotations.NullMarked;
++import org.chromium.build.annotations.Nullable;
++import org.chromium.chrome.R;
++import org.chromium.components.browser_ui.settings.CustomDividerFragment;
++import org.chromium.components.browser_ui.settings.SettingsUtils;
++
++import java.util.Locale;
++
++/** Settings page matching Kiwi Browser's tab switcher selector. */
++@NullMarked
++public final class TabSwitcherSettings extends ChromeBaseSettingsFragment
++        implements CustomDividerFragment {
++    private final SettableMonotonicObservableSupplier<String> mPageTitle =
++            ObservableSuppliers.createMonotonic();
++
++    @Override
++    public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
++        boolean ja = Locale.getDefault().getLanguage().equals("ja");
++        mPageTitle.set(ja ? "タブの切り替え" : "Tab switcher");
++        SettingsUtils.addPreferencesFromResource(this, R.xml.tabswitcher_preferences);
++        RadioButtonGroupTabSwitcherPreference preference =
++                (RadioButtonGroupTabSwitcherPreference)
++                        findPreference("tabswitcher_radio_group");
++        assert preference != null;
++        preference.setActivity(requireActivity());
++    }
++
++    @Override
++    public MonotonicObservableSupplier<String> getPageTitle() {
++        return mPageTitle;
++    }
++
++    @Override
++    public boolean hasDivider() {
++        return false;
++    }
++}
+diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java
+--- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java
++++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java
+@@ -42,6 +42,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
+ 
+ import org.chromium.base.Callback;
+ import org.chromium.base.CollectionUtil;
++import org.chromium.base.ContextUtils;
+ import org.chromium.base.DeviceInfo;
+ import org.chromium.base.Log;
+ import org.chromium.base.ResettersForTesting;
+@@ -1982,6 +1983,16 @@ public class TabListMediator implements TabListNotificationHandler {
+     @VisibleForTesting
+     int getSpanCount(int screenWidthDp) {
++        String kiwiMode =
++                ContextUtils.getAppSharedPreferences()
++                        .getString("active_tabswitcher", "default");
++        if (kiwiMode.equals("original")
++                || kiwiMode.equals("horizontal")
++                || kiwiMode.equals("classic")
++                || kiwiMode.equals("list")
++                || kiwiMode.equals("desktop")) {
++            return 1;
++        }
+         if (DeviceInfo.isXr()) {
+             // The layout span count is restricted to medium on XR immersive devices to display
+             // larger tab thumbnails, despite the large screen width.
+diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListCoordinator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListCoordinator.java
+--- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListCoordinator.java
++++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListCoordinator.java
+@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener;
+ 
+ import org.chromium.base.Callback;
++import org.chromium.base.ContextUtils;
+ import org.chromium.base.Log;
+ import org.chromium.base.ObserverList;
+ import org.chromium.base.Token;
+@@ -392,7 +393,14 @@ public class TabListCoordinator implements PriceWelcomeMessageProvider, DestroyO
+             if (mMode == TabListMode.GRID) {
++                String kiwiMode =
++                        ContextUtils.getAppSharedPreferences()
++                                .getString("active_tabswitcher", "default");
++                int orientation =
++                        (kiwiMode.equals("horizontal") || kiwiMode.equals("desktop"))
++                                ? RecyclerView.HORIZONTAL
++                                : RecyclerView.VERTICAL;
+                 GridLayoutManager gridLayoutManager =
+-                        new GridLayoutManager(activity, GRID_LAYOUT_SPAN_COUNT_COMPACT) {
++                        new GridLayoutManager(activity, GRID_LAYOUT_SPAN_COUNT_COMPACT, orientation, false) {
+                             @Override
+                             public void onLayoutCompleted(RecyclerView.State state) {
+                                 super.onLayoutCompleted(state);
+@@ -707,15 +715,29 @@ public class TabListCoordinator implements PriceWelcomeMessageProvider, DestroyO
+         if (updatedSpan) {
+             // Update the cards for the span change.
+             ViewUtils.requestLayout(mRecyclerView, "TabListCoordinator#updateGridCardLayout");
+         }
++        String kiwiMode =
++                ContextUtils.getAppSharedPreferences()
++                        .getString("active_tabswitcher", "default");
++        final int availableWidth =
++                viewWidth - mRecyclerView.getPaddingStart() - mRecyclerView.getPaddingEnd();
+         // Determine grid card width and account for margins on left and right.
+-        final int cardWidthPx =
+-                ((viewWidth - mRecyclerView.getPaddingStart() - mRecyclerView.getPaddingEnd())
+-                        / layoutManager.getSpanCount());
+-        final int cardHeightPx =
+-                TabUtils.deriveGridCardHeight(
+-                        cardWidthPx, mActivity, mBrowserControlsStateProvider);
++        final int cardWidthPx;
++        if (kiwiMode.equals("desktop")) {
++            cardWidthPx = Math.min(availableWidth, Math.round(220 * mActivity.getResources().getDisplayMetrics().density));
++        } else if (kiwiMode.equals("horizontal")) {
++            cardWidthPx = Math.min(availableWidth, Math.round(320 * mActivity.getResources().getDisplayMetrics().density));
++        } else {
++            cardWidthPx = availableWidth / layoutManager.getSpanCount();
++        }
++        final int cardHeightPx;
++        if (kiwiMode.equals("list") || kiwiMode.equals("desktop")) {
++            cardHeightPx = Math.round(72 * mActivity.getResources().getDisplayMetrics().density);
++        } else {
++            cardHeightPx =
++                    TabUtils.deriveGridCardHeight(
++                            cardWidthPx, mActivity, mBrowserControlsStateProvider);
++        }
+ 
+         final Size oldDefaultSize = mMediator.getDefaultGridCardSize();
+         final Size newDefaultSize = new Size(cardWidthPx, cardHeightPx);
+diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java
+--- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java
++++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java
+@@ -24,6 +24,7 @@ import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+ 
+ import org.chromium.base.Callback;
++import org.chromium.base.ContextUtils;
+ import org.chromium.base.ResettersForTesting;
+ import org.chromium.build.annotations.NullMarked;
+ import org.chromium.build.annotations.Nullable;
+@@ -176,6 +177,13 @@ public class TabGridViewBinder {
+                 layoutParams.width = width;
+                 view.setLayoutParams(layoutParams);
+             }
++            String kiwiMode =
++                    ContextUtils.getAppSharedPreferences()
++                            .getString("active_tabswitcher", "default");
++            TabThumbnailView thumbnail = view.fastFindViewById(R.id.tab_thumbnail);
++            thumbnail.setVisibility(
++                    kiwiMode.equals("list") || kiwiMode.equals("desktop")
++                            ? GONE
++                            : View.VISIBLE);
+             // If the size changed we always need to update. Otherwise we only need to update if the
+             // current thumbnail is a placeholder and we were waiting on a thumbnail.
+             updateThumbnail(view, model, /* onlyUpdateIfPlaceholder= */ !sizeChanged);
+diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
+--- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
++++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
+@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder;
+ 
+ import org.chromium.base.Callback;
++import org.chromium.base.ContextUtils;
+ import org.chromium.base.DeviceInfo;
+ import org.chromium.base.SysUtils;
+ import org.chromium.base.TimeUtils.UptimeMillisTimer;
+@@ -414,6 +415,13 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
+                             ? R.drawable.tablet_tab_switcher_empty_state_illustration
+                             : R.drawable.phone_tab_switcher_empty_state_illustration_static;
++            String kiwiMode =
++                    ContextUtils.getAppSharedPreferences()
++                            .getString("active_tabswitcher", "default");
++            boolean actionOnRelatedTabs =
++                    !kiwiMode.equals("original")
++                            && !kiwiMode.equals("horizontal")
++                            && !kiwiMode.equals("list")
++                            && !kiwiMode.equals("desktop");
+             TabListCoordinator tabListCoordinator =
+                     new TabListCoordinator(
+                             mode,
+@@ -424,7 +432,7 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
+                             mModalDialogManager,
+                             tabModelSupplier,
+                             mMultiThumbnailCardProvider,
+-                            /* actionOnRelatedTabs= */ true,
++                            /* actionOnRelatedTabs= */ actionOnRelatedTabs,
+                             dataSharingTabManager,
+                             getTabListItemOnClickListenerProvider(),
+                             /* dialogHandler= */ null,
+diff --git a/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java b/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
+--- a/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
++++ b/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
+@@ -140,7 +140,8 @@ public final class SharedPrefsUtils {
+                                     SharedPrefsExt.CLOSE_TABS_ON_EXIT.getKey(),
+                                     SharedPrefsExt.OPEN_LINKS_IN_INCOGNITO.getKey(),
+-                                    SharedPrefsExt.NIGHT_MODE_PRESET.getKey()),
++                                    SharedPrefsExt.NIGHT_MODE_PRESET.getKey(),
++                                    "active_tabswitcher"),
+                             List.of())
+                     : null;
+ 
