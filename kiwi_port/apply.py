@@ -38,6 +38,39 @@ def safe_relative(relative: str) -> Path:
     return path
 
 
+def effective_patch(source: Path, feature: dict[str, object], patch: Path) -> Path:
+    """Normalize known pinned-tree context drift without weakening strict preflight.
+
+    The 090 feature was authored from the same Chromium 152 code but before the pinned
+    Vanadium ChromeApplicationImpl hook was accounted for, and with an older status-bar
+    method comment as hunk context.  Only those context lines differ; the inserted code is
+    unchanged.  Keep the checked-in patch checksum strict, then materialize an effective
+    patch under .git for both --check and the real apply.
+    """
+    if feature["id"] != "black-statusbar-full-backup":
+        return patch
+
+    text = patch.read_text(encoding="utf-8")
+    chrome_old = """@@ -48,6 +49,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {\n        super.onCreate();\n \n        if (SplitCompatApplication.isBrowserProcess()) {\n+            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());\n            FontPreloader.getInstance().load(getApplication());\n \n            // Registers the extensions for all protos which would be in the Chrome split, whether\n"""
+    chrome_new = """@@ -55,6 +56,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {\n        super.onCreate();\n \n        ChromeApplicationImplHooks.onCreate();\n        if (SplitCompatApplication.isBrowserProcess()) {\n+            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());\n            FontPreloader.getInstance().load(getApplication());\n \n"""
+    status_old = """@@ -500,6 +500,12 @@ public class StatusBarColorController\n    /** Update the color of the status bar. */\n    public void updateStatusBarColor() {\n"""
+    status_new = """@@ -500,6 +500,12 @@ public class StatusBarColorController\n    /** Calculate and update the status bar's color. */\n    public void updateStatusBarColor() {\n"""
+
+    for label, old, new in (
+        ("ChromeApplicationImpl", chrome_old, chrome_new),
+        ("StatusBarColorController", status_old, status_new),
+    ):
+        if old not in text:
+            raise RuntimeError(f"090 compatibility context missing: {label}")
+        text = text.replace(old, new, 1)
+
+    effective_dir = source / ".git" / "kiwi-effective-patches"
+    effective_dir.mkdir(parents=True, exist_ok=True)
+    output = effective_dir / patch.name
+    output.write_text(text, encoding="utf-8")
+    return output
+
+
 def write_report(report: Path, source: Path, results: list[dict[str, object]]) -> None:
     report.parent.mkdir(parents=True, exist_ok=True)
     conflicts = [item for item in results if item["status"] == "conflict"]
@@ -110,8 +143,9 @@ def main() -> int:
             patch = HERE / "patches" / safe_relative(feature["patch"])
             if digest(patch) != feature["sha256"]:
                 raise RuntimeError(f"patch checksum mismatch: {patch.name}")
-            forward = git(source, "apply", "--check", str(patch))
-            reverse = git(source, "apply", "--reverse", "--check", str(patch))
+            patch_to_apply = effective_patch(source, feature, patch)
+            forward = git(source, "apply", "--check", str(patch_to_apply))
+            reverse = git(source, "apply", "--reverse", "--check", str(patch_to_apply))
             if forward.returncode != 0 and reverse.returncode != 0:
                 failures.append((feature, command_detail(forward), command_detail(reverse)))
         if failures:
@@ -132,17 +166,18 @@ def main() -> int:
         patch = HERE / "patches" / safe_relative(feature["patch"])
         if digest(patch) != feature["sha256"]:
             raise RuntimeError(f"patch checksum mismatch: {patch.name}")
+        patch_to_apply = effective_patch(source, feature, patch)
         item: dict[str, object] = {"id": feature["id"], "name": feature["name"], "patch": feature["patch"], "status": "pending", "conflicts": []}
-        if git(source, "apply", "--reverse", "--check", str(patch)).returncode == 0:
+        if git(source, "apply", "--reverse", "--check", str(patch_to_apply)).returncode == 0:
             item["status"] = "already-applied"
-        elif git(source, "apply", "--check", str(patch)).returncode == 0:
-            git(source, "apply", "--whitespace=nowarn", str(patch), check=True)
+        elif git(source, "apply", "--check", str(patch_to_apply)).returncode == 0:
+            git(source, "apply", "--whitespace=nowarn", str(patch_to_apply), check=True)
             item["status"] = "applied"
         elif not args.best_effort:
             files = "\n  ".join(feature["files"])
             raise RuntimeError(f"feature {feature['id']} ({feature['name']}) does not apply cleanly:\n  {files}\nrerun with --best-effort --report <path> to apply independent clean changes")
         else:
-            git(source, "apply", "--reject", "--whitespace=nowarn", str(patch))
+            git(source, "apply", "--reject", "--whitespace=nowarn", str(patch_to_apply))
             rejected = [str(safe_relative(path)) for path in feature["files"] if (source / f"{path}.rej").is_file()]
             item["status"] = "conflict"
             item["conflicts"] = rejected or feature["files"]
