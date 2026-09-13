@@ -1,0 +1,130 @@
+name: Build Titanium-Kiwi optimized release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bootstrap_cache_key:
+        description: Exact completed validation cache used to bootstrap the first optimized release stage.
+        required: false
+        default: "kiwi-incremental-15a277216c780215b11a17ce021e12caaae7a7e0-stage-1"
+  push:
+    branches:
+      - codex/kiwi-optimized-release
+    paths:
+      - kiwi_port/optimized-release-trigger
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: titanium-kiwi-optimized-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stage-1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: build
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: ${{ inputs.bootstrap_cache_key || 'kiwi-incremental-15a277216c780215b11a17ce021e12caaae7a7e0-stage-1' }}
+          require-restore: true
+          optimized-release: true
+          save-key: kiwi-optimized-${{ github.sha }}-stage-1
+          final-cache-key: kiwi-optimized-incremental-${{ github.sha }}-stage-1
+          build-budget-minutes: "315"
+
+  stage-2:
+    needs: stage-1
+    if: needs.stage-1.outputs.done != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: build
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-optimized-${{ github.sha }}-stage-1
+          optimized-release: true
+          save-key: kiwi-optimized-${{ github.sha }}-stage-2
+          final-cache-key: kiwi-optimized-incremental-${{ github.sha }}-stage-2
+          build-budget-minutes: "315"
+
+  stage-3:
+    needs: stage-2
+    if: needs.stage-2.outputs.done != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: build
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-optimized-${{ github.sha }}-stage-2
+          optimized-release: true
+          save-key: kiwi-optimized-${{ github.sha }}-stage-3
+          final-cache-key: kiwi-optimized-incremental-${{ github.sha }}-stage-3
+          build-budget-minutes: "315"
+
+  stage-4:
+    needs: stage-3
+    if: needs.stage-3.outputs.done != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: build
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-optimized-${{ github.sha }}-stage-3
+          optimized-release: true
+          save-key: kiwi-optimized-${{ github.sha }}-stage-4
+          final-cache-key: kiwi-optimized-incremental-${{ github.sha }}-stage-4
+          build-budget-minutes: "315"
+
+  stage-5:
+    needs: stage-4
+    if: needs.stage-4.outputs.done != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: build
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-optimized-${{ github.sha }}-stage-4
+          optimized-release: true
+          save-key: kiwi-optimized-${{ github.sha }}-stage-5
+          final-cache-key: kiwi-optimized-incremental-${{ github.sha }}-stage-5
+          build-budget-minutes: "315"
+
+  require-apk:
+    needs: [stage-1, stage-2, stage-3, stage-4, stage-5]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require one stage to finish the optimized APK
+        env:
+          S1: ${{ needs.stage-1.outputs.done }}
+          S2: ${{ needs.stage-2.outputs.done }}
+          S3: ${{ needs.stage-3.outputs.done }}
+          S4: ${{ needs.stage-4.outputs.done }}
+          S5: ${{ needs.stage-5.outputs.done }}
+        run: |
+          if [[ "$S1" != true && "$S2" != true && "$S3" != true && "$S4" != true && "$S5" != true ]]; then
+            echo "Five optimized compile checkpoints completed without producing an APK." >&2
+            exit 1
+          fi
