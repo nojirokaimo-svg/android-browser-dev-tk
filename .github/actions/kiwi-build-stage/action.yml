@@ -17,6 +17,10 @@ inputs:
     description: Refuse to compile if restore-key is unavailable; use for Night mode incremental builds.
     required: false
     default: "false"
+  optimized-release:
+    description: Regenerate the restored graph as an upstream-style official ThinLTO release before compilation.
+    required: false
+    default: "false"
   titanium-commit:
     required: false
     default: "80ffcdf1cebe51cddc593f571a6f26c3374aea2e"
@@ -47,7 +51,7 @@ runs:
   using: composite
   steps:
     # Resolve the exact checkpoint before spending time rebuilding the pinned
-    # source tree.  fail-on-cache-miss deliberately forbids fallback keys.
+    # source tree. fail-on-cache-miss deliberately forbids fallback keys.
     - name: Restore exact previous compile checkpoint
       id: restore
       if: inputs.restore-key != ''
@@ -94,6 +98,47 @@ runs:
           (cd work/titanium/chromium/src && PATH="$GITHUB_WORKSPACE/work/depot_tools:$PATH" gn gen out/Default)
         fi
 
+    - name: Switch restored graph to official optimized release
+      if: inputs.optimized-release == 'true'
+      shell: bash
+      run: |
+        args=work/titanium/chromium/src/out/Default/args.gn
+        python3 - "$args" <<'PY'
+        from pathlib import Path
+        import sys
+
+        path = Path(sys.argv[1])
+        text = path.read_text(encoding="utf-8")
+        replacements = {
+            "is_debug = true": "is_debug = false",
+            "is_official_build = false": "is_official_build = true",
+            "symbol_level = 1": "symbol_level = 0",
+            "generate_linker_map = true": "generate_linker_map = false",
+            "use_thin_lto = false": "use_thin_lto = true",
+        }
+        for old, new in replacements.items():
+            text = text.replace(old, new)
+
+        required = [
+            "is_debug = false",
+            "is_official_build = true",
+            "symbol_level = 0",
+            "generate_linker_map = false",
+            "blink_symbol_level = 0",
+            "v8_symbol_level = 0",
+            "use_thin_lto = true",
+            "treat_warnings_as_errors = false",
+        ]
+        lines = text.splitlines()
+        for line in required:
+            if line not in lines:
+                lines.append(line)
+        path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+        PY
+        echo 'Optimized release GN args:'
+        grep -E '^(is_debug|is_official_build|symbol_level|generate_linker_map|blink_symbol_level|v8_symbol_level|use_thin_lto|treat_warnings_as_errors) =' "$args"
+        (cd work/titanium/chromium/src && PATH="$GITHUB_WORKSPACE/work/depot_tools:$PATH" gn gen out/Default)
+
     - name: Continue arm64 APK compilation for at most 210 minutes
       id: compile
       shell: bash
@@ -110,7 +155,7 @@ runs:
         raise SystemExit(0 if json.load(open(sys.argv[1]))["changed_sources"] else 1)
         PY
         then
-          # Every patch-owned edit must make the APK target dirty.  Refuse to
+          # Every patch-owned edit must make the APK target dirty. Refuse to
           # publish a cached APK if timestamp restoration hid a real change.
           set +e
           env INVOKED_BY_BUILD_SERVER=1 /usr/bin/ninja \
