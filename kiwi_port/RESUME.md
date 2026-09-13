@@ -21,19 +21,19 @@ Validation/build work in progress:
 
 - Fractional image grayscale is implemented with SkColorMatrix saturation and
   cc::ColorFilter::MakeMatrix, following the old Kiwi image-filter path. The
-  incremental build must compile the renderer path before this is considered valid.
+  Chromium renderer path compiled successfully in run 35; device rendering remains unvalidated.
 - High contrast is connected to foreground/list-symbol PaintFlags using Chromium
-  BlendForMinContrast, preserving author alpha. Three renderer C++ regression
-  tests were added; they remain unvalidated until the Chromium target compiles/runs.
+  BlendForMinContrast, preserving author alpha. The Chromium target compiled in
+  run 35; the three renderer C++ regression tests still need to be executed.
 - The lifetime Java dependency is //chrome/browser/lifetime/android:java. Presets
   save synchronously and expose an explicit restart action when the saved renderer
   switch differs from the running process. Invalid values/storage failure do not
-  restart. Java type/lint validation is delegated to the incremental build gate.
-- After compile errors are resolved, continue executed renderer/persistence tests,
-  then settings/toolbar/tab work and whole-series upstream conflict tests. Do not
+  restart. Java type/lint validation passed through the successful incremental build gate.
+- Continue with executed renderer/persistence tests, device startup, then
+  settings/toolbar/tab work and whole-series upstream conflict tests. Do not
   redo completed work or substitute old tab modes with aliases to GRID.
 - Workflow explicitly restores only completed cache
-  `kiwi-incremental-96e928eb318caecadebc48e07400e79aa4063ef9-stage-1`
+  `kiwi-incremental-15a277216c780215b11a17ce021e12caaae7a7e0-stage-1`
   and requires restore. A cache miss must stop before compilation.
 
 The local workspace has no out/Default. No clean operation is permitted. The
@@ -42,3 +42,5 @@ for Java/lint/native compile errors before further implementation changes.
 
 - Chromium 152 SkColorMatrix API was corrected to use an explicit 20-float row-major buffer; patch/manifest/series hashes were updated together.
 - The original read-only incremental workflow is restored; resume compile validation from the completed checkpoint.
+
+- Run 35 completed the APK in one resume stage from the exact Stage 1 checkpoint. The completed out/Default cache above is now the only workflow default; older or empty fallback keys remain forbidden.
