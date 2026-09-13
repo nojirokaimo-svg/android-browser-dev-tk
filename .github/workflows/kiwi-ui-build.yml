@@ -30,10 +30,11 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-83d67906d05e7d0416ab7f5fc8691b2c816c3e4f-stage-5' }} # resume latest completed Stage-5 checkpoint
+          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-0a2da18f5282219afe711d05d37fe004db86664e-stage-2' }} # latest successfully saved checkpoint from run 32
           require-restore: true
           save-key: kiwi-${{ github.sha }}-stage-1
           final-cache-key: kiwi-incremental-${{ github.sha }}-stage-1
+          build-budget-minutes: "315"
 
   stage-2:
     needs: stage-1
@@ -50,6 +51,7 @@ jobs:
           restore-key: kiwi-${{ github.sha }}-stage-1
           save-key: kiwi-${{ github.sha }}-stage-2
           final-cache-key: kiwi-incremental-${{ github.sha }}-stage-2
+          build-budget-minutes: "315"
 
   stage-3:
     needs: stage-2
@@ -66,6 +68,7 @@ jobs:
           restore-key: kiwi-${{ github.sha }}-stage-2
           save-key: kiwi-${{ github.sha }}-stage-3
           final-cache-key: kiwi-incremental-${{ github.sha }}-stage-3
+          build-budget-minutes: "315"
 
   stage-4:
     needs: stage-3
@@ -82,6 +85,7 @@ jobs:
           restore-key: kiwi-${{ github.sha }}-stage-3
           save-key: kiwi-${{ github.sha }}-stage-4
           final-cache-key: kiwi-incremental-${{ github.sha }}-stage-4
+          build-budget-minutes: "315"
 
   stage-5:
     needs: stage-4
@@ -98,6 +102,7 @@ jobs:
           restore-key: kiwi-${{ github.sha }}-stage-4
           save-key: kiwi-${{ github.sha }}-stage-5
           final-cache-key: kiwi-incremental-${{ github.sha }}-stage-5
+          build-budget-minutes: "315"
 
   require-apk:
     needs: [stage-1, stage-2, stage-3, stage-4, stage-5]

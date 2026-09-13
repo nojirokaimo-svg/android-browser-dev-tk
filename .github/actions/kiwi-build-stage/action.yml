@@ -33,6 +33,10 @@ inputs:
     description: strict for pinned builds; best-effort for a newly resolved upstream.
     required: false
     default: strict
+  build-budget-minutes:
+    description: Maximum Ninja runtime, leaving time for an immutable checkpoint save.
+    required: false
+    default: "315"
 
 outputs:
   done:
@@ -42,6 +46,17 @@ outputs:
 runs:
   using: composite
   steps:
+    # Resolve the exact checkpoint before spending time rebuilding the pinned
+    # source tree.  fail-on-cache-miss deliberately forbids fallback keys.
+    - name: Restore exact previous compile checkpoint
+      id: restore
+      if: inputs.restore-key != ''
+      uses: actions/cache/restore@v4
+      with:
+        path: work/titanium/chromium/src/out/Default
+        key: ${{ inputs.restore-key }}
+        fail-on-cache-miss: true
+
     - name: Free runner disk
       shell: bash
       run: |
@@ -65,15 +80,6 @@ runs:
         CHROMIUM_VERSION: ${{ inputs.chromium-version }}
       run: ./build_kiwi_ui_arm64.sh
 
-    - name: Restore previous compile checkpoint
-      id: restore
-      if: inputs.restore-key != ''
-      uses: actions/cache/restore@v4
-      with:
-        path: work/titanium/chromium/src/out/Default
-        key: ${{ inputs.restore-key }}
-        fail-on-cache-miss: true
-
     - name: Preserve Ninja history and expose only genuinely changed sources
       if: inputs.restore-key != ''
       shell: bash
@@ -93,7 +99,7 @@ runs:
       shell: bash
       env:
         KIWI_BUILD_PHASE: compile
-        KIWI_BUILD_BUDGET_MINUTES: "210"
+        KIWI_BUILD_BUDGET_MINUTES: ${{ inputs.build-budget-minutes }}
         KIWI_INCREMENTAL_NINJA: ${{ inputs.restore-key != '' }}
         CHROMIUM_VERSION: ${{ inputs.chromium-version }}
       run: |
@@ -122,25 +128,9 @@ runs:
           fi
           date +%s%N > output/incremental-build-start-ns
         fi
-        # Fail on Java/Lint errors before spending hours on native compilation.
-        if [[ -f work/titanium/chromium/src/out/Default/.ninja_log ]]; then
-          set +e
-          timeout --signal=INT --kill-after=2m 30m env INVOKED_BY_BUILD_SERVER=1 /usr/bin/ninja \
-            -C work/titanium/chromium/src/out/Default -j 4 \
-            obj/chrome/android/chrome_public_apk__lint/build.lint.stamp 2>&1 | tee output/lint.log
-          lint_status=("${PIPESTATUS[@]}")
-          set -e
-          if [[ "${lint_status[1]}" -ne 0 ]]; then
-            exit "${lint_status[1]}"
-          fi
-          if [[ "${lint_status[0]}" -eq 124 ]]; then
-            echo "Lint dependency budget reached; save checkpoint and continue in next stage."
-            exit 0
-          fi
-          if [[ "${lint_status[0]}" -ne 0 ]]; then
-            exit "${lint_status[0]}"
-          fi
-        fi
+        # chrome_public_apk already depends on its Java/Lint target. Running
+        # that target separately made resume jobs execute the same 2,430-edge
+        # dependency chain twice, so let the real APK graph run it once.
         ./build_kiwi_ui_arm64.sh 2>&1 | tee output/build.log
 
     - name: Record result and checkpoint size

@@ -46,11 +46,11 @@ apt_update() {
   echo "APT update failed after 3 attempts." >&2
   return 1
 }
-apt_update
-sudo apt-get install -y sudo lsb-release file git curl python3 python3-pillow imagemagick librsvg2-bin ninja-build
 sudo dpkg --add-architecture i386
 apt_update
-sudo apt-get install -y libgcc-s1:i386
+sudo apt-get install -y \
+  sudo lsb-release file git curl python3 python3-pillow imagemagick librsvg2-bin \
+  ninja-build libgcc-s1:i386
 
 if [[ ! -d "$BUILD_ROOT/depot_tools/.git" ]]; then
   git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git \
