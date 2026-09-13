@@ -30,7 +30,7 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-incremental-c61e715052bd6f37df98f3202f4dd9b0efd9be12-stage-1' }} # latest completed APK checkpoint
+          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-83d67906d05e7d0416ab7f5fc8691b2c816c3e4f-stage-5' }} # resume latest completed Stage-5 checkpoint
           require-restore: true
           save-key: kiwi-${{ github.sha }}-stage-1
           final-cache-key: kiwi-incremental-${{ github.sha }}-stage-1
