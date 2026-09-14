@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Restore source timestamps without hiding edits or touching Ninja outputs.
+"""Restore source timestamps without rewriting a restored Ninja checkpoint.
 
-New caches carry hashes and source mtimes. The one legacy completed cache is
-bootstrapped from verified feature hashes; unknown caches are never guessed.
+Checkpoint continuations run on a fresh hosted runner, so an identical source tree
+has newer mtimes than the cached objects.  Age only source files and keep every
+file under out/Default intact apart from the small provenance/plan metadata that
+travels with the next checkpoint.
 """
 from __future__ import annotations
+
 import argparse
 import hashlib
 import json
@@ -22,137 +25,179 @@ def digest(path):
     if not path.is_file():
         return None
     h = hashlib.sha256()
-    with path.open('rb') as f:
-        for block in iter(lambda: f.read(1024 * 1024), b''):
+    with path.open("rb") as f:
+        for block in iter(lambda: f.read(1024 * 1024), b""):
             h.update(block)
     return h.hexdigest()
 
 
 def checked_path(source, name):
     p = Path(name)
-    if p.is_absolute() or '..' in p.parts or 'out' in p.parts or '.git' in p.parts:
-        raise RuntimeError(f'Invalid source path: {name}')
+    if p.is_absolute() or ".." in p.parts or "out" in p.parts or ".git" in p.parts:
+        raise RuntimeError(f"Invalid source path: {name}")
     result = source / p
     if result.is_symlink():
-        raise RuntimeError(f'Patch-owned symlink is unsupported: {name}')
+        raise RuntimeError(f"Patch-owned symlink is unsupported: {name}")
     return result
 
 
-def force_release_args(out):
-    """Convert a restored validation/debug checkpoint into a lean release-code build.
-
-    Keep official-build extras and ThinLTO disabled so the hosted runner can still
-    resume the build in stages, but never publish the huge/slower is_debug=true APK.
-    The composite action already runs `gn gen` whenever
-    `treat_warnings_as_errors = false` is missing, so remove that line only when
-    we change an argument and let the existing guarded regeneration path handle it.
-    """
-    args = out / 'args.gn'
+def verify_resume_args(out):
+    """Validate the Stage-1 GN configuration without modifying it or running gn gen."""
+    args = out / "args.gn"
     if not args.is_file():
-        raise RuntimeError(f'Missing restored GN args: {args}')
+        raise RuntimeError(f"Missing restored GN args: {args}")
 
-    original = args.read_text(encoding='utf-8')
-    updated = original
-    updated = updated.replace('is_debug = true', 'is_debug = false')
-    updated = updated.replace('is_official_build = true', 'is_official_build = false')
-    updated = updated.replace('symbol_level = 1', 'symbol_level = 0')
-    updated = updated.replace('generate_linker_map = true', 'generate_linker_map = false')
-
-    required = (
-        'blink_symbol_level = 0',
-        'v8_symbol_level = 0',
-        'use_thin_lto = false',
-    )
-    for line in required:
-        if line not in updated.splitlines():
-            updated = updated.rstrip() + '\n' + line + '\n'
-
-    changed = updated != original
-    if changed:
-        # Force the already-existing guarded `gn gen` in kiwi-build-stage.
-        lines = [
-            line for line in updated.splitlines()
-            if line.strip() != 'treat_warnings_as_errors = false'
-        ]
-        updated = '\n'.join(lines).rstrip() + '\n'
-        args.write_text(updated, encoding='utf-8')
-        print('Converted restored out/Default from debug validation args to release-code args.')
-    return changed
+    lines = {line.strip() for line in args.read_text(encoding="utf-8").splitlines()}
+    required = {
+        'target_cpu = "arm64"',
+        'chrome_public_manifest_package = "io.github.nojirokaimo.titaniumkiwi"',
+        "is_debug = false",
+        "is_official_build = true",
+        "symbol_level = 0",
+        "generate_linker_map = false",
+        "blink_symbol_level = 0",
+        "v8_symbol_level = 0",
+        "treat_warnings_as_errors = false",
+    }
+    forbidden = {
+        "is_debug = true",
+        "is_official_build = false",
+        "symbol_level = 1",
+        "generate_linker_map = true",
+    }
+    missing = sorted(required - lines)
+    bad = sorted(forbidden & lines)
+    if missing or bad:
+        raise RuntimeError(
+            "Restored args.gn does not match the Stage-1 release checkpoint; "
+            f"missing={missing}, forbidden={bad}. Preserving cache and stopping"
+        )
+    print("Verified restored args.gn; no GN arguments were changed and gn gen is not required.")
 
 
 def patch_owned_files():
-    series = json.loads((HERE / 'patches/series.json').read_text(encoding='utf-8'))
+    series = json.loads((HERE / "patches/series.json").read_text(encoding="utf-8"))
     return {
         name
-        for feature in series['features']
-        for name in feature.get('files', [])
+        for feature in series["features"]
+        for name in feature.get("files", [])
     }
 
 
-def restore(source, cache_key, manifest, legacy, identity):
-    out = source / 'out/Default'
+def restore(source, cache_key, manifest, legacy, identity, bootstrap_current=False):
+    out = source / "out/Default"
     state_path = out / STATE
+    previous = None
+    bootstrapped = False
+
     if state_path.is_file():
-        previous = json.loads(state_path.read_text())
-        if previous['identity'] != identity:
-            raise RuntimeError('Cache source/toolchain identity changed; preserving cache and stopping')
-        previous = previous['files']
+        state = json.loads(state_path.read_text())
+        if state["identity"] != identity:
+            raise RuntimeError(
+                "Cache source/toolchain identity changed; preserving cache and stopping"
+            )
+        previous = state["files"]
+    elif cache_key == legacy["cache_key"]:
+        previous = {
+            p: {"sha256": h, "mtime_ns": AGE_NS}
+            for p, h in legacy["files"].items()
+        }
+    elif bootstrap_current:
+        # This path is only enabled after the workflow proves that every
+        # source-producing repository input is unchanged from the revision that
+        # created the restored cache.  Therefore the freshly prepared pinned tree
+        # is the exact source state the cached objects were built from.
+        bootstrapped = True
     else:
-        if cache_key != legacy['cache_key']:
-            raise RuntimeError('No source provenance for this cache; preserving cache and stopping')
-        previous = {p: {'sha256': h, 'mtime_ns': AGE_NS} for p, h in legacy['files'].items()}
-    names = sorted(set(manifest['files']) | set(previous) | patch_owned_files())
+        raise RuntimeError(
+            "No source provenance for this cache; preserving cache and stopping"
+        )
+
+    names = sorted(
+        set(manifest["files"])
+        | set(previous or {})
+        | patch_owned_files()
+    )
     paths = {name: checked_path(source, name) for name in names}
     current = {name: digest(p) for name, p in paths.items()}
-    # Age only source files. Prune every out/.git directory, including nested
-    # dependency repositories; never alter .ninja_log or compiled objects.
+
+    if bootstrapped:
+        previous = {
+            name: {"sha256": current[name], "mtime_ns": AGE_NS}
+            for name in names
+        }
+
+    # Fresh checkouts have new mtimes and would make Ninja rebuild already cached
+    # objects.  Age source files only.  Never enter any out/ or .git/ directory,
+    # and never touch .ninja_log, build.ninja, args.gn, objects, or generated files
+    # inside the restored out/Default checkpoint.
     for directory, dirs, files in os.walk(source):
-        dirs[:] = [d for d in dirs if d not in ('.git', 'out') and not (Path(directory)/d).is_symlink()]
+        dirs[:] = [
+            d
+            for d in dirs
+            if d not in (".git", "out")
+            and not (Path(directory) / d).is_symlink()
+        ]
         for name in files:
             p = Path(directory) / name
-            if name != '.git' and not p.is_symlink():
+            if name != ".git" and not p.is_symlink():
                 os.utime(p, ns=(AGE_NS, AGE_NS))
+
     now = time.time_ns()
     changed = []
     records = {}
     for name, p in paths.items():
         old = previous.get(name)
-        different = old is None or old['sha256'] != current[name]
-        stamp = now if different else old['mtime_ns']
+        different = old is None or old["sha256"] != current[name]
+        stamp = now if different else old["mtime_ns"]
         if different:
             changed.append(name)
         if p.is_file():
             os.utime(p, ns=(stamp, stamp))
-        records[name] = {'sha256': current[name], 'mtime_ns': stamp}
-    # This new metadata travels with the NEXT immutable cache archive. On a
-    # time-sliced continuation, retain changed-source mtimes instead of touching
-    # those files again and rebuilding the same dependencies each stage.
-    state_path.write_text(json.dumps({'identity': identity, 'files': records}, indent=2) + '\n')
+        records[name] = {"sha256": current[name], "mtime_ns": stamp}
+
+    verify_resume_args(out)
+
+    # Only metadata is written into out/Default.  The Ninja database, GN files,
+    # object files and generated build outputs remain byte-for-byte untouched.
+    state_path.write_text(
+        json.dumps({"identity": identity, "files": records}, indent=2) + "\n"
+    )
     plan = {
-        'cache_key': cache_key,
-        'identity': identity,
-        'changed_sources': changed,
-        'tracked_sources': len(records),
+        "cache_key": cache_key,
+        "identity": identity,
+        "bootstrapped_exact_checkpoint": bootstrapped,
+        "changed_sources": changed,
+        "tracked_sources": len(records),
     }
-    # The build step consumes this report before Ninja starts.  It is stored in
-    # out/Default so a checkpoint continuation can prove whether this stage
-    # introduced source edits without touching any compiled output.
-    (out / PLAN).write_text(json.dumps(plan, indent=2) + '\n')
-    force_release_args(out)
+    (out / PLAN).write_text(json.dumps(plan, indent=2) + "\n")
     print(json.dumps(plan, indent=2))
     return changed
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('source', type=Path)
-    parser.add_argument('--cache-key', required=True)
-    parser.add_argument('--identity', required=True)
+    parser.add_argument("source", type=Path)
+    parser.add_argument("--cache-key", required=True)
+    parser.add_argument("--identity", required=True)
+    parser.add_argument(
+        "--bootstrap-current",
+        action="store_true",
+        help=(
+            "Trust the freshly prepared source tree as the restored cache source "
+            "state. The caller must first prove source-producing inputs are unchanged."
+        ),
+    )
     args = parser.parse_args()
-    restore(args.source.resolve(), args.cache_key,
-            json.loads((HERE/'manifest.json').read_text()),
-            json.loads((HERE/'legacy-cache-source-hashes.json').read_text()), args.identity)
+    restore(
+        args.source.resolve(),
+        args.cache_key,
+        json.loads((HERE / "manifest.json").read_text()),
+        json.loads((HERE / "legacy-cache-source-hashes.json").read_text()),
+        args.identity,
+        bootstrap_current=args.bootstrap_current,
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
