@@ -46,6 +46,10 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Verify complete patch series integrity
+      shell: bash
+      run: python3 kiwi_port/verify_series.py
+
     - name: Restore exact previous compile checkpoint
       id: restore
       if: inputs.restore-key != ''
