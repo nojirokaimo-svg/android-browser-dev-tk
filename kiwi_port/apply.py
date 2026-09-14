@@ -42,6 +42,72 @@ def effective_patch(source: Path, feature: dict[str, object], patch: Path) -> Pa
     """Return the Chromium 153 patch as checked in; no hidden context rewriting."""
     return patch
 
+
+def _insert_after_unique(path: Path, anchor: str, insertion: str) -> bool:
+    """Insert exact text after one verified anchor, or accept an already-applied insertion."""
+    text = path.read_text(encoding="utf-8")
+    if insertion in text:
+        return True
+    if text.count(anchor) != 1:
+        return False
+    path.write_text(text.replace(anchor, anchor + insertion, 1), encoding="utf-8")
+    return True
+
+
+def repair_known_context_drift(
+    source: Path, feature_id: str, rejected: list[str]
+) -> list[str]:
+    """Repair only known M153 context-only rejects after validating unique anchors.
+
+    These are intentionally narrow. Any content change that removes or duplicates an anchor
+    remains a hard conflict instead of being silently accepted.
+    """
+    remaining = list(rejected)
+
+    if feature_id == "black-statusbar-full-backup":
+        relative = "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java"
+        if relative in remaining:
+            anchor = "        @ColorInt int statusBarColor = calculateFinalStatusBarColor();\n"
+            insertion = (
+                "        int nightMode =\n"
+                "                mActivity.getResources().getConfiguration().uiMode\n"
+                "                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK;\n"
+                "        if (nightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) {\n"
+                "            statusBarColor = Color.BLACK;\n"
+                "        }\n"
+            )
+            target = source / relative
+            if target.is_file() and _insert_after_unique(target, anchor, insertion):
+                (source / f"{relative}.rej").unlink(missing_ok=True)
+                remaining.remove(relative)
+
+    if feature_id == "kiwi-tab-switcher":
+        relative = "chrome/android/chrome_java_resources.gni"
+        if relative in remaining:
+            target = source / relative
+            if target.is_file():
+                additions = (
+                    (
+                        '  "java/res/layout/radio_button_group_homepage_preference.xml",\n',
+                        '  "java/res/layout/radio_button_group_tabswitcher_preference.xml",\n',
+                    ),
+                    (
+                        '  "java/res/xml/main_preferences.xml",\n',
+                        '  "java/res/xml/tabswitcher_preferences.xml",\n',
+                    ),
+                )
+                repaired = True
+                for anchor, insertion in additions:
+                    if not _insert_after_unique(target, anchor, insertion):
+                        repaired = False
+                        break
+                if repaired:
+                    (source / f"{relative}.rej").unlink(missing_ok=True)
+                    remaining.remove(relative)
+
+    return remaining
+
+
 def write_report(report: Path, source: Path, results: list[dict[str, object]]) -> None:
     report.parent.mkdir(parents=True, exist_ok=True)
     conflicts = [item for item in results if item["status"] == "conflict"]
@@ -148,10 +214,18 @@ def main() -> int:
             files = "\n  ".join(feature["files"])
             raise RuntimeError(f"feature {feature['id']} ({feature['name']}) does not apply cleanly:\n  {files}\nrerun with --best-effort --report <path> to apply independent clean changes")
         else:
-            git(source, "apply", "--reject", "--whitespace=nowarn", str(patch_to_apply))
+            partial = git(source, "apply", "--reject", "--whitespace=nowarn", str(patch_to_apply))
             rejected = [str(safe_relative(path)) for path in feature["files"] if (source / f"{path}.rej").is_file()]
-            item["status"] = "conflict"
-            item["conflicts"] = rejected or feature["files"]
+            original_rejected = list(rejected)
+            if rejected:
+                rejected = repair_known_context_drift(source, str(feature["id"]), rejected)
+            if partial.returncode == 0:
+                item["status"] = "applied"
+            elif original_rejected and not rejected:
+                item["status"] = "repaired-context-drift"
+            else:
+                item["status"] = "conflict"
+                item["conflicts"] = rejected or feature["files"]
         results.append(item)
 
     if args.report:
