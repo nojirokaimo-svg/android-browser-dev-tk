@@ -79,7 +79,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ui/system/Statu
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
 @@ -500,6 +500,12 @@ public class StatusBarColorController
-     /** Update the color of the status bar. */
+     /** Calculate and update the status bar's color. */
      public void updateStatusBarColor() {
          @ColorInt int statusBarColor = calculateFinalStatusBarColor();
 +        int nightMode =
