@@ -5,10 +5,10 @@ KIT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 BUILD_ROOT="${KIWI_BUILD_ROOT:-$KIT_ROOT/work}"
 TITANIUM_DIR="$BUILD_ROOT/titanium"
 TITANIUM_REPOSITORY="${TITANIUM_REPOSITORY:-https://github.com/jqssun/android-titanium-browser.git}"
-TITANIUM_COMMIT="${TITANIUM_COMMIT:-80ffcdf1cebe51cddc593f571a6f26c3374aea2e}"
-VANADIUM_COMMIT="${VANADIUM_COMMIT:-150a27e23302cc265baf8a7fb7c0f0112bddf2fd}"
-CHROMIUM_COMMIT="${CHROMIUM_COMMIT:-506c834ecceaa943c5f41e6cfe7f68acb5c45346}"
-VERSION="${CHROMIUM_VERSION:-152.0.7977.64}"
+TITANIUM_COMMIT="${TITANIUM_COMMIT:-7584b534f6e1f9c29e8bb98df71d7610960a5db3}"
+VANADIUM_COMMIT="${VANADIUM_COMMIT:-02d87ad8e17aee77d0fea49d122349a5da87ed2e}"
+CHROMIUM_COMMIT="${CHROMIUM_COMMIT:-507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c}"
+VERSION="${CHROMIUM_VERSION:-153.0.8010.36}"
 PHASE="${KIWI_BUILD_PHASE:-all}"
 PATCH_MODE="${KIWI_PATCH_MODE:-strict}"
 
@@ -35,10 +35,6 @@ git -C "$TITANIUM_DIR" submodule update --init --recursive --depth 1
 test "$(git -C "$TITANIUM_DIR/vanadium" rev-parse HEAD)" = "$VANADIUM_COMMIT"
 
 export DEBIAN_FRONTEND=noninteractive
-# GitHub's Ubuntu image includes a Google Chrome APT source that is not needed
-# for this Android build. Its Release and Packages files can briefly disagree
-# while Google publishes an update, causing an unrelated Hash Sum mismatch.
-# Disable only that runner-provided source and retry transient APT failures.
 sudo rm -f /etc/apt/sources.list.d/google-chrome.list
 apt_update() {
   local attempt
@@ -65,11 +61,6 @@ if [[ ! -d "$BUILD_ROOT/depot_tools/.git" ]]; then
 fi
 export PATH="$BUILD_ROOT/depot_tools:$PATH"
 
-# gclient hooks apply patches with plain `git am` inside nested repositories
-# (notably V8). Fresh GitHub runners have no author identity configured, which
-# makes git-am exit before printing an "Applying:" line and crashes Vanadium's
-# patch helper with IndexError. Give all hook-created repositories a disposable
-# build identity before running the hooks.
 git config --global user.name "Titanium-Kiwi build"
 git config --global user.email "build@example.invalid"
 
@@ -106,9 +97,6 @@ gclient runhooks
 ./build/install-build-deps.sh --no-prompt
 
 export SCRIPT_DIR="$TITANIUM_DIR"
-# patch.sh normally inherits this helper from Titanium's build.sh/common.sh.
-# Define it locally so sourcing common.sh cannot overwrite SCRIPT_DIR with the
-# location of this wrapper script.
 version_lt() {
   [[ "$1" != "$2" ]] && [[ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1)" == "$1" ]]
 }
@@ -122,8 +110,6 @@ elif [[ "$PATCH_MODE" != "strict" ]]; then
 fi
 python3 "$KIT_ROOT/kiwi_port/apply.py" "$PWD" "${PATCH_ARGS[@]}"
 
-# The local-backend fallback accepts ManagePasswordsReferrer, not the distinct
-# PasswordCheckReferrer enum. Do not suppress WrongConstant or cast the integer.
 python3 - <<'PY'
 from pathlib import Path
 p = Path("chrome/browser/password_manager/android/java/src/org/chromium/chrome/browser/password_manager/PasswordManagerHelper.java")
@@ -154,16 +140,14 @@ s = s.replace(
     'chrome_public_manifest_package = "io.github.jqssun.helium"',
     'chrome_public_manifest_package = "io.github.nojirokaimo.titaniumkiwi"',
 )
-# A full Chromium official release build only reached ~43% before the fixed
-# six-hour GitHub-hosted runner limit. This is an installable validation APK,
-# so trade release optimization and symbols for a substantially faster local
-# debug-code build. Functional/UI behavior remains testable; a distributable
-# optimized release can be produced later on a persistent/larger builder.
-s = s.replace('is_debug = false', 'is_debug = true')
-s = s.replace('is_official_build = true', 'is_official_build = false')
+# Keep Titanium's release/official optimization. The old validation build flipped
+# these to debug/non-official and inflated libchrome.so by ~86 MB. Save CI time
+# without changing generated release code by dropping external symbols/linker map.
 s = s.replace('symbol_level = 1', 'symbol_level = 0')
 s = s.replace('generate_linker_map = true', 'generate_linker_map = false')
-s += '\nblink_symbol_level = 0\nv8_symbol_level = 0\nuse_thin_lto = false\ntreat_warnings_as_errors = false\n'
+s += '\nblink_symbol_level = 0\nv8_symbol_level = 0\ntreat_warnings_as_errors = false\n'
+if 'is_debug = false' not in s or 'is_official_build = true' not in s:
+    raise SystemExit('Titanium release optimization flags are missing from args.gn')
 p.write_text(s, encoding="utf-8")
 PY
 
@@ -177,19 +161,9 @@ fi
 export PATH="$BUILD_ROOT/depot_tools:$PATH"
 cd "$TITANIUM_DIR/chromium/src"
 
-# GitHub-hosted jobs are forcibly terminated at six hours. Stop Siso/Ninja
-# ourselves while enough time remains to save out/Default, then let the next
-# job restore the checkpoint and continue from the completed object files.
 BUILD_STATUS=0
 BUILD_COMMAND=(autoninja -C out/Default chrome_public_apk)
 if [[ "${KIWI_INCREMENTAL_NINJA:-false}" == "true" ]]; then
-  # Siso's interrupted-build state is not portable across fresh hosted runners:
-  # it re-executed roughly the same 28k edges after every cache restore. Ninja's
-  # timestamp graph reuses the restored object files and only builds missing or
-  # genuinely stale outputs. The composite action makes restored outputs newer
-  # than the identical pinned source tree before selecting this mode.
-  # Direct Ninja has no autoninja-managed Android build server. Force Chromium's
-  # build-server-aware actions to run inline, preserving the cached Ninja graph.
   BUILD_COMMAND=(env INVOKED_BY_BUILD_SERVER=1 /usr/bin/ninja -C out/Default -j "${KIWI_NINJA_JOBS:-4}" chrome_public_apk)
 fi
 printf 'Build command:'
@@ -203,7 +177,6 @@ else
   "${BUILD_COMMAND[@]}" || BUILD_STATUS=$?
 fi
 
-# A stale APK in a restored checkpoint must never conceal a failed command.
 if [[ "$BUILD_STATUS" -ne 0 && "$BUILD_STATUS" -ne 124 && "$BUILD_STATUS" -ne 130 && "$BUILD_STATUS" -ne 137 ]]; then
   exit "$BUILD_STATUS"
 fi
@@ -222,10 +195,7 @@ if [[ -z "$APK" ]]; then
     exit 0
   fi
   echo "APK was not produced (autoninja status: $BUILD_STATUS)." >&2
-  if [[ "$BUILD_STATUS" -eq 0 ]]; then
-    exit 1
-  fi
-  exit "$BUILD_STATUS"
+  exit 1
 fi
 if [[ -f "$KIT_ROOT/output/incremental-build-start-ns" ]]; then
   BUILD_START_NS="$(<"$KIT_ROOT/output/incremental-build-start-ns")"
@@ -240,13 +210,32 @@ PY
     exit 1
   fi
 fi
+
 mkdir -p "$KIT_ROOT/output"
-cp "$APK" "$KIT_ROOT/output/Titanium-Kiwi-core-$VERSION-arm64-v8a.apk"
+OUTPUT_APK="$KIT_ROOT/output/Titanium-Kiwi-core-$VERSION-arm64-v8a.apk"
+cp "$APK" "$OUTPUT_APK"
+
+# Upstream Titanium 153 arm64 is 324,215,805 bytes. Kiwi UI patches should only
+# add a small amount; reject a debug-style ~400 MB regression automatically.
+python3 - "$OUTPUT_APK" <<'PY'
+import os
+import sys
+import zipfile
+apk = sys.argv[1]
+size = os.path.getsize(apk)
+print(f"Final APK size: {size:,} bytes ({size / 1_000_000:.1f} MB)")
+with zipfile.ZipFile(apk) as z:
+    print("Largest APK entries:")
+    for info in sorted(z.infolist(), key=lambda x: x.file_size, reverse=True)[:12]:
+        print(f"  {info.file_size / 1_000_000:7.1f} MB  {info.filename}")
+if size > 360_000_000:
+    raise SystemExit(
+        f"APK size regression: {size:,} bytes exceeds 360,000,000-byte release guard"
+    )
+PY
 
 APKSIGNER="$(find third_party/android_sdk/public/build-tools -type f -name apksigner | sort | tail -n 1)"
 test -x "$APKSIGNER"
-"$APKSIGNER" verify --verbose \
-  "$KIT_ROOT/output/Titanium-Kiwi-core-$VERSION-arm64-v8a.apk"
-sha256sum "$KIT_ROOT/output/Titanium-Kiwi-core-$VERSION-arm64-v8a.apk" \
-  > "$KIT_ROOT/output/SHA256SUMS.txt"
+"$APKSIGNER" verify --verbose "$OUTPUT_APK"
+sha256sum "$OUTPUT_APK" > "$KIT_ROOT/output/SHA256SUMS.txt"
 touch "$KIT_ROOT/output/BUILD_COMPLETE"
