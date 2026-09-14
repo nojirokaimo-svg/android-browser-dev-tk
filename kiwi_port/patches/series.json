@@ -27,7 +27,7 @@
     },
     {
       "id": "menu-presentation",
-      "name": "Compact menu presentation and bottom-menu disabling",
+      "name": "Compact menu presentation, pure-black dark overflow surface, and bottom-menu disabling",
       "patch": "030-menu-presentation.patch",
       "files": [
         "chrome/browser/chrome_browser_field_trials.cc",
@@ -35,7 +35,7 @@
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/res/values/styles.xml"
       ],
-      "sha256": "3c3a86d003ca980e2e176efc28deba747c2840ba76309cc1a55141b3ad2d1ccf"
+      "sha256": "b439ae3a45c7e4583e794a1e4f89bb31dea6dcdd18bd132281f962b0ba6ffa6f"
     },
     {
       "id": "preference-registry",
