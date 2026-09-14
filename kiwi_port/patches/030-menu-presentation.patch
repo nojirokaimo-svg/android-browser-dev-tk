@@ -37,7 +37,7 @@ diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/ch
 index 04fd644b7e1898491aa789edc8e8486f901f1d60..ff64ab86c33be43bb27f0c30f9ad4694e84f8e7e 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -394,7 +394,8 @@ class AppMenu implements OnKeyListener {
+@@ -394,11 +394,18 @@ class AppMenu implements OnKeyListener {
  
          View contentView = createAppMenuContentView(context, addTopPaddingBeforeFirstRow);
  
@@ -47,6 +47,17 @@ index 04fd644b7e1898491aa789edc8e8486f901f1d60..ff64ab86c33be43bb27f0c30f9ad4694
              var sharedDrawable = AppCompatResources.getDrawable(context, R.drawable.popup_bg_8dp);
              if (sharedDrawable != null) {
                  var drawable = sharedDrawable.mutate();
+-                drawable.setTint(SemanticColorUtils.getMenuBgColor(context));
++                boolean isDark =
++                        (context.getResources().getConfiguration().uiMode
++                                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
++                                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
++                // Match Kiwi's pure-black overflow menu in dark mode while preserving
++                // Chromium's normal surface color in light mode.
++                drawable.setTint(isDark ? Color.BLACK : SemanticColorUtils.getMenuBgColor(context));
+                 drawable.setTintMode(PorterDuff.Mode.MULTIPLY);
+                 contentView.setBackground(drawable);
+             }
 diff --git a/components/browser_ui/styles/android/java/res/values/styles.xml b/components/browser_ui/styles/android/java/res/values/styles.xml
 index 2876f1d44b33835568a2f7ca3ed66134cc935711..69d0f1a94c1a929212784e5fdebeb2d6e0c11eb8 100644
 --- a/components/browser_ui/styles/android/java/res/values/styles.xml
