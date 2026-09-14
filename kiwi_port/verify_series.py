@@ -59,9 +59,17 @@ def main() -> int:
             errors.append(f"{feature_id}: renamed/malformed paths: {', '.join(malformed)}")
         actual_files = [left for left, right in pairs if left == right]
         listed_files = feature.get("files")
-        if actual_files != listed_files:
+        if len(actual_files) != len(set(actual_files)):
+            errors.append(f"{feature_id}: patch contains a duplicate file section")
+        if not isinstance(listed_files, list) or any(
+            not isinstance(path, str) for path in listed_files
+        ):
+            errors.append(f"{feature_id}: files must be a list of paths")
+        elif len(listed_files) != len(set(listed_files)):
+            errors.append(f"{feature_id}: series contains a duplicate file path")
+        elif set(actual_files) != set(listed_files):
             errors.append(
-                f"{feature_id}: files list differs from patch: "
+                f"{feature_id}: files set differs from patch: "
                 f"series={listed_files!r}, patch={actual_files!r}"
             )
 
