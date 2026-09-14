@@ -93,7 +93,7 @@
         "chrome/browser/resources/extensions/item_list.css",
         "chrome/browser/resources/extensions/manager.css"
       ],
-      "sha256": "e6f192a02d8df1324e6d12c54f7a0df6935f7c8f750d44c106262352142bf23e"
+      "sha256": "418c58a46d3f23e0a39fe3aca8a294253aba8c4db7fe73a1657cc0a39a6b148c"
     },
     {
       "id": "black-statusbar-full-backup",
@@ -127,7 +127,7 @@
         "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java",
         "titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java"
       ],
-      "sha256": "433c3721c185066ed01115fc2a42c1369e2a2eee0665fa27c4df7c858611a0cc"
+      "sha256": "5d2b7f165de30763f75507d4fcb3532d20a2b4e886be135db8e75036ddd3cbe3"
     }
   ]
 }

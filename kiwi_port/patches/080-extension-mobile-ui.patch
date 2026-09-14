@@ -1,7 +1,7 @@
 diff --git a/chrome/browser/resources/extensions/item_list.css b/chrome/browser/resources/extensions/item_list.css
 --- a/chrome/browser/resources/extensions/item_list.css
 +++ b/chrome/browser/resources/extensions/item_list.css
-@@ -120,3 +120,26 @@
+@@ -120,3 +120,29 @@
     * is clickable. */
    z-index: 1;
  }
