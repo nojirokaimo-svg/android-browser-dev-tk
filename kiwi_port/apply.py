@@ -51,10 +51,10 @@ def effective_patch(source: Path, feature: dict[str, object], patch: Path) -> Pa
         return patch
 
     text = patch.read_text(encoding="utf-8")
-    chrome_old = """@@ -48,6 +49,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {\n        super.onCreate();\n \n        if (SplitCompatApplication.isBrowserProcess()) {\n+            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());\n            FontPreloader.getInstance().load(getApplication());\n \n            // Registers the extensions for all protos which would be in the Chrome split, whether\n"""
-    chrome_new = """@@ -55,6 +56,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {\n        super.onCreate();\n \n        ChromeApplicationImplHooks.onCreate();\n        if (SplitCompatApplication.isBrowserProcess()) {\n+            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());\n            FontPreloader.getInstance().load(getApplication());\n \n"""
-    status_old = """@@ -500,6 +500,12 @@ public class StatusBarColorController\n    /** Update the color of the status bar. */\n    public void updateStatusBarColor() {\n"""
-    status_new = """@@ -500,6 +500,12 @@ public class StatusBarColorController\n    /** Calculate and update the status bar's color. */\n    public void updateStatusBarColor() {\n"""
+    chrome_old = """@@ -48,6 +49,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {\n         super.onCreate();\n \n         if (SplitCompatApplication.isBrowserProcess()) {\n+            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());\n             FontPreloader.getInstance().load(getApplication());\n \n             // Registers the extensions for all protos which would be in the Chrome split, whether\n"""
+    chrome_new = """@@ -55,6 +56,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {\n         super.onCreate();\n \n         ChromeApplicationImplHooks.onCreate();\n         if (SplitCompatApplication.isBrowserProcess()) {\n+            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());\n             FontPreloader.getInstance().load(getApplication());\n \n"""
+    status_old = """@@ -500,6 +500,12 @@ public class StatusBarColorController\n     /** Update the color of the status bar. */\n     public void updateStatusBarColor() {\n"""
+    status_new = """@@ -500,6 +500,12 @@ public class StatusBarColorController\n     /** Calculate and update the status bar's color. */\n     public void updateStatusBarColor() {\n"""
 
     for label, old, new in (
         ("ChromeApplicationImpl", chrome_old, chrome_new),
