@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 
 HERE = Path(__file__).resolve().parent
 PATCH_DIR = HERE / "patches"
@@ -52,6 +53,16 @@ def main() -> int:
             errors.append(
                 f"{feature_id}: checksum mismatch for {patch_name}: "
                 f"series={expected}, actual={actual}"
+            )
+        syntax = subprocess.run(
+            ["git", "apply", "--numstat", str(patch)],
+            text=True,
+            capture_output=True,
+        )
+        if syntax.returncode:
+            errors.append(
+                f"{feature_id}: malformed unified diff: "
+                f"{syntax.stderr.strip() or syntax.stdout.strip()}"
             )
         pairs = touched_files(patch.read_text(encoding="utf-8"))
         malformed = [f"{left} -> {right}" for left, right in pairs if left != right]

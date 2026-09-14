@@ -30,12 +30,10 @@
       "name": "Compact menu presentation, pure-black dark overflow surface, and bottom-menu disabling",
       "patch": "030-menu-presentation.patch",
       "files": [
-        "chrome/browser/chrome_browser_field_trials.cc",
-        "chrome/browser/flags/android/java/src/org/chromium/chrome/browser/flags/ChromeFeatureList.java",
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/res/values/styles.xml"
       ],
-      "sha256": "f75cfc4661dec069d6abc9025d6cd7183aa804790f8b62adbbf715ac4349cc67"
+      "sha256": "e9a982bfd66ad4f83f8ee59e924a44ec06e27906408a880e20c76d018d3d5da6"
     },
     {
       "id": "preference-registry",
@@ -46,7 +44,7 @@
         "chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java",
         "titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java"
       ],
-      "sha256": "453ec15347eae72210e9188db1b7c4145bda2e5d75ff83f7cebb462ae3e85063"
+      "sha256": "393d46e2c0fa3a7c59aaacc2ebe15d8d08605eb53a001a3cfb4e1120632731dc"
     },
     {
       "id": "night-mode-presets",
@@ -109,7 +107,7 @@
         "chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java",
         "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java"
       ],
-      "sha256": "72156b05b961ca6d5b7f670f62fe966f1de1b153e24fabc956e1931063acb68c"
+      "sha256": "c27e8081bb3bcbb0ff7808575a09ed72c4d867a769222ec7a2e1ae2644ae2df0"
     },
     {
       "id": "kiwi-tab-switcher",

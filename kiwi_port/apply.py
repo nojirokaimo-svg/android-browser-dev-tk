@@ -39,37 +39,8 @@ def safe_relative(relative: str) -> Path:
 
 
 def effective_patch(source: Path, feature: dict[str, object], patch: Path) -> Path:
-    """Normalize known pinned-tree context drift without weakening strict preflight.
-
-    The 090 feature was authored from the same Chromium 152 code but before the pinned
-    Vanadium ChromeApplicationImpl hook was accounted for, and with an older status-bar
-    method comment as hunk context.  Only those context lines differ; the inserted code is
-    unchanged.  Keep the checked-in patch checksum strict, then materialize an effective
-    patch under .git for both --check and the real apply.
-    """
-    if feature["id"] != "black-statusbar-full-backup":
-        return patch
-
-    text = patch.read_text(encoding="utf-8")
-    chrome_old = """@@ -48,6 +49,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {\n         super.onCreate();\n \n         if (SplitCompatApplication.isBrowserProcess()) {\n+            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());\n             FontPreloader.getInstance().load(getApplication());\n \n             // Registers the extensions for all protos which would be in the Chrome split, whether\n"""
-    chrome_new = """@@ -55,6 +56,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {\n         super.onCreate();\n \n         ChromeApplicationImplHooks.onCreate();\n         if (SplitCompatApplication.isBrowserProcess()) {\n+            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());\n             FontPreloader.getInstance().load(getApplication());\n \n"""
-    status_old = """@@ -500,6 +500,12 @@ public class StatusBarColorController\n     /** Update the color of the status bar. */\n     public void updateStatusBarColor() {\n"""
-    status_new = """@@ -500,6 +500,12 @@ public class StatusBarColorController\n     /** Calculate and update the status bar's color. */\n     public void updateStatusBarColor() {\n"""
-
-    for label, old, new in (
-        ("ChromeApplicationImpl", chrome_old, chrome_new),
-        ("StatusBarColorController", status_old, status_new),
-    ):
-        if old not in text:
-            raise RuntimeError(f"090 compatibility context missing: {label}")
-        text = text.replace(old, new, 1)
-
-    effective_dir = source / ".git" / "kiwi-effective-patches"
-    effective_dir.mkdir(parents=True, exist_ok=True)
-    output = effective_dir / patch.name
-    output.write_text(text, encoding="utf-8")
-    return output
-
+    """Return the Chromium 153 patch as checked in; no hidden context rewriting."""
+    return patch
 
 def write_report(report: Path, source: Path, results: list[dict[str, object]]) -> None:
     report.parent.mkdir(parents=True, exist_ok=True)

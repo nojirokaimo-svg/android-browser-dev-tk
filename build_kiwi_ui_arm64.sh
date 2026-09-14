@@ -94,7 +94,6 @@ git -c user.name="Titanium-Kiwi build" -c user.email="build@example.invalid" \
 
 gclient sync -D --no-history --nohooks
 gclient runhooks
-./build/install-build-deps.sh --no-prompt
 
 export SCRIPT_DIR="$TITANIUM_DIR"
 version_lt() {
@@ -109,6 +108,9 @@ elif [[ "$PATCH_MODE" != "strict" ]]; then
   exit 2
 fi
 python3 "$KIT_ROOT/kiwi_port/apply.py" "$PWD" "${PATCH_ARGS[@]}"
+
+# Install compiler packages only after every source patch has applied cleanly.
+./build/install-build-deps.sh --no-prompt
 
 python3 - <<'PY'
 from pathlib import Path

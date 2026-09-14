@@ -78,20 +78,28 @@ index a95ba4d..ed2b07e 100644
          if (mRegistry.mLegacyFormatKeys.contains(key)) {
              return true;
 diff --git a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java
-index 7680907..dfe8d59 100644
+index f5b1e8d704063..0000000000000 100644
 --- a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java
 +++ b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java
-@@ -9,5 +9,6 @@ import androidx.annotation.VisibleForTesting;
+@@ -8,11 +8,13 @@ import androidx.annotation.VisibleForTesting;
  import org.chromium.base.shared_preferences.KnownPreferenceKeyRegistries;
  import org.chromium.base.shared_preferences.PreferenceKeyRegistry;
 +import org.chromium.base.shared_preferences.SharedPrefsUtils;
+ import org.chromium.build.BuildConfig;
  import org.chromium.build.annotations.CheckDiscard;
  import org.chromium.build.annotations.NullMarked;
+ import org.chromium.build.annotations.Nullable;
  import org.chromium.components.cached_flags.CachedFlagsSharedPreferences;
-@@ -21,5 +22,6 @@ public class AllPreferenceKeyRegistries {
-     static final Set<PreferenceKeyRegistry> KNOWN_REGISTRIES =
-             Set.of(
-                     ChromeSharedPreferences.REGISTRY,
-+                    SharedPrefsUtils.REGISTRY,
-                     CachedFlagsSharedPreferences.REGISTRY,
-                     MultiInstanceSharedPreferences.REGISTRY);
+ 
++import java.util.Objects;
+ import java.util.Set;
+ 
+ @CheckDiscard("Preference key checking should only happen on build with asserts")
+@@ -22,6 +24,7 @@ public class AllPreferenceKeyRegistries {
+             BuildConfig.ENABLE_ASSERTS
+                     ? Set.of(
+                             ChromeSharedPreferences.REGISTRY,
++                            Objects.requireNonNull(SharedPrefsUtils.REGISTRY),
+                             CachedFlagsSharedPreferences.REGISTRY,
+                             MultiInstanceSharedPreferences.REGISTRY)
+                     : null;

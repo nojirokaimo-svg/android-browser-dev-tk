@@ -1,8 +1,8 @@
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -226,6 +226,7 @@ chrome_java_sources = [
-   "java/src/org/chromium/chrome/browser/backup/BoolPrefBackupSerializer.java",
+@@ -227,6 +227,7 @@ chrome_java_sources = [
+   "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
 +  "java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
@@ -27,21 +27,21 @@ diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/Andro
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
-@@ -19,5 +19,6 @@ import org.chromium.chrome.browser.accessibility.hierarchysnapshotter.HierarchyS
+@@ -17,5 +17,6 @@ import org.chromium.chrome.browser.accessibility.hierarchysnapshotter.HierarchyS
  import org.chromium.chrome.browser.app.notifications.ContextualNotificationPermissionRequesterImpl;
  import org.chromium.chrome.browser.background_task_scheduler.ChromeBackgroundTaskFactory;
 +import org.chromium.chrome.browser.backup.KiwiFullBackupActivity;
  import org.chromium.chrome.browser.base.SplitCompatApplication;
  import org.chromium.chrome.browser.crash.ChromePureJavaExceptionReporter;
  import org.chromium.chrome.browser.customtabs.CustomTabsConnection;
-@@ -48,6 +49,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {
+@@ -50,6 +51,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {
          super.onCreate();
  
-         if (SplitCompatApplication.isBrowserProcess()) {
-+            KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());
-             FontPreloader.getInstance().load(getApplication());
- 
-             // Registers the extensions for all protos which would be in the Chrome split, whether
+         ChromeApplicationImplHooks.onCreate();
++        KiwiFullBackupActivity.restorePendingBackupIfAny(getApplication());
+         // This Impl is only instantiated in the browser process; SplitChromeApplication uses the
+         // base Impl for all other processes so that the chrome split is never loaded there.
+         assert SplitCompatApplication.isBrowserProcess();
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
