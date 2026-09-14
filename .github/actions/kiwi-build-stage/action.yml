@@ -14,21 +14,21 @@ inputs:
     required: false
     default: ""
   require-restore:
-    description: Refuse to compile if restore-key is unavailable; use for Night mode incremental builds.
+    description: Refuse to compile if restore-key is unavailable; use for incremental builds.
     required: false
     default: "false"
   titanium-commit:
     required: false
-    default: "80ffcdf1cebe51cddc593f571a6f26c3374aea2e"
+    default: "7584b534f6e1f9c29e8bb98df71d7610960a5db3"
   vanadium-commit:
     required: false
-    default: "150a27e23302cc265baf8a7fb7c0f0112bddf2fd"
+    default: "02d87ad8e17aee77d0fea49d122349a5da87ed2e"
   chromium-commit:
     required: false
-    default: "506c834ecceaa943c5f41e6cfe7f68acb5c45346"
+    default: "507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c"
   chromium-version:
     required: false
-    default: "152.0.7977.64"
+    default: "153.0.8010.36"
   patch-mode:
     description: strict for pinned builds; best-effort for a newly resolved upstream.
     required: false
@@ -46,8 +46,6 @@ outputs:
 runs:
   using: composite
   steps:
-    # Resolve the exact checkpoint before spending time rebuilding the pinned
-    # source tree.  fail-on-cache-miss deliberately forbids fallback keys.
     - name: Restore exact previous compile checkpoint
       id: restore
       if: inputs.restore-key != ''
@@ -87,14 +85,13 @@ runs:
         python3 kiwi_port/incremental_sources.py work/titanium/chromium/src \
           --cache-key '${{ inputs.restore-key }}' \
           --identity '${{ inputs.titanium-commit }}:${{ inputs.vanadium-commit }}:${{ inputs.chromium-commit }}:validation'
-        # Reconcile a cached GN graph only when build arguments changed.
         args=work/titanium/chromium/src/out/Default/args.gn
         if ! grep -qx 'treat_warnings_as_errors = false' "$args"; then
           echo 'treat_warnings_as_errors = false' >> "$args"
           (cd work/titanium/chromium/src && PATH="$GITHUB_WORKSPACE/work/depot_tools:$PATH" gn gen out/Default)
         fi
 
-    - name: Continue arm64 APK compilation for at most 210 minutes
+    - name: Continue arm64 APK compilation within the stage budget
       id: compile
       shell: bash
       env:
@@ -110,8 +107,6 @@ runs:
         raise SystemExit(0 if json.load(open(sys.argv[1]))["changed_sources"] else 1)
         PY
         then
-          # Every patch-owned edit must make the APK target dirty.  Refuse to
-          # publish a cached APK if timestamp restoration hid a real change.
           set +e
           env INVOKED_BY_BUILD_SERVER=1 /usr/bin/ninja \
             -C work/titanium/chromium/src/out/Default -n chrome_public_apk \
@@ -128,9 +123,6 @@ runs:
           fi
           date +%s%N > output/incremental-build-start-ns
         fi
-        # chrome_public_apk already depends on its Java/Lint target. Running
-        # that target separately made resume jobs execute the same 2,430-edge
-        # dependency chain twice, so let the real APK graph run it once.
         ./build_kiwi_ui_arm64.sh 2>&1 | tee output/build.log
 
     - name: Record result and checkpoint size
