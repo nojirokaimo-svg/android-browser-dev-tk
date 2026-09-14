@@ -3,7 +3,7 @@ description: Prepare the pinned tree, resume a cached Ninja output directory, an
 
 inputs:
   restore-key:
-    description: Exact cache key produced by the previous stage; empty for stage 1.
+    description: Exact cache key produced by the previous stage; empty for a cold stage 1.
     required: false
     default: ""
   save-key:
@@ -14,9 +14,13 @@ inputs:
     required: false
     default: ""
   require-restore:
-    description: Refuse to compile if restore-key is unavailable; use for incremental builds.
+    description: Refuse a cold build when this stage is intended to resume a checkpoint.
     required: false
     default: "false"
+  bootstrap-revision:
+    description: Repository revision that created a checkpoint lacking provenance. Empty disables one-time bootstrap.
+    required: false
+    default: ""
   titanium-commit:
     required: false
     default: "7584b534f6e1f9c29e8bb98df71d7610960a5db3"
@@ -48,7 +52,16 @@ runs:
   steps:
     - name: Verify complete patch series integrity
       shell: bash
-      run: python3 kiwi_port/verify_series.py
+      run: |
+        python3 kiwi_port/verify_series.py
+        python3 -m py_compile kiwi_port/apply.py kiwi_port/incremental_sources.py
+
+    - name: Enforce checkpoint-only resume
+      if: inputs.require-restore == 'true' && inputs.restore-key == ''
+      shell: bash
+      run: |
+        echo 'This stage requires an exact checkpoint key; refusing a cold build.' >&2
+        exit 1
 
     - name: Restore exact previous compile checkpoint
       id: restore
@@ -59,6 +72,17 @@ runs:
         key: ${{ inputs.restore-key }}
         fail-on-cache-miss: true
 
+    - name: Verify restored checkpoint before preparation
+      if: inputs.restore-key != ''
+      shell: bash
+      run: |
+        out=work/titanium/chromium/src/out/Default
+        test -f "$out/.ninja_log"
+        test -f "$out/build.ninja"
+        test -f "$out/args.gn"
+        echo "Restored exact checkpoint: ${{ inputs.restore-key }}"
+        du -sh "$out"
+
     - name: Free runner disk
       shell: bash
       run: |
@@ -66,9 +90,20 @@ runs:
         sudo docker system prune --all --force --volumes || true
         df -h
 
-    - name: Verify patch applicator
+    # build_kiwi_ui_arm64.sh prepares a fresh pinned Chromium checkout and normally
+    # runs gn gen at the end.  On a continuation, hide the restored checkpoint in
+    # the same out/ directory first.  Preparation can generate a disposable
+    # out/Default, but it can never rewrite the cached .ninja_log, args.gn, Ninja
+    # files, objects or generated outputs we are resuming from.
+    - name: Protect restored out Default from source preparation
+      if: inputs.restore-key != ''
       shell: bash
-      run: python3 -m py_compile kiwi_port/apply.py
+      run: |
+        root=work/titanium/chromium/src/out
+        checkpoint="$root/.kiwi-restored-Default"
+        test ! -e "$checkpoint"
+        mv "$root/Default" "$checkpoint"
+        echo 'Restored out/Default is protected; preparation cannot modify it.'
 
     - name: Prepare pinned and patched Chromium tree
       shell: bash
@@ -82,18 +117,56 @@ runs:
         CHROMIUM_VERSION: ${{ inputs.chromium-version }}
       run: ./build_kiwi_ui_arm64.sh
 
-    - name: Preserve Ninja history and expose only genuinely changed sources
+    - name: Restore untouched checkpoint after source preparation
+      if: always() && inputs.restore-key != ''
+      shell: bash
+      run: |
+        root=work/titanium/chromium/src/out
+        checkpoint="$root/.kiwi-restored-Default"
+        generated="$root/.kiwi-prepare-generated"
+        if [[ -d "$checkpoint" ]]; then
+          test ! -e "$generated"
+          if [[ -e "$root/Default" ]]; then
+            mv "$root/Default" "$generated"
+          fi
+          mv "$checkpoint" "$root/Default"
+        fi
+        test -f "$root/Default/.ninja_log"
+        test -f "$root/Default/build.ninja"
+        test -f "$root/Default/args.gn"
+        echo 'Original restored out/Default is back in place unchanged by prepare/gn gen.'
+
+    - name: Prove one-time provenance bootstrap is source-identical
+      if: inputs.restore-key != '' && inputs.bootstrap-revision != ''
+      shell: bash
+      run: |
+        base='${{ inputs.bootstrap-revision }}'
+        git fetch --no-tags --depth=1 origin "$base"
+        protected_paths=(
+          build_kiwi_ui_arm64.sh
+          kiwi_port/apply.py
+          kiwi_port/manifest.json
+          kiwi_port/patches
+        )
+        if ! git diff --quiet "$base" HEAD -- "${protected_paths[@]}"; then
+          echo 'Build/source-producing inputs changed since the checkpoint revision; refusing provenance bootstrap.' >&2
+          git diff --name-only "$base" HEAD -- "${protected_paths[@]}" >&2
+          exit 1
+        fi
+        echo "Source-producing inputs match checkpoint revision $base exactly."
+
+    - name: Preserve Ninja history without rewriting restored output
       if: inputs.restore-key != ''
       shell: bash
       run: |
+        bootstrap_args=()
+        if [[ -n '${{ inputs.bootstrap-revision }}' ]]; then
+          bootstrap_args+=(--bootstrap-current)
+        fi
         python3 kiwi_port/incremental_sources.py work/titanium/chromium/src \
           --cache-key '${{ inputs.restore-key }}' \
-          --identity '${{ inputs.titanium-commit }}:${{ inputs.vanadium-commit }}:${{ inputs.chromium-commit }}:validation'
-        args=work/titanium/chromium/src/out/Default/args.gn
-        if ! grep -qx 'treat_warnings_as_errors = false' "$args"; then
-          echo 'treat_warnings_as_errors = false' >> "$args"
-          (cd work/titanium/chromium/src && PATH="$GITHUB_WORKSPACE/work/depot_tools:$PATH" gn gen out/Default)
-        fi
+          --identity '${{ inputs.titanium-commit }}:${{ inputs.vanadium-commit }}:${{ inputs.chromium-commit }}:validation' \
+          "${bootstrap_args[@]}"
 
     - name: Continue arm64 APK compilation within the stage budget
       id: compile
@@ -176,7 +249,6 @@ runs:
           work/titanium/chromium/src/out/Default/*.log
           output/*.log
           output/kiwi-patch-report.*
-          work/titanium/chromium/src/**/*.rej
         include-hidden-files: true
         if-no-files-found: ignore
         retention-days: 7
