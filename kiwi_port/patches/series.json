@@ -50,7 +50,7 @@
     },
     {
       "id": "night-mode-presets",
-      "name": "Six Kiwi Night mode presets on the Chromium 152 renderer path",
+      "name": "Six Kiwi Night mode presets on the Chromium renderer path",
       "patch": "050-night-mode-presets.patch",
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java",
@@ -89,14 +89,13 @@
     },
     {
       "id": "extension-mobile-ui",
-      "name": "Fit chrome extensions management UI to phone widths",
+      "name": "Match Kiwi extension manager geometry on phone widths",
       "patch": "080-extension-mobile-ui.patch",
       "files": [
         "chrome/browser/resources/extensions/item_list.css",
-        "chrome/browser/resources/extensions/shared_style.css",
         "chrome/browser/resources/extensions/manager.css"
       ],
-      "sha256": "2f319818ef2a4ee3f2c94210f5fc8b11555ae8c556e68073b3930311f39b6e0c"
+      "sha256": "55c5097302361179d82569830bd6d35d7582c4f21a9b2a2297ed454bc0c06c36"
     },
     {
       "id": "black-statusbar-full-backup",
