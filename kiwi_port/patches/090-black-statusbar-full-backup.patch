@@ -58,7 +58,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSe
  
          SettingsUtils.addPreferencesFromResource(this, R.xml.main_preferences);
 +        boolean isJapanese = java.util.Locale.getDefault().getLanguage().equals("ja");
-+        Preference fullBackupPreference = new Preference(getStyledContext());
++        Preference fullBackupPreference = new Preference(requireContext());
 +        fullBackupPreference.setKey("kiwi_full_backup");
 +        fullBackupPreference.setTitle(isJapanese ? "フルバックアップ / 復元" : "Full backup / restore");
 +        fullBackupPreference.setSummary(

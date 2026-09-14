@@ -107,7 +107,7 @@
         "chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java",
         "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java"
       ],
-      "sha256": "8c4146c6008fabab30f92230c1144f706ce782e62d856a7d97162b05d9663be7"
+      "sha256": "013476dcc2847a75648ae07446bfeb4850522c7b0a6d862174404ad481441836"
     },
     {
       "id": "kiwi-tab-switcher",
@@ -127,7 +127,7 @@
         "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java",
         "titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java"
       ],
-      "sha256": "8c3dddd82b1671edf60f2743e872d1e2dc4dd8edc055c03512e8ba4f67c1c8da"
+      "sha256": "4f25483ed5fdae9a2adbc19aa80a4a816ea78b7079d35c2991a696fa803f2477"
     }
   ]
 }

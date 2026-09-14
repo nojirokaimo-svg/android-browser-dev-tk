@@ -32,12 +32,12 @@ jobs:
         with:
           # Recovery is deliberately exact: never fall back to an older/empty
           # checkpoint and never start another cold multi-hour compile.
-          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-153-74e12da0849d380f66bc3f93a36a4a167910bee9-stage-1' }}
+          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-153-031651c539d609177bee2c9cf5120472064a510a-stage-1' }}
           require-restore: "true"
           # The pinned recovery cache predates source-provenance metadata.  The
           # composite action permits bootstrap only after proving that every
           # source-producing input still matches this exact revision.
-          bootstrap-revision: ${{ inputs.incremental_cache_key == '' && '74e12da0849d380f66bc3f93a36a4a167910bee9' || '' }}
+          bootstrap-revision: ""
           save-key: kiwi-153-${{ github.sha }}-stage-1
           final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-1
           titanium-commit: 7584b534f6e1f9c29e8bb98df71d7610960a5db3

@@ -272,7 +272,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwi
 new file mode 100644
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
-@@ -0,0 +1,48 @@
+@@ -0,0 +1,54 @@
 +// Copyright 2026 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -288,6 +288,7 @@ new file mode 100644
 +import org.chromium.build.annotations.Nullable;
 +import org.chromium.chrome.R;
 +import org.chromium.components.browser_ui.settings.CustomDividerFragment;
++import org.chromium.components.browser_ui.settings.SettingsFragment;
 +import org.chromium.components.browser_ui.settings.SettingsUtils;
 +
 +import java.util.Locale;
@@ -314,6 +315,11 @@ new file mode 100644
 +    @Override
 +    public MonotonicObservableSupplier<String> getPageTitle() {
 +        return mPageTitle;
++    }
++
++    @Override
++    public @SettingsFragment.AnimationType int getAnimationType() {
++        return SettingsFragment.AnimationType.PROPERTY;
 +    }
 +
 +    @Override
