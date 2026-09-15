@@ -33,7 +33,7 @@
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/res/values/styles.xml"
       ],
-      "sha256": "4dec8273107d00b36b1012bb4870647bf7549ece8e83d7ee8f26390c42014eeb"
+      "sha256": "296ccf475e9d499b8e304a753ec476d71246d39bbe9a444e7071f419fc38e1e8"
     },
     {
       "id": "preference-registry",
@@ -95,7 +95,7 @@
         "chrome/browser/resources/extensions/item_list.css",
         "chrome/browser/resources/extensions/manager.css"
       ],
-      "sha256": "71dded79f0f2fdcba2751114e35fc642f718c676f789b51560349e89debf2eab"
+      "sha256": "e6592a97c8a1ff665403f17188244ada01169e2ddb9d1dfe8a047cf3c1baa0fd"
     },
     {
       "id": "black-statusbar-full-backup",

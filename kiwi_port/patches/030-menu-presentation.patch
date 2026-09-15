@@ -2,7 +2,7 @@ diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/ch
 index 4dea03c56a8b6..0000000000000 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -399,12 +399,14 @@ class AppMenu implements OnKeyListener {
+@@ -399,12 +399,13 @@ class AppMenu implements OnKeyListener {
          }
  
 -        if (SysUtils.isLowEndDevice()) {
@@ -18,7 +18,7 @@ index 4dea03c56a8b6..0000000000000 100644
              }
          }
  
-@@ -977,11 +979,43 @@ class AppMenu implements OnKeyListener {
+@@ -977,11 +979,42 @@ class AppMenu implements OnKeyListener {
          mMenuItemEnterAnimator.start();
      }
  
