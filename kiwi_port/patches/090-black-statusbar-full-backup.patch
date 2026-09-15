@@ -78,14 +78,15 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSe
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java b/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
-@@ -500,6 +500,12 @@ public class StatusBarColorController
+@@ -500,6 +500,13 @@ public class StatusBarColorController
      /** Calculate and update the status bar's color. */
      public void updateStatusBarColor() {
          @ColorInt int statusBarColor = calculateFinalStatusBarColor();
-+        int nightMode =
-+                mActivity.getResources().getConfiguration().uiMode
-+                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
-+        if (nightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
++        int weightedLuminance =
++                Color.red(statusBarColor) * 299
++                        + Color.green(statusBarColor) * 587
++                        + Color.blue(statusBarColor) * 114;
++        if (weightedLuminance < 128000) {
 +            statusBarColor = Color.BLACK;
 +        }
          setStatusBarColor(
@@ -583,3 +584,38 @@ new file mode 100644
 +        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_LONG).show());
 +    }
 +}
+diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
+--- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
++++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
+@@ -582,9 +582,10 @@ public class ToolbarPhone extends ToolbarLayout
+     /** Set the background color of the location bar to appropriately match the theme color. */
+     private void updateModernLocationBarColor(@ColorInt int color) {
++        color = forcePureBlackForDarkSurface(color);
+         if (mCurrentLocationBarColor == color) return;
+         mCurrentLocationBarColor = color;
+         mLocationBarBackground.setBackgroundColor(color);
+         if (mOptionalButtonCoordinator != null) {
+             mOptionalButtonCoordinator.setBackgroundColorFilter(color);
+         }
+     }
+@@ -924,8 +925,20 @@ public class ToolbarPhone extends ToolbarLayout
+         return Math.max(mToolbarSidePaddingForNtp, toolbarButtonsContainerWidth);
+     }
+ 
++    /** Makes every dark browser-chrome surface pure black, including Titanium AMOLED. */
++    private static @ColorInt int forcePureBlackForDarkSurface(@ColorInt int color) {
++        int weightedLuminance =
++                Color.red(color) * 299
++                        + Color.green(color) * 587
++                        + Color.blue(color) * 114;
++        return weightedLuminance < 128000
++                ? Color.argb(Color.alpha(color), 0, 0, 0)
++                : color;
++    }
++
+     private void updateToolbarBackground(@ColorInt int color) {
++        color = forcePureBlackForDarkSurface(color);
+         if (mToolbarBackground.getColor() == color) return;
+         mToolbarBackground.setColor(color);
+         setToolbarHairlineColor(color);
+         invalidate();

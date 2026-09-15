@@ -2,7 +2,7 @@ diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/ch
 index 4dea03c56a8b6..0000000000000 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -399,12 +399,19 @@ class AppMenu implements OnKeyListener {
+@@ -399,12 +399,21 @@ class AppMenu implements OnKeyListener {
          }
  
 -        if (SysUtils.isLowEndDevice()) {
@@ -12,13 +12,15 @@ index 4dea03c56a8b6..0000000000000 100644
              if (sharedDrawable != null) {
                  var drawable = sharedDrawable.mutate();
 -                drawable.setTint(SemanticColorUtils.getMenuBgColor(context));
++                int menuBgColor = SemanticColorUtils.getMenuBgColor(context);
 +                boolean isDark =
-+                        (context.getResources().getConfiguration().uiMode
-+                                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
-+                                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-+                // Match Kiwi's pure-black overflow menu in dark mode while preserving
-+                // Chromium's normal surface color in light mode.
-+                drawable.setTint(isDark ? Color.BLACK : SemanticColorUtils.getMenuBgColor(context));
++                        Color.red(menuBgColor) * 299
++                                        + Color.green(menuBgColor) * 587
++                                        + Color.blue(menuBgColor) * 114
++                                < 128000;
++                // Match Kiwi's pure-black overflow menu for every dark browser theme,
++                // including Titanium AMOLED, while preserving the light surface color.
++                drawable.setTint(isDark ? Color.BLACK : menuBgColor);
                  drawable.setTintMode(PorterDuff.Mode.MULTIPLY);
                  contentView.setBackground(drawable);
              }
