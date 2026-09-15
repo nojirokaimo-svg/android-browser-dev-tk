@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       incremental_cache_key:
-        description: Exact Chromium 153 out/Default cache key. Empty uses the pinned recovery Stage-1 checkpoint; cache miss stops immediately.
+        description: Exact Chromium 153 out/Default cache key. Empty uses the latest pinned valid checkpoint; cache miss stops immediately.
         required: false
         default: ""
   push:
@@ -30,13 +30,12 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Recovery is deliberately exact: never fall back to an older/empty
+          # Resume is deliberately exact: never fall back to an older/empty
           # checkpoint and never start another cold multi-hour compile.
-          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-153-031651c539d609177bee2c9cf5120472064a510a-stage-1' }}
+          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-153-2e4a14806483cb842fe3d478443738ab679e797b-stage-5' }}
           require-restore: "true"
-          # The pinned recovery cache predates source-provenance metadata.  The
-          # composite action permits bootstrap only after proving that every
-          # source-producing input still matches this exact revision.
+          # The pinned checkpoint is the latest valid M153 lineage and is restored
+          # only by exact key after all source-producing inputs are verified.
           bootstrap-revision: ""
           save-key: kiwi-153-${{ github.sha }}-stage-1
           final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-1
