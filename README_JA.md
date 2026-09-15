@@ -7,12 +7,16 @@ Titaniumの現行Chromiumと拡張機能基盤を保ち、Kiwi風UIを機能別p
 - 3点メニュー上部の5操作行
 - 拡張機能のカラーアイコン・バッジ付き行と既存権限/popup経路での実行
 - フラットな「拡張機能」管理行
-- 通常メニューのアイコンとKiwiに近いコンパクトpopup
-- Chromiumの大きな下部メニューとサブメニューを既定で無効化
-- 基本Night mode ON/OFF（UI暗色＋Auto Dark）
+- 通常メニューのアイコンとKiwiに近いコンパクトpopup（暗色時 `#202124`）
+- popupから開くサブメニューも同じKiwi暗色surfaceへ統一
+- 6種類のNight mode、renderer contrast/grayscale/high-contrast伝播
+- AMOLED時のシステムstatus bar・toolbar・再表示後の合成toolbarを純黒化
+- Kiwi密度へ寄せた拡張機能管理画面と、削除前の確認dialog
+- Default／Original／Horizontal／Vertical／Grid／List／Desktopの7種類から選べるタブ切り替え
+- タブ状態・download・history・bookmarkを含む手動backup/restore
 - 英語・日本語リソース
 
-完全移植ではありません。Kiwiの6種類のNight mode、設定画面全体、ツールバー設定、旧タブ表示方式、新規タブ・履歴等の全画面調整は未実装です。6種類のNight modeはChromium 152のレンダラー設定伝播と旧Kiwiの方式が非互換なため、Astraで設計を確定してから実装します。
+完全移植ではありません。実機での6種類のNight mode、全7タブ切り替え、backup/restore、各popupの最終確認は継続中です。
 
 ## patch構成
 
@@ -26,13 +30,13 @@ Titaniumの現行Chromiumと拡張機能基盤を保ち、Kiwi風UIを機能別p
 
 拡張機能とNight modeは同じActivity/メニュー生成箇所を変更するため、競合しやすいファイルを二重patchにせず、一つの依存単位にしています。
 
-固定対象はTitanium `80ffcdf1cebe51cddc593f571a6f26c3374aea2e`、Vanadium `150a27e23302cc265baf8a7fb7c0f0112bddf2fd`、Chromium `506c834ecceaa943c5f41e6cfe7f68acb5c45346` (`152.0.7977.64`)です。`manifest.json`には固定版の適用前後ハッシュを残しています。
+固定対象はTitanium `7584b534f6e1f9c29e8bb98df71d7610960a5db3`、Vanadium `02d87ad8e17aee77d0fea49d122349a5da87ed2e`、Chromium `507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c` (`153.0.8010.36`)です。`manifest.json`には固定版の適用前後ハッシュを残しています。
 
 ## 固定版APKビルド
 
-Actionsの **Build Titanium-Kiwi core** を実行します。GitHub-hosted runnerの6時間制限を避けるため、1段階210分で安全停止し、`out/Default`をActions cacheへ保存して最大5段階で継続します。前段のobjectを復元するので完了済みコンパイルはやり直しません。
+Actionsの **Build Titanium-Kiwi core** を実行します。GitHub-hosted runnerの6時間制限を避けるため、1段階90分で安全停止し、`out/Default`をActions cacheへ保存して最大5段階で継続します。前段のobjectを復元するので完了済みコンパイルはやり直しません。
 
-成功artifactは `Titanium-Kiwi-core-<version>-arm64` で、APKと `SHA256SUMS.txt` を含みます。テスト版package名は `io.github.nojirokaimo.titaniumkiwi`、Chromiumのテスト署名です。
+成功artifactは `Titanium-Kiwi-core-<version>-arm64` で、APKと `SHA256SUMS.txt` を含みます。テスト版package名は `io.github.nojirokaimo.titaniumkiwi` です。artifact内のAPKはAndroid v2署名を検証し、`SHA256SUMS.txt`を同梱します。
 
 ### Night mode等の増分再ビルド
 
@@ -58,7 +62,7 @@ workflowは次を自動実行します。
 
 1. 新しいTitanium commit、Vanadium submodule、Chromium version/tag SHAを固定
 2. Titanium/Vanadium patch適用後のChromiumへKiwi機能patchをbest-effort適用
-3. 競合がなければ、固定版と同じ210分×最大5段階のcache継続ビルド
+3. 競合がなければ、固定版と同じ90分×最大5段階のcache継続ビルド
 4. 競合時はビルドせず、機能別レポート、JSON、`.rej`をfailure artifactへ保存
 
 このworkflowはupstreamを検証用のdetached checkoutへ取得します。作業branchを強制merge/force-pushしないため、既存成果や進行中ビルドを壊しません。成功した固定SHAを確認後、必要なら通常のGit操作でforkへmergeします。
