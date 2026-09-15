@@ -2,41 +2,66 @@ diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/ch
 index 4dea03c56a8b6..0000000000000 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -399,12 +399,32 @@ class AppMenu implements OnKeyListener {
+@@ -399,12 +399,14 @@ class AppMenu implements OnKeyListener {
          }
  
 -        if (SysUtils.isLowEndDevice()) {
-+        // Kiwi uses a compact 8dp menu shape on all devices.
++        // Kiwi keeps the compact 8dp popup and its dark #202124 surface.
 +        {
              var sharedDrawable = AppCompatResources.getDrawable(context, R.drawable.popup_bg_8dp);
              if (sharedDrawable != null) {
                  var drawable = sharedDrawable.mutate();
 -                drawable.setTint(SemanticColorUtils.getMenuBgColor(context));
-+                int menuBgColor = SemanticColorUtils.getMenuBgColor(context);
-+                boolean isDark =
-+                        Color.red(menuBgColor) * 299
-+                                        + Color.green(menuBgColor) * 587
-+                                        + Color.blue(menuBgColor) * 114
-+                                < 128000;
-+                // Match Kiwi's pure-black overflow menu for every dark browser theme,
-+                // including Titanium AMOLED, while preserving the light surface color.
-+                drawable.setTint(isDark ? Color.BLACK : menuBgColor);
++                drawable.setTint(getKiwiMenuBackgroundColor(context));
                  drawable.setTintMode(PorterDuff.Mode.MULTIPLY);
                  contentView.setBackground(drawable);
-+                if (isDark) {
-+                    View innerContainer =
-+                            contentView.findViewById(R.id.app_menu_content_container);
-+                    var innerBackground = innerContainer.getBackground();
-+                    if (innerBackground != null) {
-+                        innerBackground = innerBackground.mutate();
-+                        innerBackground.setTint(Color.BLACK);
-+                        innerBackground.setTintMode(PorterDuff.Mode.SRC_IN);
-+                        innerContainer.setBackground(innerBackground);
-+                    }
-+                }
              }
          }
  
+@@ -977,11 +979,43 @@ class AppMenu implements OnKeyListener {
+         mMenuItemEnterAnimator.start();
+     }
+ 
++    private static int getKiwiMenuBackgroundColor(Context context) {
++        int menuBgColor = SemanticColorUtils.getMenuBgColor(context);
++        boolean isDark =
++                Color.red(menuBgColor) * 299
++                                + Color.green(menuBgColor) * 587
++                                + Color.blue(menuBgColor) * 114
++                        < 128000;
++        return isDark ? Color.rgb(32, 33, 36) : menuBgColor;
++    }
++
++    private static void tintKiwiMenuBackgrounds(
++            Context context, ViewGroup contentView, ViewGroup innerContainer) {
++        int menuBgColor = getKiwiMenuBackgroundColor(context);
++        var sharedDrawable = AppCompatResources.getDrawable(context, R.drawable.popup_bg_8dp);
++        if (sharedDrawable != null) {
++            var outerBackground = sharedDrawable.mutate();
++            outerBackground.setTint(menuBgColor);
++            outerBackground.setTintMode(PorterDuff.Mode.MULTIPLY);
++            contentView.setBackground(outerBackground);
++        }
++
++        var innerBackground = innerContainer.getBackground();
++        if (innerBackground != null) {
++            innerBackground = innerBackground.mutate();
++            innerBackground.setTint(menuBgColor);
++            innerBackground.setTintMode(PorterDuff.Mode.SRC_IN);
++            innerContainer.setBackground(innerBackground);
++        }
++    }
++
+     private View createAppMenuContentView(Context context, boolean addTopPaddingBeforeFirstRow) {
+         ViewGroup contentView =
+                 (ViewGroup) LayoutInflater.from(context).inflate(R.layout.app_menu_layout, null);
+ 
+         ViewGroup innerContainer = contentView.findViewById(R.id.app_menu_content_container);
++        tintKiwiMenuBackgrounds(context, contentView, innerContainer);
+ 
+         // Ensure the inner shape has standard padding, and conditionally add visual menu top
+         // padding.
+
 diff --git a/components/browser_ui/styles/android/java/res/values/styles.xml b/components/browser_ui/styles/android/java/res/values/styles.xml
 index 2876f1d44b33835568a2f7ca3ed66134cc935711..69d0f1a94c1a929212784e5fdebeb2d6e0c11eb8 100644
 --- a/components/browser_ui/styles/android/java/res/values/styles.xml

@@ -27,13 +27,13 @@
     },
     {
       "id": "menu-presentation",
-      "name": "Compact menu presentation, pure-black dark overflow surface, and bottom-menu disabling",
+      "name": "Compact Kiwi menu presentation with matched main and flyout dark surfaces",
       "patch": "030-menu-presentation.patch",
       "files": [
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/res/values/styles.xml"
       ],
-      "sha256": "99be8b3fe6b1154d78d193730883c63b6057a403edf29d74dbad6dc794b7be3a"
+      "sha256": "4dec8273107d00b36b1012bb4870647bf7549ece8e83d7ee8f26390c42014eeb"
     },
     {
       "id": "preference-registry",
@@ -87,13 +87,15 @@
     },
     {
       "id": "extension-mobile-ui",
-      "name": "Match Kiwi extension manager geometry on phone widths",
+      "name": "Compact Kiwi extension manager geometry with explicit removal confirmation",
       "patch": "080-extension-mobile-ui.patch",
       "files": [
+        "chrome/browser/resources/extensions/item.css",
+        "chrome/browser/resources/extensions/item.ts",
         "chrome/browser/resources/extensions/item_list.css",
         "chrome/browser/resources/extensions/manager.css"
       ],
-      "sha256": "418c58a46d3f23e0a39fe3aca8a294253aba8c4db7fe73a1657cc0a39a6b148c"
+      "sha256": "71dded79f0f2fdcba2751114e35fc642f718c676f789b51560349e89debf2eab"
     },
     {
       "id": "black-statusbar-full-backup",

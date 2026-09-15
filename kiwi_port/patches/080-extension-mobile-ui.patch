@@ -7,11 +7,16 @@ diff --git a/chrome/browser/resources/extensions/item_list.css b/chrome/browser/
  }
 +
 +@media (max-width: 600px) {
-+  /* Kiwi keeps the desktop 400px card instead of stretching each card to
-+   * the full phone width. Only drop Chromium's minimum wrapper width so
-+   * the fixed card can stay centered inside the phone viewport. */
++  /* Kiwi uses a compact centered card on phones instead of Chromium's
++   * nearly edge-to-edge modern layout. */
++  .items-container,
++  #content-wrapper {
++    --extensions-card-width: min(320px, calc(100vw - 32px));
++  }
++
 +  #content-wrapper {
 +    min-width: 0;
++    padding: 20px 16px 64px;
 +  }
 +
 +  /* Kiwi's phone list starts directly with extension cards. Chromium 152+
@@ -54,3 +59,71 @@ diff --git a/chrome/browser/resources/extensions/manager.css b/chrome/browser/re
 +    display: none;
 +  }
 +}
+diff --git a/chrome/browser/resources/extensions/item.css b/chrome/browser/resources/extensions/item.css
+--- a/chrome/browser/resources/extensions/item.css
++++ b/chrome/browser/resources/extensions/item.css
+@@ -140,3 +140,39 @@
+   overflow: hidden;
+ }
++
++@media (max-width: 600px) {
++  :host {
++    font-size: 13px;
++  }
++
++  #icon-wrapper {
++    padding: 4px;
++  }
++
++  #icon {
++    height: 30px;
++    width: 30px;
++  }
++
++  #card.dev-mode {
++    height: 184px;
++  }
++
++  #main {
++    padding: 12px;
++  }
++
++  #content {
++    margin-inline-start: 12px;
++  }
++
++  #button-strip {
++    padding-inline-end: 12px;
++  }
++
++  #source-indicator {
++    margin-inline-start: 17px;
++    margin-top: 17px;
++  }
++}
+diff --git a/chrome/browser/resources/extensions/item.ts b/chrome/browser/resources/extensions/item.ts
+--- a/chrome/browser/resources/extensions/item.ts
++++ b/chrome/browser/resources/extensions/item.ts
+@@ -231,6 +231,13 @@ export class ExtensionsItemElement extends ExtensionsItemElementBase {
+   }
+ 
+   protected onRemoveClick_() {
++    const removeMessage = navigator.language.startsWith('ja') ?
++        `拡張機能「${this.data.name}」を削除しますか？` :
++        `Remove extension "${this.data.name}"?`;
++    if (!window.confirm(removeMessage)) {
++      return;
++    }
++
+     if (this.safetyCheckShowing) {
+       const actionToRecord = this.data.safetyCheckText ?
+           'SafetyCheck.ReviewPanelRemoveClicked' :
+@@ -239,7 +246,7 @@ export class ExtensionsItemElement extends ExtensionsItemElementBase {
+       chrome.metricsPrivate.recordUserAction(actionToRecord);
+     }
+     assert(this.delegate);
+-    this.delegate.deleteItem(this.data.id);
++    void this.delegate.deleteItems([this.data.id]);
+   }
+ 
+   protected onEnableToggleChange_() {
