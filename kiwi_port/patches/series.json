@@ -33,7 +33,7 @@
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/res/values/styles.xml"
       ],
-      "sha256": "8e8e4ea8c5127fc44f8189ccfc9c6efd11535f570763e31c862ddf3659251c0f"
+      "sha256": "99be8b3fe6b1154d78d193730883c63b6057a403edf29d74dbad6dc794b7be3a"
     },
     {
       "id": "preference-registry",
@@ -97,7 +97,7 @@
     },
     {
       "id": "black-statusbar-full-backup",
-      "name": "Pure-black dark system bar, toolbar, omnibox, and manual full browser-state backup",
+      "name": "Pure-black dark system bar, live/composited toolbar, omnibox, and manual full browser-state backup",
       "patch": "090-black-statusbar-full-backup.patch",
       "files": [
         "chrome/android/chrome_java_sources.gni",
@@ -106,9 +106,11 @@
         "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
         "chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java",
         "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java",
-        "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java"
+        "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java",
+        "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java",
+        "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java"
       ],
-      "sha256": "d4e08352ed1acc99fa4237f0373e6d0cd5c5ff5c7ae56acd19fbd879aa5b5105"
+      "sha256": "6148b3050547ba4aa80afd173b03050fc658d7eb70c7ac4e522aa4799d22b314"
     },
     {
       "id": "kiwi-tab-switcher",

@@ -619,3 +619,74 @@ diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/brow
          mToolbarBackground.setColor(color);
          setToolbarHairlineColor(color);
          invalidate();
+diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java
+--- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java
++++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java
+@@ -7,4 +7,5 @@
+ import android.animation.TimeAnimator.TimeListener;
+ import android.content.Context;
++import android.graphics.Color;
+ import android.graphics.Rect;
+ import android.view.View;
+@@ -484,7 +485,20 @@
+     private void updateThemeColor(Tab tab) {
+-        @ColorInt int color = getToolbarBackgroundColor(tab);
++        @ColorInt int color = forcePureBlackForDarkSurface(getToolbarBackgroundColor(tab));
+         mModel.set(TopToolbarOverlayProperties.TOOLBAR_BACKGROUND_COLOR, color);
+-        mModel.set(TopToolbarOverlayProperties.URL_BAR_COLOR, getUrlBarBackgroundColor(tab, color));
++        mModel.set(
++                TopToolbarOverlayProperties.URL_BAR_COLOR,
++                forcePureBlackForDarkSurface(getUrlBarBackgroundColor(tab, color)));
+     }
+ 
++    /** Keeps the composited toolbar black after browser-controls hide/show animations. */
++    private static @ColorInt int forcePureBlackForDarkSurface(@ColorInt int color) {
++        int weightedLuminance =
++                Color.red(color) * 299
++                        + Color.green(color) * 587
++                        + Color.blue(color) * 114;
++        return weightedLuminance < 128000
++                ? Color.argb(Color.alpha(color), 0, 0, 0)
++                : color;
++    }
++
+     // ThemeColorObserver implementation.
+diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java
+--- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java
++++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java
+@@ -316,16 +316,16 @@
+     @Override
+     public void toggleLocationBarOnlyMode(boolean showLocationBarOnly) {
+         if (mShowLocationBarOnly == showLocationBarOnly) return;
+ 
+         mShowLocationBarOnly = showLocationBarOnly;
+         if (showLocationBarOnly) {
+             mLocationBarView = mToolbar.removeLocationBarView();
+             assert mLocationBarView != null
+                     : "Trying to remove location bar view from toolbar when there is no location"
+                             + " bar";
+             mToolbar.getProgressBar().setVisibility(View.GONE);
+             mToolbarView.setVisibility(View.GONE);
+             mToolbarView.removeView(mLocationBarView);
+             mToolbarContainer.addView(mLocationBarView);
+-            setBackgroundColor(mToolbarDataProvider.getPrimaryColor());
++            setBackgroundColor(forcePureBlackForDarkSurface(mToolbarDataProvider.getPrimaryColor()));
+         } else {
+@@ -738,8 +738,16 @@
+     @Override
+     public void onPrimaryColorChanged() {
+         if (mShowLocationBarOnly) {
+-            setBackgroundColor(mToolbarDataProvider.getPrimaryColor());
++            setBackgroundColor(forcePureBlackForDarkSurface(mToolbarDataProvider.getPrimaryColor()));
+         }
+     }
+ 
++    private static int forcePureBlackForDarkSurface(int color) {
++        int weightedLuminance =
++                Color.red(color) * 299
++                        + Color.green(color) * 587
++                        + Color.blue(color) * 114;
++        return weightedLuminance < 128000 ? Color.BLACK : color;
++    }
++
+     /** The layout that handles generating the toolbar view resource. */
