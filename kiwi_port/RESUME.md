@@ -1,46 +1,55 @@
 # Current implementation checkpoint
 
-The existing Night mode feature patch is a work in progress, not yet a validated
-six-mode implementation. An incremental validation build is now authorized from
-this checkpoint; never clean or fall back to an older/empty cache.
+Chromium/Titanium 153.0.8010.36 release build completed successfully in GitHub
+Actions run 59. Continue from this point; do not clean, delete out/Default, or
+fall back to an older/empty cache.
 
-Completed in this continuation:
+Pinned upstream revisions:
 
-- Retained the existing preference registry crash fix and source provenance code.
-- Compared the LAB formula with Kiwi commit
-  `7be7edd1532148f22103cb4c5a1964d96297836f` and connected the contrast setting
-  to the LAB lightness pivot (100 + contrast * 100), clamping L to [0, 100].
-- Rejected nonfinite renderer settings before conversion to float.
-- Disabled AndroidX persistence in XML so preference inflation cannot write
-  an unregistered setting. Restart now requires successful synchronous storage.
-- Preset selection no longer silently enables global website darkening.
-- Pinned Chromium 152 APIs used by the restart and contrast paths were checked
-  before starting the incremental validation build.
+- Titanium: `7584b534f6e1f9c29e8bb98df71d7610960a5db3`
+- Vanadium: `02d87ad8e17aee77d0fea49d122349a5da87ed2e`
+- Chromium: `507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c`
+- Chromium version: `153.0.8010.36`
 
-Validation/build work in progress:
+Completed build checkpoint:
 
-- Fractional image grayscale is implemented with SkColorMatrix saturation and
-  cc::ColorFilter::MakeMatrix, following the old Kiwi image-filter path. The
-  Chromium renderer path compiled successfully in run 35; device rendering remains unvalidated.
-- High contrast is connected to foreground/list-symbol PaintFlags using Chromium
-  BlendForMinContrast, preserving author alpha. The Chromium target compiled in
-  run 35; the three renderer C++ regression tests still need to be executed.
-- The lifetime Java dependency is //chrome/browser/lifetime/android:java. Presets
-  save synchronously and expose an explicit restart action when the saved renderer
-  switch differs from the running process. Invalid values/storage failure do not
-  restart. Java type/lint validation passed through the successful incremental build gate.
-- Continue with executed renderer/persistence tests, device startup, then
-  settings/toolbar/tab work and whole-series upstream conflict tests. Do not
-  redo completed work or substitute old tab modes with aliases to GRID.
-- Workflow explicitly restores only completed cache
-  `kiwi-incremental-15a277216c780215b11a17ce021e12caaae7a7e0-stage-1`
-  and requires restore. A cache miss must stop before compilation.
+- Run: https://github.com/nojirokaimo-svg/android-titanium-browser/actions/runs/34927670350
+- Commit built: `b47e787dc7c2b9633624ebe996fd275155c340a1`
+- APK: `Titanium-Kiwi-core-153.0.8010.36-arm64-v8a.apk`
+- APK size: 323,925,692 bytes
+- APK SHA-256: `be882080da3425092530858e59ab490c7e94ca82d93a6b116f24c9ebfda00fe9`
+- libchrome.so: approximately 221.1 MB
+- Android v2 signature verification passed.
+- Completed incremental baseline:
+  `kiwi-incremental-153-b47e787dc7c2b9633624ebe996fd275155c340a1-stage-3`
 
-The local workspace has no out/Default. No clean operation is permitted. The
-incremental GitHub Actions run triggered by this checkpoint is the source of truth
-for Java/lint/native compile errors before further implementation changes.
+The workflow default is pinned to that exact completed M153 baseline. Exact cache
+misses must fail immediately; no restore-key fallback is permitted. M152 caches
+remain preserved but must never be used for M153.
 
-- Chromium 152 SkColorMatrix API was corrected to use an explicit 20-float row-major buffer; patch/manifest/series hashes were updated together.
-- The original read-only incremental workflow is restored; resume compile validation from the completed checkpoint.
+Compiled feature series retained:
 
-- Run 35 completed the APK in one resume stage from the exact Stage 1 checkpoint. The completed out/Default cache above is now the only workflow default; older or empty fallback keys remain forbidden.
+- Kiwi menu resources and application-menu actions
+- compact Kiwi-style overflow menu and pure-black dark overflow background
+- preference registry crash fix
+- six Night mode presets, renderer contrast/grayscale/high-contrast paths
+- runtime Night mode and renderer force-dark propagation
+- mobile extensions manager layout
+- pure-black dark status bar and full manual browser-state backup/restore
+- selectable Kiwi-style tab switcher
+
+Build configuration remains release optimized: `is_debug=false` and
+`is_official_build=true`. APK size checks are warning-only and must not discard
+an otherwise completed build, artifact, checksum, or incremental cache.
+
+Remaining validation:
+
+- Install and launch the M153 APK on an arm64 device.
+- Verify all six Night mode presets, renderer output, high contrast, persistence,
+  restart behavior, Settings, toolbar, overflow menu, extensions UI, and tabs.
+- Verify backup/restore of tab state, downloads, history, and bookmarks.
+- Run renderer regression tests not exercised by the APK target.
+- Regenerate final feature patches, manifest, and series after device fixes.
+- Test automatic reapplication onto a fresh upstream checkout, including
+  feature/file-specific conflict reporting and partial application behavior.
+- Document update, recovery, and patch-regeneration procedures in the README.
