@@ -9,6 +9,17 @@ diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java
    "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
    "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
    "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
+diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
+--- a/chrome/android/BUILD.gn
++++ b/chrome/android/BUILD.gn
+@@ -3724,6 +3724,7 @@ if (_is_default_toolchain) {
+       "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
+       "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
+       "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
++      "java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java",
+       "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
+       "java/src/org/chromium/chrome/browser/browserservices/digitalgoods/SiteIsolator.java",
+       "java/src/org/chromium/chrome/browser/browserservices/permissiondelegation/InstalledWebappBridge.java",
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
