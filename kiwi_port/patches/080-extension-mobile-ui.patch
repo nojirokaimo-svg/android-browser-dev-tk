@@ -15,29 +15,3 @@ diff --git a/chrome/browser/resources/extensions/item_list.css b/chrome/browser/
 +    --cr-card-background-color: #000;
 +  }
 +}
-diff --git a/chrome/browser/resources/extensions/item.ts b/chrome/browser/resources/extensions/item.ts
---- a/chrome/browser/resources/extensions/item.ts
-+++ b/chrome/browser/resources/extensions/item.ts
-@@ -231,6 +231,13 @@ export class ExtensionsItemElement extends ExtensionsItemElementBase {
-   }
- 
-   protected onRemoveClick_() {
-+    const removeMessage = navigator.language.startsWith('ja') ?
-+        `拡張機能「${this.data.name}」を削除しますか？` :
-+        `Remove extension "${this.data.name}"?`;
-+    if (!window.confirm(removeMessage)) {
-+      return;
-+    }
-+
-     if (this.safetyCheckShowing) {
-       const actionToRecord = this.data.safetyCheckText ?
-           'SafetyCheck.ReviewPanelRemoveClicked' :
-@@ -239,7 +246,7 @@ export class ExtensionsItemElement extends ExtensionsItemElementBase {
-       chrome.metricsPrivate.recordUserAction(actionToRecord);
-     }
-     assert(this.delegate);
--    this.delegate.deleteItem(this.data.id);
-+    void this.delegate.deleteItems([this.data.id]);
-   }
- 
-   protected onEnableToggleChange_() {
