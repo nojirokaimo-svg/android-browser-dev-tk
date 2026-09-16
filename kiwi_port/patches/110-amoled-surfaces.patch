@@ -1,3 +1,4 @@
+diff --git a/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java b/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
 --- a/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
 +++ b/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
 @@ -5,6 +5,7 @@
@@ -18,6 +19,7 @@
          if (BottomBarConfigUtils.isBottomBarEnabled(context)) {
              if (ColorUtils.inNightMode(context)) {
                  return SemanticColorUtils.getColorSurface(context);
+diff --git a/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java b/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
 --- a/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
 +++ b/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
 @@ -25,6 +25,7 @@
@@ -45,6 +47,7 @@
          if (applyWhiteBackground) {
              if (NewTabPageUtils.isNtpAuroraEnabled()) {
                  // When Aurora is enabled on customized image theme, use white mixed with 2% primary
+diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
 @@ -12,6 +12,7 @@
@@ -67,6 +70,7 @@
          invalidateSelf();
      }
  
+diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
 @@ -12,6 +12,7 @@
@@ -107,6 +111,7 @@
          return brandedColorScheme == BrandedColorScheme.INCOGNITO
                  ? context.getColor(R.color.omnibox_dropdown_bg_incognito)
                  : ContextCompat.getColor(context, R.color.omnibox_suggestion_dropdown_bg);
+diff --git a/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml b/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml
 --- a/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml
 +++ b/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml
 @@ -6,5 +6,5 @@
@@ -116,6 +121,7 @@
 -  <item android:color="?attr/colorSurface"/>
 +  <item android:color="@android:color/black"/>
  </selector>
+diff --git a/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml b/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml
 --- a/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml
 +++ b/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml
 @@ -6,5 +6,5 @@
