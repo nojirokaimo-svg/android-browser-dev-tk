@@ -153,13 +153,14 @@
       "patch": "120-kiwi-migration-extension-import.patch",
       "files": [
         "chrome/android/chrome_java_sources.gni",
+        "chrome/android/BUILD.gn",
         "chrome/android/java/AndroidManifest.xml",
         "chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java",
         "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java",
         "chrome/browser/android/BUILD.gn",
         "chrome/browser/android/backup/kiwi_migration_bridge.cc"
       ],
-      "sha256": "4dd6083aada04871852b00beb0c3297da52091c8fb01a387b0fe42f5600c1d11"
+      "sha256": "773cdd55ae672f07ec79ff0a6fd4ab29b4fd0cd917bf05488c13460f22ab7a7f"
     }
   ]
 }
