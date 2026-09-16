@@ -55,7 +55,7 @@ runs:
       run: |
         python3 kiwi_port/verify_series.py
         python3 -m py_compile kiwi_port/apply.py kiwi_port/incremental_sources.py
-        python3 -m unittest \
+        PYTHONPATH=kiwi_port python3 -m unittest \
           kiwi_port.test_reapply \
           kiwi_port.test_incremental_sources \
           kiwi_port.test_night_mode_patch
@@ -134,6 +134,9 @@ runs:
             mv "$root/Default" "$generated"
           fi
           mv "$checkpoint" "$root/Default"
+        elif [[ ! -d "$root/Default" ]]; then
+          echo 'No restored checkpoint exists because an earlier prerequisite failed.'
+          exit 0
         fi
         test -f "$root/Default/.ninja_log"
         test -f "$root/Default/build.ninja"
