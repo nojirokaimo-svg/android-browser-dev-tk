@@ -148,7 +148,7 @@
         "chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java",
         "chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java"
       ],
-      "sha256": "8e6e7dabeb47dea3643ac7177c1be3c99c30cd25034ab7d8b18316246db6c08e"
+      "sha256": "295ad110dbbe88287c74a7efffd3539a2550138483b6173fd3798a2962c4ac93"
     },
     {
       "id": "kiwi-migration-extension-import",

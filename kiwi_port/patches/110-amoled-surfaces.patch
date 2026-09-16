@@ -150,7 +150,7 @@ diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser
  
  import androidx.annotation.ColorInt;
  import androidx.annotation.ColorRes;
-@@ -19,6 +20,7 @@ import org.chromium.chrome.browser.tasks.tab_management.TabListEditorCoordinator.CreationMode;
+@@ -19,5 +20,6 @@ import org.chromium.chrome.browser.tasks.tab_management.TabListEditorCoordinator.CreationMode;
  import org.chromium.components.browser_ui.styles.SemanticColorUtils;
  import org.chromium.components.tab_groups.TabGroupColorId;
 +import org.chromium.ui.util.ColorUtils;
@@ -221,7 +221,7 @@ diff --git a/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/
  
  import androidx.annotation.ColorInt;
  import androidx.annotation.ColorRes;
-@@ -138,6 +139,9 @@ public class TabCardThemeUtil {
+@@ -138,7 +139,10 @@ public class TabCardThemeUtil {
              return isIncognito
                      ? ContextCompat.getColor(context, R.color.incognito_tab_bg_selected_color)
                      : MaterialColors.getColor(context, R.attr.colorPrimary, TAG);
