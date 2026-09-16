@@ -61,7 +61,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigr
 new file mode 100644
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
-@@ -0,0 +1,453 @@
+@@ -0,0 +1,455 @@
 +// Copyright 2026 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -432,9 +432,10 @@ new file mode 100644
 +    }
 +
 +    private String readUtf8(Uri uri, long limit) throws IOException {
-+        try (InputStream input = new BufferedInputStream(getContentResolver().openInputStream(uri));
++        InputStream rawInput = getContentResolver().openInputStream(uri);
++        if (rawInput == null) throw new IOException("Unable to open file");
++        try (InputStream input = new BufferedInputStream(rawInput);
 +                ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-+            if (input == null) throw new IOException("Unable to open file");
 +            byte[] buffer = new byte[64 * 1024];
 +            long total = 0;
 +            int count;
@@ -448,9 +449,10 @@ new file mode 100644
 +    }
 +
 +    private void copyUri(Uri uri, File target, long limit) throws IOException {
-+        try (InputStream input = new BufferedInputStream(getContentResolver().openInputStream(uri));
++        InputStream rawInput = getContentResolver().openInputStream(uri);
++        if (rawInput == null) throw new IOException("Unable to open file");
++        try (InputStream input = new BufferedInputStream(rawInput);
 +                OutputStream output = new BufferedOutputStream(new FileOutputStream(target))) {
-+            if (input == null) throw new IOException("Unable to open file");
 +            byte[] buffer = new byte[64 * 1024];
 +            long total = 0;
 +            int count;
