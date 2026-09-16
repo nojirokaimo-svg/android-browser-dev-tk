@@ -160,7 +160,7 @@
         "chrome/browser/android/BUILD.gn",
         "chrome/browser/android/backup/kiwi_migration_bridge.cc"
       ],
-      "sha256": "36d2635124d5616d7dd418f03ebaca54507897a0d8dd36a199b5770ef19f27ae"
+      "sha256": "dca4699c0cac33d535a6bca5c41a5404ebf857b9c5ccb75cc7c3eaa4d00a5bdf"
     }
   ]
 }
