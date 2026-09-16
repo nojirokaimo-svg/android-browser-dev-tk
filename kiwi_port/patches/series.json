@@ -135,7 +135,7 @@
     },
     {
       "id": "amoled-surfaces",
-      "name": "Pure-black AMOLED new tab and omnibox surfaces",
+      "name": "Pure-black AMOLED new tab, omnibox, and Kiwi-matched tab switcher surfaces",
       "patch": "110-amoled-surfaces.patch",
       "files": [
         "chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java",
@@ -143,9 +143,12 @@
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java",
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java",
         "components/browser_ui/widget/android/BUILD.gn",
-        "components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml"
+        "components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml",
+        "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabUiThemeProvider.java",
+        "chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java",
+        "chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java"
       ],
-      "sha256": "95e6fd8653f1e24925e6fe66dc29424ec5bad7e72c83b7a1d72e46c0322ae15b"
+      "sha256": "8e6e7dabeb47dea3643ac7177c1be3c99c30cd25034ab7d8b18316246db6c08e"
     },
     {
       "id": "kiwi-migration-extension-import",
@@ -163,7 +166,7 @@
         "chrome/browser/resources/extensions/toolbar.ts",
         "chrome/browser/ui/webui/extensions/extensions_ui.cc"
       ],
-      "sha256": "43514c49e79165313990618e0db3867ebb75d03b63aefe5ca8cf10f895ac1d93"
+      "sha256": "8f0226ee9dc671af84d299d5f7a9b9933df1297c3cd07eb08c3edc2ed71534ef"
     }
   ]
 }

@@ -780,7 +780,7 @@ new file mode 100644
 diff --git a/chrome/browser/resources/extensions/toolbar.html.ts b/chrome/browser/resources/extensions/toolbar.html.ts
 --- a/chrome/browser/resources/extensions/toolbar.html.ts
 +++ b/chrome/browser/resources/extensions/toolbar.html.ts
-@@ -43,6 +43,11 @@ export function getHtml(this: ToolbarElement) {
+@@ -43,5 +43,10 @@ export function getHtml(this: ToolbarElement) {
  <div id="devDrawer" ?expanded="${this.expanded_}">
    <div id="buttonStrip">
 +<if expr="is_android">
@@ -808,7 +808,7 @@ diff --git a/chrome/browser/resources/extensions/toolbar.ts b/chrome/browser/res
 diff --git a/chrome/browser/ui/webui/extensions/extensions_ui.cc b/chrome/browser/ui/webui/extensions/extensions_ui.cc
 --- a/chrome/browser/ui/webui/extensions/extensions_ui.cc
 +++ b/chrome/browser/ui/webui/extensions/extensions_ui.cc
-@@ -43,7 +43,9 @@
+@@ -43,6 +43,8 @@
  #include "ui/webui/webui_util.h"
  
  #if BUILDFLAG(IS_ANDROID)

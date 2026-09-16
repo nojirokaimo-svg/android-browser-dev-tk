@@ -139,3 +139,96 @@ new file mode 100644
 +  <solid android:color="@android:color/black"/>
 +  <corners android:radius="@dimen/home_surface_ui_background_radius"/>
 +</shape>
+diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabUiThemeProvider.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabUiThemeProvider.java
+--- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabUiThemeProvider.java
++++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabUiThemeProvider.java
+@@ -6,6 +6,7 @@ package org.chromium.chrome.browser.tasks.tab_management;
+ 
+ import android.content.Context;
+ import android.content.res.ColorStateList;
++import android.graphics.Color;
+ 
+ import androidx.annotation.ColorInt;
+ import androidx.annotation.ColorRes;
+@@ -19,6 +20,7 @@ import org.chromium.chrome.browser.tasks.tab_management.TabListEditorCoordinator.CreationMode;
+ import org.chromium.components.browser_ui.styles.SemanticColorUtils;
+ import org.chromium.components.tab_groups.TabGroupColorId;
++import org.chromium.ui.util.ColorUtils;
+ 
+ /** Utility class that provides theme related attributes for Tab UI. */
+ @NullMarked
+@@ -28,6 +30,9 @@ public class TabUiThemeProvider {
+ 
+     public static @ColorInt int getGridTabSwitcherBackgroundColor(
+             Context context, boolean isIncognito) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return isIncognito
+                 ? ContextCompat.getColor(context, R.color.default_bg_color_dark)
+                 : SemanticColorUtils.getDefaultBgColor(context);
+diff --git a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java
+--- a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java
++++ b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java
+@@ -52,6 +52,9 @@ public final class HubColors {
+     /** Returns the background color generic surfaces should use per the given color scheme. */
+     public static @ColorInt int getBackgroundColor(
+             Context context, @HubColorScheme int colorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return switch (colorScheme) {
+             case HubColorScheme.DEFAULT -> SemanticColorUtils.getDefaultBgColor(context);
+             case HubColorScheme.INCOGNITO ->
+@@ -163,6 +166,9 @@ public final class HubColors {
+     /** Returns the color of the background for the search box. */
+     public static @ColorInt int getSearchBoxBgColor(
+             Context context, @HubColorScheme int colorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return switch (colorScheme) {
+             case HubColorScheme.DEFAULT ->
+                     ContextCompat.getColor(context, R.color.hub_search_box_bg_color);
+@@ -175,6 +181,9 @@ public final class HubColors {
+     /** Returns the hub tool bar action button background color as per the given color scheme. */
+     public static @ColorInt int getToolbarActionButtonBackgroundColor(
+             Context context, @HubColorScheme int colorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return switch (colorScheme) {
+             case HubColorScheme.DEFAULT -> SemanticColorUtils.getFilledButtonBgColor(context);
+             case HubColorScheme.INCOGNITO ->
+@@ -186,6 +195,9 @@ public final class HubColors {
+     /** Returns the hub pane switcher background color as per the given color scheme. */
+     public static @ColorInt int getPaneSwitcherBackgroundColor(
+             Context context, @HubColorScheme int colorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return switch (colorScheme) {
+             case HubColorScheme.DEFAULT -> SemanticColorUtils.getColorSurfaceContainer(context);
+             case HubColorScheme.INCOGNITO ->
+diff --git a/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java b/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java
+--- a/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java
++++ b/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java
+@@ -6,6 +6,7 @@ package org.chromium.chrome.browser.tab_ui;
+ 
+ import android.content.Context;
+ import android.content.res.ColorStateList;
++import android.graphics.Color;
+ 
+ import androidx.annotation.ColorInt;
+ import androidx.annotation.ColorRes;
+@@ -138,6 +139,9 @@ public class TabCardThemeUtil {
+             return isIncognito
+                     ? ContextCompat.getColor(context, R.color.incognito_tab_bg_selected_color)
+                     : MaterialColors.getColor(context, R.attr.colorPrimary, TAG);
+         } else {
++            if (org.chromium.ui.util.ColorUtils.inNightMode(context)) {
++                return Color.rgb(32, 33, 36);
++            }
+             if (colorId != null) {
+                 return TabGroupColorPickerUtils.getTabGroupCardColor(context, colorId, isIncognito);
+             }
