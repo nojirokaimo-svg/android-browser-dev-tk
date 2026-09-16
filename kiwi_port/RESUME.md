@@ -1,8 +1,9 @@
 # Current implementation checkpoint
 
-Chromium/Titanium 153.0.8010.36 release build completed successfully in GitHub
-Actions run 63. Continue from this point; do not clean, delete out/Default, or
-fall back to an older/empty cache.
+Chromium/Titanium 153.0.8010.36 release build, including native Kiwi migration
+and extension-file loading, completed successfully in GitHub Actions run 87.
+Continue from this point; do not clean, delete `out/Default`, overwrite an
+existing cache key, or fall back to an older/empty cache.
 
 Pinned upstream revisions:
 
@@ -13,45 +14,50 @@ Pinned upstream revisions:
 
 Completed build checkpoint:
 
-- Run: https://github.com/nojirokaimo-svg/android-titanium-browser/actions/runs/34981587196
-- Commit built: `e47338cc1af4bd7169b816fc67e2dd7375ec1305`
+- Run: https://github.com/nojirokaimo-svg/android-titanium-browser/actions/runs/35112848810
+- Commit built: `3fefd81c80ff80f5dadee212aabcc4d98329b09c`
 - APK: `Titanium-Kiwi-core-153.0.8010.36-arm64-v8a.apk`
-- APK size: 323,924,934 bytes
-- Artifact: https://github.com/nojirokaimo-svg/android-titanium-browser/actions/runs/34981587196/artifacts/10403173735
-- Artifact ZIP SHA-256: `7de7665ef5b537aa1b2d83e477a8d1e92c5eba49f7bd83ead73fd6f857b07cdd`
-- APK SHA-256: pending re-read of the artifact's `SHA256SUMS.txt` after a transient download 502.
+- APK size: 324,012,949 bytes
+- Artifact: https://github.com/nojirokaimo-svg/android-titanium-browser/actions/runs/35112848810/artifacts/10455408574
+- APK SHA-256: `154917e8c30f4d673185aa85c60676ca856b8651e0afcedcacf486dd4209cdab`
 - libchrome.so: approximately 221.1 MB
 - Android v2 signature verification passed.
 - Completed incremental baseline:
-  `kiwi-incremental-153-e47338cc1af4bd7169b816fc67e2dd7375ec1305-stage-1`
+  `kiwi-incremental-153-3fefd81c80ff80f5dadee212aabcc4d98329b09c-stage-1`
 
-The workflow default is pinned to that exact completed M153 baseline. Exact cache
-misses must fail immediately; no restore-key fallback is permitted. M152 caches
-remain preserved but must never be used for M153.
+The workflow default must remain pinned to that exact completed M153 baseline.
+Exact cache misses fail immediately; no restore-key fallback is permitted.
 
 Compiled feature series retained:
 
-- Kiwi menu resources and application-menu actions
-- compact Kiwi-style overflow menu and `#202124` main/flyout dark surfaces
-- preference registry crash fix
-- six Night mode presets, renderer contrast/grayscale/high-contrast paths
-- runtime Night mode and renderer force-dark propagation
-- Kiwi-density mobile extensions manager layout with removal confirmation
-- pure-black dark status bar and full manual browser-state backup/restore
-- selectable Kiwi-style tab switcher
+- Kiwi menu resources, compact `#202124` overflow/flyout surfaces, and extension actions
+- formal preference registry startup fix
+- six Night mode presets and runtime renderer contrast/grayscale/high-contrast propagation
+- pure-black AMOLED system bar, toolbar, omnibox, new-tab and search surfaces
+- responsive Chromium extension manager layout and its standard removal confirmation
+- selectable seven-mode Kiwi tab switcher
+- full manual browser-state backup/restore
+- native “Kiwi Browserから移行” flow
+- native bookmark/tab/history import with original history visit timestamps
+- Android SAF ZIP/CRX/unpacked extension loading
 
-Build configuration remains release optimized: `is_debug=false` and
-`is_official_build=true`. APK size checks are warning-only and must not discard
-an otherwise completed build, artifact, checksum, or incremental cache.
+Patch/update validation:
 
-Remaining validation:
+- `verify_series.py` verifies all 12 feature patches, checksums and file lists.
+- Reapplication tests cover strict atomic conflicts, idempotence, and best-effort
+  partial application where independent features apply and only conflicting
+  feature/file hunks remain as `.rej`.
+- Fixed-M153 build applied the complete series and produced the signed APK.
+- The upstream update workflow reuses the same five-stage checkpoint/cache action
+  and emits feature/file-specific conflict reports.
 
-- Install and launch the M153 APK on an arm64 device.
-- Verify all six Night mode presets, renderer output, high contrast, persistence,
-  restart behavior, Settings, toolbar, overflow menu, extensions UI, and tabs.
-- Verify backup/restore of tab state, downloads, history, and bookmarks.
-- Run renderer regression tests not exercised by the APK target.
-- Regenerate final feature patches, manifest, and series after device fixes.
-- Test automatic reapplication onto a fresh upstream checkout, including
-  feature/file-specific conflict reporting and partial application behavior.
-- Document update, recovery, and patch-regeneration procedures in the README.
+Remaining device validation:
+
+- Install and launch the run-87 APK on arm64.
+- Exercise the Kiwi migration picker with a real Kiwi export and confirm original
+  history timestamps, bookmarks and tabs.
+- Load one ZIP, one CRX and one unpacked extension through SAF.
+- Verify all six Night modes, all seven tab switchers, restart persistence,
+  backup/restore, toolbar/status-bar transitions and extension UI.
+- If a device-only defect is found, repair only its feature patch and resume from
+  the exact completed cache above.
