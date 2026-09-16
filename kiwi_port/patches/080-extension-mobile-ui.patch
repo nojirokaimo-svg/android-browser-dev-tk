@@ -1,31 +1,10 @@
 diff --git a/chrome/browser/resources/extensions/item_list.css b/chrome/browser/resources/extensions/item_list.css
 --- a/chrome/browser/resources/extensions/item_list.css
 +++ b/chrome/browser/resources/extensions/item_list.css
-@@ -120,3 +120,34 @@
+@@ -120,3 +120,13 @@
     * is clickable. */
    z-index: 1;
  }
-+
-+@media (max-width: 600px) {
-+  /* Kiwi uses a compact centered card on phones instead of Chromium's
-+   * nearly edge-to-edge modern layout. */
-+  .items-container,
-+  #content-wrapper {
-+    --extensions-card-width: min(320px, calc(100vw - 32px));
-+  }
-+
-+  #content-wrapper {
-+    min-width: 0;
-+    padding: 20px 16px 64px;
-+  }
-+
-+  /* Kiwi's phone list starts directly with extension cards. Chromium 152+
-+   * adds a redundant "All extensions" section heading that shifts the
-+   * first card down. */
-+  .section-header-contents {
-+    display: none;
-+  }
-+}
 +
 +@media (max-width: 600px) and (prefers-color-scheme: dark) {
 +  #container {
@@ -34,71 +13,6 @@ diff --git a/chrome/browser/resources/extensions/item_list.css b/chrome/browser/
 +
 +  .items-container {
 +    --cr-card-background-color: #000;
-+  }
-+}
-diff --git a/chrome/browser/resources/extensions/manager.css b/chrome/browser/resources/extensions/manager.css
---- a/chrome/browser/resources/extensions/manager.css
-+++ b/chrome/browser/resources/extensions/manager.css
-@@ -87,3 +87,19 @@
-   width: 100%;
- }
- 
-+@media (max-width: 600px) {
-+  #viewManager,
-+  #viewManager:has(extensions-item-list.active) {
-+    flex-basis: 100%;
-+    min-width: 0;
-+  }
-+
-+  #container {
-+    width: 100%;
-+  }
-+
-+  #left,
-+  #right {
-+    display: none;
-+  }
-+}
-diff --git a/chrome/browser/resources/extensions/item.css b/chrome/browser/resources/extensions/item.css
---- a/chrome/browser/resources/extensions/item.css
-+++ b/chrome/browser/resources/extensions/item.css
-@@ -140,2 +140,38 @@
-   overflow: hidden;
- }
-+
-+@media (max-width: 600px) {
-+  :host {
-+    font-size: 13px;
-+  }
-+
-+  #icon-wrapper {
-+    padding: 4px;
-+  }
-+
-+  #icon {
-+    height: 30px;
-+    width: 30px;
-+  }
-+
-+  #card.dev-mode {
-+    height: 184px;
-+  }
-+
-+  #main {
-+    padding: 12px;
-+  }
-+
-+  #content {
-+    margin-inline-start: 12px;
-+  }
-+
-+  #button-strip {
-+    padding-inline-end: 12px;
-+  }
-+
-+  #source-indicator {
-+    margin-inline-start: 17px;
-+    margin-top: 17px;
 +  }
 +}
 diff --git a/chrome/browser/resources/extensions/item.ts b/chrome/browser/resources/extensions/item.ts
