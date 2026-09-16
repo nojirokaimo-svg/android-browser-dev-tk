@@ -133,6 +133,20 @@
         "titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java"
       ],
       "sha256": "4f25483ed5fdae9a2adbc19aa80a4a816ea78b7079d35c2991a696fa803f2477"
+    },
+    {
+      "id": "amoled-surfaces",
+      "name": "Pure-black AMOLED new tab and omnibox surfaces",
+      "patch": "110-amoled-surfaces.patch",
+      "files": [
+        "chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java",
+        "chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java",
+        "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java",
+        "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java",
+        "components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml",
+        "components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml"
+      ],
+      "sha256": "65012b87edffd5c2ade7829876f73824dd8ed5b03a62fe6b6cb92142305d41d7"
     }
   ]
 }
