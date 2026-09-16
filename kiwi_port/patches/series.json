@@ -146,6 +146,20 @@
         "components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml"
       ],
       "sha256": "95e6fd8653f1e24925e6fe66dc29424ec5bad7e72c83b7a1d72e46c0322ae15b"
+    },
+    {
+      "id": "kiwi-migration-extension-import",
+      "name": "Native Kiwi migration with original history timestamps and Android SAF ZIP/CRX/unpacked extension loading",
+      "patch": "120-kiwi-migration-extension-import.patch",
+      "files": [
+        "chrome/android/chrome_java_sources.gni",
+        "chrome/android/java/AndroidManifest.xml",
+        "chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java",
+        "chrome/browser/android/BUILD.gn",
+        "chrome/browser/android/backup/kiwi_migration_bridge.cc"
+      ],
+      "sha256": "23d75136eaeac88e6c02da91f515fb7540e68d4b1795b41801782f154cfc62a3"
     }
   ]
 }
