@@ -143,10 +143,10 @@
         "chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java",
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java",
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java",
-        "components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml",
-        "components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml"
+        "components/browser_ui/widget/android/BUILD.gn",
+        "components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml"
       ],
-      "sha256": "4df9b2453c7aaa5f545c3737f5d47f65755fa8dbe99b2debe86e8118d74ecd29"
+      "sha256": "95e6fd8653f1e24925e6fe66dc29424ec5bad7e72c83b7a1d72e46c0322ae15b"
     }
   ]
 }
