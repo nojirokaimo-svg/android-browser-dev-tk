@@ -149,7 +149,7 @@
     },
     {
       "id": "kiwi-migration-extension-import",
-      "name": "Native Kiwi migration with original history timestamps and Android SAF ZIP/CRX/unpacked extension loading",
+      "name": "Native Kiwi migration plus chrome://extensions ZIP/CRX installation",
       "patch": "120-kiwi-migration-extension-import.patch",
       "files": [
         "chrome/android/chrome_java_sources.gni",
@@ -158,9 +158,12 @@
         "chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java",
         "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java",
         "chrome/browser/android/BUILD.gn",
-        "chrome/browser/android/backup/kiwi_migration_bridge.cc"
+        "chrome/browser/android/backup/kiwi_migration_bridge.cc",
+        "chrome/browser/resources/extensions/toolbar.html.ts",
+        "chrome/browser/resources/extensions/toolbar.ts",
+        "chrome/browser/ui/webui/extensions/extensions_ui.cc"
       ],
-      "sha256": "dca4699c0cac33d535a6bca5c41a5404ebf857b9c5ccb75cc7c3eaa4d00a5bdf"
+      "sha256": "43514c49e79165313990618e0db3867ebb75d03b63aefe5ca8cf10f895ac1d93"
     }
   ]
 }

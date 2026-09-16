@@ -56,8 +56,8 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSe
 +                isJapanese ? "Kiwi Browserから移行" : "Migrate from Kiwi Browser");
 +        kiwiMigrationPreference.setSummary(
 +                isJapanese
-+                        ? "ブックマーク、元日時付き履歴、タブを取り込み。ZIP / CRX / 展開済み拡張にも対応"
-+                        : "Import bookmarks, original visit times, tabs, ZIP, CRX and unpacked extensions");
++                        ? "ブックマーク、元日時付き履歴、タブをネイティブ取り込み"
++                        : "Natively import bookmarks, original visit times and tabs");
 +        kiwiMigrationPreference.setOrder(Integer.MAX_VALUE - 11);
 +        kiwiMigrationPreference.setOnPreferenceClickListener(
 +                preference -> {
@@ -72,7 +72,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigr
 new file mode 100644
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
-@@ -0,0 +1,455 @@
+@@ -0,0 +1,476 @@
 +// Copyright 2026 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -100,11 +100,13 @@ new file mode 100644
 +
 +import org.chromium.base.ApplicationStatus;
 +import org.chromium.build.annotations.NullMarked;
++import org.chromium.build.annotations.Nullable;
 +import org.chromium.chrome.browser.ChromeTabbedActivity;
 +import org.chromium.chrome.browser.profiles.Profile;
 +import org.chromium.chrome.browser.profiles.ProfileManager;
 +import org.chromium.chrome.browser.tab.TabLaunchType;
 +import org.chromium.content_public.browser.LoadUrlParams;
++import org.jni_zero.CalledByNative;
 +import org.jni_zero.JNINamespace;
 +import org.jni_zero.JniType;
 +import org.jni_zero.NativeMethods;
@@ -129,6 +131,7 @@ new file mode 100644
 +@NullMarked
 +@JNINamespace("chrome::android")
 +public final class KiwiMigrationActivity extends Activity {
++    private static final String EXTRA_DIRECT_PACKAGE_PICKER = "direct_package_picker";
 +    private static final int CREATE_EXPORTER = 9201;
 +    private static final int OPEN_MIGRATION = 9202;
 +    private static final int OPEN_EXTENSION_PACKAGE = 9203;
@@ -136,12 +139,27 @@ new file mode 100644
 +    private static final long MAX_MIGRATION_BYTES = 128L * 1024L * 1024L;
 +
 +    private TextView mStatus;
++    private boolean mDirectPackagePicker;
 +
 +    @Override
 +    protected void onCreate(Bundle savedInstanceState) {
 +        super.onCreate(savedInstanceState);
-+        setTitle(isJapanese() ? "Kiwi Browserから移行" : "Migrate from Kiwi Browser");
++        mDirectPackagePicker = getIntent().getBooleanExtra(EXTRA_DIRECT_PACKAGE_PICKER, false);
++        setTitle(
++                mDirectPackagePicker
++                        ? (isJapanese() ? "ZIP / CRX を読み込む" : "Load ZIP / CRX")
++                        : (isJapanese() ? "Kiwi Browserから移行" : "Migrate from Kiwi Browser"));
 +        setContentView(createContent());
++        if (mDirectPackagePicker) chooseExtensionPackage();
++    }
++
++    @CalledByNative
++    private static void openExtensionPackagePicker() {
++        @Nullable Activity activity = ApplicationStatus.getLastTrackedFocusedActivity();
++        if (activity == null) return;
++        Intent intent = new Intent(activity, KiwiMigrationActivity.class);
++        intent.putExtra(EXTRA_DIRECT_PACKAGE_PICKER, true);
++        activity.startActivity(intent);
 +    }
 +
 +    private View createContent() {
@@ -173,15 +191,6 @@ new file mode 100644
 +                button(
 +                        isJapanese() ? "2. Kiwiの移行ファイルを読み込む" : "2. Import Kiwi migration file",
 +                        v -> chooseMigration()));
-+        root.addView(
-+                button(
-+                        isJapanese() ? "ZIP / CRX拡張を読み込む" : "Load ZIP / CRX extension",
-+                        v -> chooseExtensionPackage()));
-+        root.addView(
-+                button(
-+                        isJapanese() ? "展開済み拡張を読み込む" : "Load unpacked extension",
-+                        v -> chooseUnpackedExtension()));
-+
 +        mStatus = text(isJapanese() ? "準備完了" : "Ready", 14);
 +        mStatus.setTextColor(0xff9aa0a6);
 +        mStatus.setPadding(0, dp(20), 0, 0);
@@ -411,14 +420,26 @@ new file mode 100644
 +                                                    KiwiMigrationActivityJni.get()
 +                                                            .installExtensionFile(
 +                                                                    profile(), packageFile.getAbsolutePath());
-+                                            setStatus(
++                                            String message =
 +                                                    started
 +                                                            ? (isJapanese()
 +                                                                    ? "拡張機能のインストールを開始しました"
 +                                                                    : "Extension installation started")
 +                                                            : (isJapanese()
 +                                                                    ? "インストーラがパッケージを拒否しました"
-+                                                                    : "Installer rejected the package"));
++                                                                    : "Installer rejected the package");
++                                            if (mDirectPackagePicker) {
++                                                Toast.makeText(
++                                                                this,
++                                                                message,
++                                                                started
++                                                                        ? Toast.LENGTH_SHORT
++                                                                        : Toast.LENGTH_LONG)
++                                                        .show();
++                                                finish();
++                                            } else {
++                                                setStatus(message);
++                                            }
 +                                        });
 +                            } catch (IOException exception) {
 +                                if (temporary != null) temporary.delete();
@@ -755,3 +776,72 @@ new file mode 100644
 +DEFINE_JNI(KiwiMigrationActivity)
 +
 +}  // namespace chrome::android
+
+diff --git a/chrome/browser/resources/extensions/toolbar.html.ts b/chrome/browser/resources/extensions/toolbar.html.ts
+--- a/chrome/browser/resources/extensions/toolbar.html.ts
++++ b/chrome/browser/resources/extensions/toolbar.html.ts
+@@ -43,6 +43,11 @@ export function getHtml(this: ToolbarElement) {
+ <div id="devDrawer" ?expanded="${this.expanded_}">
+   <div id="buttonStrip">
++<if expr="is_android">
++    <cr-button id="loadPackage" @click="${this.onLoadPackageClick_}">
++      $i18n{toolbarLoadPackage}
++    </cr-button>
++</if>
+     <cr-button ?hidden="${!this.canLoadUnpacked_()}" id="loadUnpacked"
+         @click="${this.onLoadUnpackedClick_}">
+       $i18n{toolbarLoadUnpacked}
+diff --git a/chrome/browser/resources/extensions/toolbar.ts b/chrome/browser/resources/extensions/toolbar.ts
+--- a/chrome/browser/resources/extensions/toolbar.ts
++++ b/chrome/browser/resources/extensions/toolbar.ts
+@@ -173,6 +173,10 @@ export class ExtensionsToolbarElement extends ExtensionsToolbarElementBase {
+     this.expanded_ = !this.expanded_;
+   }
+ 
++  protected onLoadPackageClick_() {
++    chrome.send('openKiwiExtensionPackagePicker');
++  }
++
+   protected onLoadUnpackedClick_() {
+     this.delegate.loadUnpacked()
+         .then((success) => {
+diff --git a/chrome/browser/ui/webui/extensions/extensions_ui.cc b/chrome/browser/ui/webui/extensions/extensions_ui.cc
+--- a/chrome/browser/ui/webui/extensions/extensions_ui.cc
++++ b/chrome/browser/ui/webui/extensions/extensions_ui.cc
+@@ -43,7 +43,9 @@
+ #include "ui/webui/webui_util.h"
+ 
+ #if BUILDFLAG(IS_ANDROID)
++#include "base/android/jni_android.h"
++#include "chrome/android/chrome_jni_headers/KiwiMigrationActivity_jni.h"
+ #include "chrome/browser/ui/webui/current_channel_logo.h"
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
+@@ -371,6 +373,11 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
+ #if BUILDFLAG(IS_ANDROID)
+   source->AddResourcePath("images/product_logo.png",
+                           webui::CurrentChannelLogoResourceId());
++  source->AddString(
++      "toolbarLoadPackage",
++      base::StartsWith(g_browser_process->GetApplicationLocale(), "ja")
++          ? u"ZIP / CRX を読み込む"
++          : u"Load ZIP / CRX");
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
+ #if BUILDFLAG(IS_CHROMEOS)
+@@ -438,6 +445,15 @@ ExtensionsUI::ExtensionsUI(content::WebUI* web_ui)
+   source = CreateAndAddExtensionsSource(profile, *in_dev_mode_);
+   ManagedUIHandler::Initialize(web_ui, source);
+ 
++#if BUILDFLAG(IS_ANDROID)
++  web_ui->RegisterMessageCallback(
++      "openKiwiExtensionPackagePicker",
++      base::BindRepeating([](const base::Value::List&) {
++        Java_KiwiMigrationActivity_openExtensionPackagePicker(
++            base::android::AttachCurrentThread());
++      }));
++#endif  // BUILDFLAG(IS_ANDROID)
++
+   // Need to allow <object> elements so that the <extensionoptions> browser
+   // plugin can be loaded within chrome://extensions.
+   source->OverrideContentSecurityPolicy(
