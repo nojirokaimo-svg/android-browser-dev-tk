@@ -1,0 +1,742 @@
+diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
+--- a/chrome/android/chrome_java_sources.gni
++++ b/chrome/android/chrome_java_sources.gni
+@@ -228,6 +228,7 @@ chrome_java_sources = [
+   "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
+   "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
+   "java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
++  "java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java",
+   "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
+   "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
+   "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
+diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -243,6 +243,11 @@ found in the LICENSE file.
+             android:theme="@style/Theme.Chromium.Settings"
+             android:exported="false">
+         </activity>
++        <activity
++            android:name="org.chromium.chrome.browser.backup.KiwiMigrationActivity"
++            android:theme="@style/Theme.Chromium.Settings"
++            android:exported="false">
++        </activity>
+         <activity android:name="org.chromium.chrome.browser.document.ChromeLauncherActivity"
+             android:theme="@style/LauncherTheme"
+             android:relinquishTaskIdentity="true"
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
+--- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
+@@ -39,7 +39,8 @@ import org.chromium.build.annotations.Nullable;
+ import org.chromium.chrome.R;
+ import org.chromium.chrome.browser.appearance.settings.AppearanceSettingsFragment;
+ import org.chromium.chrome.browser.autofill.settings.SettingsNavigationHelper;
+ import org.chromium.chrome.browser.backup.KiwiFullBackupActivity;
++import org.chromium.chrome.browser.backup.KiwiMigrationActivity;
+ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFragment;
+ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsMediator;
+ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsReferrer;
+@@ -363,5 +364,20 @@ public class MainSettings extends ChromeBaseSettingsFragment
+                 });
+         getPreferenceScreen().addPreference(fullBackupPreference);
++        Preference kiwiMigrationPreference = new Preference(requireContext());
++        kiwiMigrationPreference.setKey("kiwi_browser_migration");
++        kiwiMigrationPreference.setTitle(
++                isJapanese ? "Kiwi Browserから移行" : "Migrate from Kiwi Browser");
++        kiwiMigrationPreference.setSummary(
++                isJapanese
++                        ? "ブックマーク、元日時付き履歴、タブを取り込み。ZIP / CRX / 展開済み拡張にも対応"
++                        : "Import bookmarks, original visit times, tabs, ZIP, CRX and unpacked extensions");
++        kiwiMigrationPreference.setOrder(Integer.MAX_VALUE - 11);
++        kiwiMigrationPreference.setOnPreferenceClickListener(
++                preference -> {
++                    startActivity(new Intent(requireContext(), KiwiMigrationActivity.class));
++                    return true;
++                });
++        getPreferenceScreen().addPreference(kiwiMigrationPreference);
+ 
+         IdentityManager identityManager =
+                 IdentityServicesProvider.get().getIdentityManager(getProfile());
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
+new file mode 100644
+--- /dev/null
++++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
+@@ -0,0 +1,453 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.backup;
++
++import android.app.Activity;
++import android.content.Intent;
++import android.database.Cursor;
++import android.graphics.Color;
++import android.net.Uri;
++import android.os.Bundle;
++import android.provider.OpenableColumns;
++import android.view.Gravity;
++import android.view.View;
++import android.widget.Button;
++import android.widget.LinearLayout;
++import android.widget.ScrollView;
++import android.widget.TextView;
++import android.widget.Toast;
++
++import org.json.JSONArray;
++import org.json.JSONException;
++import org.json.JSONObject;
++
++import org.chromium.base.ApplicationStatus;
++import org.chromium.build.annotations.NullMarked;
++import org.chromium.chrome.browser.ChromeTabbedActivity;
++import org.chromium.chrome.browser.profiles.Profile;
++import org.chromium.chrome.browser.profiles.ProfileManager;
++import org.chromium.chrome.browser.tab.TabLaunchType;
++import org.chromium.content_public.browser.LoadUrlParams;
++import org.jni_zero.JNINamespace;
++import org.jni_zero.JniType;
++import org.jni_zero.NativeMethods;
++
++import java.io.BufferedInputStream;
++import java.io.BufferedOutputStream;
++import java.io.ByteArrayOutputStream;
++import java.io.File;
++import java.io.FileOutputStream;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.nio.charset.StandardCharsets;
++import java.util.HashSet;
++import java.util.List;
++import java.util.Locale;
++import java.util.Set;
++import java.util.zip.ZipEntry;
++import java.util.zip.ZipOutputStream;
++
++/** End-to-end Kiwi Browser migration and Android extension package loading. */
++@NullMarked
++@JNINamespace("chrome::android")
++public final class KiwiMigrationActivity extends Activity {
++    private static final int CREATE_EXPORTER = 9201;
++    private static final int OPEN_MIGRATION = 9202;
++    private static final int OPEN_EXTENSION_PACKAGE = 9203;
++    private static final int OPEN_UNPACKED_EXTENSION = 9204;
++    private static final long MAX_MIGRATION_BYTES = 128L * 1024L * 1024L;
++
++    private TextView mStatus;
++
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setTitle(isJapanese() ? "Kiwi Browserから移行" : "Migrate from Kiwi Browser");
++        setContentView(createContent());
++    }
++
++    private View createContent() {
++        ScrollView scroll = new ScrollView(this);
++        LinearLayout root = new LinearLayout(this);
++        root.setOrientation(LinearLayout.VERTICAL);
++        root.setPadding(dp(24), dp(24), dp(24), dp(40));
++        root.setBackgroundColor(Color.BLACK);
++        scroll.addView(root);
++
++        TextView title = text(isJapanese() ? "Kiwi Browserから移行" : "Migrate from Kiwi Browser", 24);
++        title.setTextColor(Color.WHITE);
++        root.addView(title);
++        TextView help =
++                text(
++                        isJapanese()
++                                ? "Kiwiで書き出したデータをTitaniumへ直接取り込みます。ログイン状態やCookieは移行しません。"
++                                : "Import Kiwi data directly into Titanium. Sign-in state and cookies are not migrated.",
++                        15);
++        help.setTextColor(0xffbdbdbd);
++        help.setPadding(0, dp(8), 0, dp(20));
++        root.addView(help);
++
++        root.addView(
++                button(
++                        isJapanese() ? "1. Kiwi用書き出し拡張を保存" : "1. Save Kiwi exporter extension",
++                        v -> createExporter()));
++        root.addView(
++                button(
++                        isJapanese() ? "2. Kiwiの移行ファイルを読み込む" : "2. Import Kiwi migration file",
++                        v -> chooseMigration()));
++        root.addView(
++                button(
++                        isJapanese() ? "ZIP / CRX拡張を読み込む" : "Load ZIP / CRX extension",
++                        v -> chooseExtensionPackage()));
++        root.addView(
++                button(
++                        isJapanese() ? "展開済み拡張を読み込む" : "Load unpacked extension",
++                        v -> chooseUnpackedExtension()));
++
++        mStatus = text(isJapanese() ? "準備完了" : "Ready", 14);
++        mStatus.setTextColor(0xff9aa0a6);
++        mStatus.setPadding(0, dp(20), 0, 0);
++        root.addView(mStatus);
++        return scroll;
++    }
++
++    private Button button(String label, View.OnClickListener listener) {
++        Button button = new Button(this);
++        button.setText(label);
++        button.setAllCaps(false);
++        button.setTextSize(16);
++        button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
++        button.setOnClickListener(listener);
++        LinearLayout.LayoutParams params =
++                new LinearLayout.LayoutParams(
++                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
++        params.setMargins(0, dp(6), 0, dp(6));
++        button.setLayoutParams(params);
++        return button;
++    }
++
++    private TextView text(String value, int size) {
++        TextView view = new TextView(this);
++        view.setText(value);
++        view.setTextSize(size);
++        return view;
++    }
++
++    private void createExporter() {
++        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
++        intent.addCategory(Intent.CATEGORY_OPENABLE);
++        intent.setType("application/zip");
++        intent.putExtra(Intent.EXTRA_TITLE, "titanium-kiwi-exporter.zip");
++        startActivityForResult(intent, CREATE_EXPORTER);
++    }
++
++    private void chooseMigration() {
++        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
++        intent.addCategory(Intent.CATEGORY_OPENABLE);
++        intent.setType("application/json");
++        startActivityForResult(intent, OPEN_MIGRATION);
++    }
++
++    private void chooseExtensionPackage() {
++        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
++        intent.addCategory(Intent.CATEGORY_OPENABLE);
++        intent.setType("application/octet-stream");
++        intent.putExtra(
++                Intent.EXTRA_MIME_TYPES,
++                new String[] {"application/zip", "application/x-chrome-extension", "application/octet-stream"});
++        startActivityForResult(intent, OPEN_EXTENSION_PACKAGE);
++    }
++
++    private void chooseUnpackedExtension() {
++        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
++        intent.addFlags(
++                Intent.FLAG_GRANT_READ_URI_PERMISSION
++                        | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
++        startActivityForResult(intent, OPEN_UNPACKED_EXTENSION);
++    }
++
++    @Override
++    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
++        super.onActivityResult(requestCode, resultCode, data);
++        if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
++        Uri uri = data.getData();
++        if (requestCode == CREATE_EXPORTER) {
++            saveExporter(uri);
++        } else if (requestCode == OPEN_MIGRATION) {
++            importMigration(uri);
++        } else if (requestCode == OPEN_EXTENSION_PACKAGE) {
++            installPackage(uri);
++        } else if (requestCode == OPEN_UNPACKED_EXTENSION) {
++            try {
++                getContentResolver()
++                        .takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
++            } catch (SecurityException ignored) {
++            }
++            boolean started =
++                    KiwiMigrationActivityJni.get().loadUnpacked(profile(), uri.toString());
++            setStatus(
++                    started
++                            ? (isJapanese() ? "展開済み拡張の読み込みを開始しました" : "Loading unpacked extension")
++                            : (isJapanese() ? "フォルダを読み込めませんでした" : "Unable to load folder"));
++        }
++    }
++
++    private void saveExporter(Uri uri) {
++        setStatus(isJapanese() ? "書き出し拡張を作成中…" : "Creating exporter…");
++        new Thread(
++                        () -> {
++                            try (OutputStream output = getContentResolver().openOutputStream(uri, "w")) {
++                                if (output == null) throw new IOException("Unable to open destination");
++                                writeExporterZip(output);
++                                setStatus(isJapanese() ? "保存しました。KiwiでZIPを読み込んで実行してください" : "Saved. Load the ZIP in Kiwi and run it");
++                            } catch (IOException exception) {
++                                setStatus((isJapanese() ? "保存失敗: " : "Save failed: ") + exception.getMessage());
++                            }
++                        },
++                        "KiwiExporterWriter")
++                .start();
++    }
++
++    private void importMigration(Uri uri) {
++        setStatus(isJapanese() ? "移行データを読み込み中…" : "Importing migration data…");
++        new Thread(
++                        () -> {
++                            try {
++                                String json = readUtf8(uri, MAX_MIGRATION_BYTES);
++                                JSONObject root = new JSONObject(json);
++                                if (!"titanium-kiwi-migration-v1".equals(root.optString("format"))) {
++                                    throw new IOException("Unsupported migration format");
++                                }
++                                runOnUiThread(() -> completeMigrationImport(json, root));
++                            } catch (IOException | JSONException exception) {
++                                setStatus((isJapanese() ? "取り込み失敗: " : "Import failed: ") + exception.getMessage());
++                            }
++                        },
++                        "KiwiMigrationImport")
++                .start();
++    }
++
++    private void completeMigrationImport(String json, JSONObject root) {
++        String nativeResult =
++                KiwiMigrationActivityJni.get().importMigrationData(profile(), json);
++        if (!nativeResult.startsWith("OK|")) {
++            setStatus((isJapanese() ? "取り込み失敗: " : "Import failed: ") + nativeResult);
++            return;
++        }
++        try {
++            int openedTabs = openExportedTabs(root);
++            String[] fields = nativeResult.split("\\|", -1);
++            String message =
++                    isJapanese()
++                            ? "完了: ブックマーク "
++                                    + fields[1]
++                                    + "件、履歴訪問 "
++                                    + fields[2]
++                                    + "件、タブ "
++                                    + openedTabs
++                                    + "件"
++                            : "Done: "
++                                    + fields[1]
++                                    + " bookmarks, "
++                                    + fields[2]
++                                    + " history visits, "
++                                    + openedTabs
++                                    + " tabs";
++            setStatus(message);
++        } catch (JSONException exception) {
++            setStatus((isJapanese() ? "タブ取り込み失敗: " : "Tab import failed: ") + exception.getMessage());
++        }
++    }
++
++    private int openExportedTabs(JSONObject root) throws JSONException {
++        Set<String> urls = new HashSet<>();
++        collectTabs(root.optJSONArray("tabs"), urls);
++        JSONArray recent = root.optJSONArray("recentlyClosed");
++        if (recent != null) {
++            for (int i = 0; i < recent.length(); i++) {
++                JSONObject session = recent.optJSONObject(i);
++                if (session == null) continue;
++                JSONObject tab = session.optJSONObject("tab");
++                if (tab != null) addUrl(tab.optString("url"), urls);
++                JSONObject window = session.optJSONObject("window");
++                if (window != null) collectTabs(window.optJSONArray("tabs"), urls);
++            }
++        }
++        if (urls.isEmpty()) return 0;
++        ChromeTabbedActivity activity = findTabbedActivity();
++        if (activity == null) {
++            Toast.makeText(
++                            this,
++                            isJapanese() ? "タブ画面へ戻って再度取り込んでください" : "Return to the tab screen and import again",
++                            Toast.LENGTH_LONG)
++                    .show();
++            return 0;
++        }
++        for (String url : urls) {
++            activity.getTabCreator(false)
++                    .createNewTab(
++                            new LoadUrlParams(url),
++                            TabLaunchType.FROM_LONGPRESS_BACKGROUND,
++                            null);
++        }
++        return urls.size();
++    }
++
++    private static void collectTabs(JSONArray tabs, Set<String> urls) {
++        if (tabs == null) return;
++        for (int i = 0; i < tabs.length(); i++) {
++            JSONObject tab = tabs.optJSONObject(i);
++            if (tab != null) addUrl(tab.optString("url"), urls);
++        }
++    }
++
++    private static void addUrl(String url, Set<String> urls) {
++        if (url.startsWith("http://") || url.startsWith("https://")) urls.add(url);
++    }
++
++    private static ChromeTabbedActivity findTabbedActivity() {
++        List<Activity> activities = ApplicationStatus.getRunningActivities();
++        for (Activity activity : activities) {
++            if (activity instanceof ChromeTabbedActivity) return (ChromeTabbedActivity) activity;
++        }
++        return null;
++    }
++
++    private void installPackage(Uri uri) {
++        setStatus(isJapanese() ? "拡張パッケージを準備中…" : "Preparing extension package…");
++        new Thread(
++                        () -> {
++                            File temporary = null;
++                            try {
++                                String name = displayName(uri).toLowerCase(Locale.ROOT);
++                                String suffix;
++                                if (name.endsWith(".zip")) suffix = ".zip";
++                                else if (name.endsWith(".crx")) suffix = ".crx";
++                                else throw new IOException("Select a .zip or .crx file");
++                                temporary = File.createTempFile("kiwi-extension-", suffix, getCacheDir());
++                                copyUri(uri, temporary, MAX_MIGRATION_BYTES);
++                                File packageFile = temporary;
++                                runOnUiThread(
++                                        () -> {
++                                            boolean started =
++                                                    KiwiMigrationActivityJni.get()
++                                                            .installExtensionFile(
++                                                                    profile(), packageFile.getAbsolutePath());
++                                            setStatus(
++                                                    started
++                                                            ? (isJapanese()
++                                                                    ? "拡張機能のインストールを開始しました"
++                                                                    : "Extension installation started")
++                                                            : (isJapanese()
++                                                                    ? "インストーラがパッケージを拒否しました"
++                                                                    : "Installer rejected the package"));
++                                        });
++                            } catch (IOException exception) {
++                                if (temporary != null) temporary.delete();
++                                setStatus((isJapanese() ? "読み込み失敗: " : "Load failed: ") + exception.getMessage());
++                            }
++                        },
++                        "KiwiExtensionInstall")
++                .start();
++    }
++
++    private Profile profile() {
++        return ProfileManager.getLastUsedRegularProfile().getOriginalProfile();
++    }
++
++    private String displayName(Uri uri) {
++        try (Cursor cursor =
++                getContentResolver().query(uri, new String[] {OpenableColumns.DISPLAY_NAME}, null, null, null)) {
++            if (cursor != null && cursor.moveToFirst()) return cursor.getString(0);
++        }
++        String segment = uri.getLastPathSegment();
++        return segment == null ? "" : segment;
++    }
++
++    private String readUtf8(Uri uri, long limit) throws IOException {
++        try (InputStream input = new BufferedInputStream(getContentResolver().openInputStream(uri));
++                ByteArrayOutputStream output = new ByteArrayOutputStream()) {
++            if (input == null) throw new IOException("Unable to open file");
++            byte[] buffer = new byte[64 * 1024];
++            long total = 0;
++            int count;
++            while ((count = input.read(buffer)) != -1) {
++                total += count;
++                if (total > limit) throw new IOException("Migration file is too large");
++                output.write(buffer, 0, count);
++            }
++            return output.toString(StandardCharsets.UTF_8.name());
++        }
++    }
++
++    private void copyUri(Uri uri, File target, long limit) throws IOException {
++        try (InputStream input = new BufferedInputStream(getContentResolver().openInputStream(uri));
++                OutputStream output = new BufferedOutputStream(new FileOutputStream(target))) {
++            if (input == null) throw new IOException("Unable to open file");
++            byte[] buffer = new byte[64 * 1024];
++            long total = 0;
++            int count;
++            while ((count = input.read(buffer)) != -1) {
++                total += count;
++                if (total > limit) throw new IOException("Extension package is too large");
++                output.write(buffer, 0, count);
++            }
++        }
++    }
++
++    private static void writeExporterZip(OutputStream destination) throws IOException {
++        try (ZipOutputStream zip = new ZipOutputStream(new BufferedOutputStream(destination))) {
++            writeZipEntry(zip, "manifest.json", EXPORTER_MANIFEST);
++            writeZipEntry(zip, "popup.html", EXPORTER_HTML);
++            writeZipEntry(zip, "popup.js", EXPORTER_JS);
++        }
++    }
++
++    private static void writeZipEntry(ZipOutputStream zip, String name, String value)
++            throws IOException {
++        zip.putNextEntry(new ZipEntry(name));
++        zip.write(value.replace("\\n", "\n").getBytes(StandardCharsets.UTF_8));
++        zip.closeEntry();
++    }
++
++    private void setStatus(String message) {
++        runOnUiThread(() -> mStatus.setText(message));
++    }
++
++    private boolean isJapanese() {
++        return Locale.getDefault().getLanguage().equals("ja");
++    }
++
++    private int dp(int value) {
++        return Math.round(value * getResources().getDisplayMetrics().density);
++    }
++
++    private static final String EXPORTER_MANIFEST =
++            "{\n"
++                    + "  \"manifest_version\": 2,\n"
++                    + "  \"name\": \"Titanium Kiwi Migration Exporter\",\n"
++                    + "  \"version\": \"1.0\",\n"
++                    + "  \"permissions\": [\"bookmarks\", \"history\", \"tabs\", \"sessions\", \"downloads\", \"management\"],\n"
++                    + "  \"browser_action\": {\"default_popup\": \"popup.html\"}\n"
++                    + "}\n";
++
++    private static final String EXPORTER_HTML =
++            "<!doctype html><meta charset=\"utf-8\"><style>body{font:15px sans-serif;width:320px;padding:16px;background:#111;color:#eee}button{width:100%;padding:12px}</style><h2>Kiwi → Titanium</h2><p>ブックマーク、元日時付き履歴、タブをJSONへ書き出します。</p><button id=go>移行ファイルを書き出す</button><p id=status></p><script src=popup.js></script>";
++
++    private static final String EXPORTER_JS =
++            "const call=(fn,arg)=>new Promise((ok,ng)=>fn(arg,x=>chrome.runtime.lastError?ng(new Error(chrome.runtime.lastError.message)):ok(x)));\n"
++                    + "const noarg=fn=>new Promise((ok,ng)=>fn(x=>chrome.runtime.lastError?ng(new Error(chrome.runtime.lastError.message)):ok(x)));\n"
++                    + "document.getElementById('go').onclick=async()=>{const s=document.getElementById('status');try{s.textContent='履歴を収集中…';const bookmarks=await noarg(chrome.bookmarks.getTree);const items=await call(chrome.history.search,{text:'',startTime:0,maxResults:100000});const history=[];for(let i=0;i<items.length;i++){const item=items[i];const visits=await call(chrome.history.getVisits,{url:item.url});history.push({...item,visits});if(i%100===0)s.textContent=`履歴 ${i}/${items.length}`;}const tabs=await call(chrome.tabs.query,{});const recentlyClosed=await call(chrome.sessions.getRecentlyClosed,{maxResults:25});const downloads=await call(chrome.downloads.search,{});const extensions=await noarg(chrome.management.getAll);const data={format:'titanium-kiwi-migration-v1',exportedAt:Date.now(),bookmarks,history,tabs,recentlyClosed,downloads,extensions};const blob=new Blob([JSON.stringify(data)],{type:'application/json'});const url=URL.createObjectURL(blob);await call(chrome.downloads.download,{url,filename:`kiwi-migration-${new Date().toISOString().replace(/[:.]/g,'-')}.json`,saveAs:true});s.textContent='書き出しました';}catch(e){s.textContent='失敗: '+e.message;}};\\n";
++
++    @NativeMethods
++    interface Natives {
++        String importMigrationData(@JniType("Profile*") Profile profile, String json);
++
++        boolean installExtensionFile(@JniType("Profile*") Profile profile, String path);
++
++        boolean loadUnpacked(@JniType("Profile*") Profile profile, String uri);
++    }
++}
+diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
+--- a/chrome/browser/android/BUILD.gn
++++ b/chrome/browser/android/BUILD.gn
+@@ -129,6 +129,7 @@ if (is_android) {
+       "background_task_scheduler/proxy_native_task.cc",
+       "background_task_scheduler/proxy_native_task.h",
+       "backup/chrome_backup_agent.cc",
++      "backup/kiwi_migration_bridge.cc",
+       "backup/dict_pref_backup_serializer.cc",
+       "backup/dict_pref_backup_serializer.h",
+       "browserservices/site_isolator.cc",
+diff --git a/chrome/browser/android/backup/kiwi_migration_bridge.cc b/chrome/browser/android/backup/kiwi_migration_bridge.cc
+new file mode 100644
+--- /dev/null
++++ b/chrome/browser/android/backup/kiwi_migration_bridge.cc
+@@ -0,0 +1,209 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include <jni.h>
++
++#include <optional>
++#include <string>
++
++#include "base/android/jni_string.h"
++#include "base/files/file_path.h"
++#include "base/files/file_util.h"
++#include "base/json/json_reader.h"
++#include "base/strings/string_number_conversions.h"
++#include "base/strings/utf_string_conversions.h"
++#include "base/time/time.h"
++#include "chrome/android/chrome_jni_headers/KiwiMigrationActivity_jni.h"
++#include "chrome/browser/bookmarks/bookmark_model_factory.h"
++#include "chrome/browser/extensions/chrome_zipfile_installer.h"
++#include "chrome/browser/history/history_service_factory.h"
++#include "chrome/browser/profiles/profile.h"
++#include "chrome/browser/ui/browser_finder.h"
++#include "components/bookmarks/browser/bookmark_model.h"
++#include "components/bookmarks/browser/bookmark_node.h"
++#include "components/history/core/browser/history_service.h"
++#include "components/history/core/browser/history_types.h"
++#include "components/keyed_service/core/service_access_type.h"
++#include "extensions/browser/crx_installer.h"
++#include "extensions/browser/extension_file_task_runner.h"
++#include "extensions/browser/extension_registrar.h"
++#include "extensions/browser/unpacked_installer.h"
++#include "url/gurl.h"
++
++namespace chrome::android {
++namespace {
++
++void ImportBookmarkChildren(const base::Value::List& children,
++                            bookmarks::BookmarkModel* model,
++                            const bookmarks::BookmarkNode* parent,
++                            int* imported) {
++  for (const base::Value& value : children) {
++    if (!value.is_dict()) {
++      continue;
++    }
++    const base::Value::Dict& item = value.GetDict();
++    const std::string* title = item.FindString("title");
++    const std::string* url_string = item.FindString("url");
++    const base::Value::List* nested = item.FindList("children");
++    if (url_string) {
++      GURL url(*url_string);
++      if (url.is_valid() && (url.SchemeIsHTTPOrHTTPS())) {
++        model->AddURL(parent, parent->children().size(),
++                      base::UTF8ToUTF16(title ? *title : *url_string), url);
++        ++*imported;
++      }
++      continue;
++    }
++    if (!nested) {
++      continue;
++    }
++    const bookmarks::BookmarkNode* folder = model->AddFolder(
++        parent, parent->children().size(),
++        base::UTF8ToUTF16(title && !title->empty() ? *title : "Kiwi"));
++    ImportBookmarkChildren(*nested, model, folder, imported);
++  }
++}
++
++std::string ImportMigrationData(Profile* profile, const std::string& json) {
++  std::optional<base::Value> parsed = base::JSONReader::Read(json);
++  if (!parsed || !parsed->is_dict()) {
++    return "Invalid JSON";
++  }
++  const base::Value::Dict& root = parsed->GetDict();
++  const std::string* format = root.FindString("format");
++  if (!format || *format != "titanium-kiwi-migration-v1") {
++    return "Unsupported migration format";
++  }
++
++  bookmarks::BookmarkModel* model =
++      BookmarkModelFactory::GetForBrowserContext(profile);
++  if (!model || !model->loaded() || !model->mobile_node()) {
++    return "Bookmark model is not ready";
++  }
++  int bookmarks = 0;
++  if (const base::Value::List* roots = root.FindList("bookmarks")) {
++    const bookmarks::BookmarkNode* folder = model->AddFolder(
++        model->mobile_node(), model->mobile_node()->children().size(),
++        u"Kiwi Browserから移行");
++    for (const base::Value& value : *roots) {
++      if (!value.is_dict()) {
++        continue;
++      }
++      if (const base::Value::List* children = value.GetDict().FindList("children")) {
++        ImportBookmarkChildren(*children, model, folder, &bookmarks);
++      }
++    }
++  }
++
++  int visits = 0;
++  history::HistoryService* history_service =
++      HistoryServiceFactory::GetForProfile(profile,
++                                           ServiceAccessType::EXPLICIT_ACCESS);
++  if (history_service) {
++    if (const base::Value::List* history_items = root.FindList("history")) {
++      for (const base::Value& value : *history_items) {
++        if (!value.is_dict()) {
++          continue;
++        }
++        const base::Value::Dict& item = value.GetDict();
++        const std::string* url_string = item.FindString("url");
++        if (!url_string) {
++          continue;
++        }
++        GURL url(*url_string);
++        if (!url.is_valid() || !url.SchemeIsHTTPOrHTTPS()) {
++          continue;
++        }
++        const std::string* title = item.FindString("title");
++        if (title && !title->empty()) {
++          history_service->SetPageTitle(url, base::UTF8ToUTF16(*title));
++        }
++        const base::Value::List* item_visits = item.FindList("visits");
++        if (!item_visits) {
++          continue;
++        }
++        for (const base::Value& visit : *item_visits) {
++          if (!visit.is_dict()) {
++            continue;
++          }
++          std::optional<double> milliseconds =
++              visit.GetDict().FindDouble("visitTime");
++          if (!milliseconds || *milliseconds <= 0) {
++            continue;
++          }
++          history_service->AddPage(
++              url, base::Time::FromMillisecondsSinceUnixEpoch(*milliseconds),
++              history::SOURCE_BROWSED);
++          ++visits;
++        }
++      }
++    }
++  }
++  return "OK|" + base::NumberToString(bookmarks) + "|" +
++         base::NumberToString(visits);
++}
++
++}  // namespace
++
++static jni_zero::ScopedJavaLocalRef<jstring>
++JNI_KiwiMigrationActivity_ImportMigrationData(
++    JNIEnv* env,
++    Profile* profile,
++    const base::android::JavaParamRef<jstring>& j_json) {
++  return base::android::ConvertUTF8ToJavaString(
++      env, ImportMigrationData(
++               profile, base::android::ConvertJavaStringToUTF8(env, j_json)));
++}
++
++static jboolean JNI_KiwiMigrationActivity_InstallExtensionFile(
++    JNIEnv* env,
++    Profile* profile,
++    const base::android::JavaParamRef<jstring>& j_path) {
++  base::FilePath path = base::FilePath::FromUTF8Unsafe(
++      base::android::ConvertJavaStringToUTF8(env, j_path));
++  if (!base::PathExists(path)) {
++    return false;
++  }
++  if (path.MatchesExtension(FILE_PATH_LITERAL(".zip"))) {
++    extensions::ExtensionRegistrar* registrar =
++        extensions::ExtensionRegistrar::Get(profile);
++    extensions::ZipFileInstaller::Create(
++        extensions::GetExtensionFileTaskRunner(),
++        extensions::MakeRegisterInExtensionServiceCallback(profile))
++        ->InstallZipFileToUnpackedExtensionsDir(
++            path, registrar->unpacked_install_directory());
++    return true;
++  }
++  if (path.MatchesExtension(FILE_PATH_LITERAL(".crx"))) {
++    scoped_refptr<extensions::CrxInstaller> installer =
++        extensions::CrxInstaller::CreateSilent(profile);
++    installer->set_error_on_unsupported_requirements(true);
++    installer->set_off_store_install_allow_reason(
++        extensions::CrxInstaller::OffStoreInstallAllowedFromSettingsPage);
++    installer->set_install_immediately(true);
++    installer->InstallCrx(path);
++    return true;
++  }
++  return false;
++}
++
++static jboolean JNI_KiwiMigrationActivity_LoadUnpacked(
++    JNIEnv* env,
++    Profile* profile,
++    const base::android::JavaParamRef<jstring>& j_uri) {
++  base::FilePath uri = base::FilePath::FromUTF8Unsafe(
++      base::android::ConvertJavaStringToUTF8(env, j_uri));
++  std::optional<base::FilePath> virtual_path =
++      base::ResolveToVirtualDocumentPath(uri);
++  if (!virtual_path) {
++    return false;
++  }
++  scoped_refptr<extensions::UnpackedInstaller> installer =
++      extensions::UnpackedInstaller::Create(profile);
++  installer->set_be_noisy_on_failure(true);
++  installer->Load(*virtual_path);
++  return true;
++}
++
++}  // namespace chrome::android
