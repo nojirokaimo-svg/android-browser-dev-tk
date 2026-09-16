@@ -14,6 +14,8 @@ Titaniumの現行Chromiumと拡張機能基盤を保ち、Kiwi風UIを機能別p
 - Kiwi密度へ寄せた拡張機能管理画面と、削除前の確認dialog
 - Default／Original／Horizontal／Vertical／Grid／List／Desktopの7種類から選べるタブ切り替え
 - タブ状態・download・history・bookmarkを含む手動backup/restore
+- 「Kiwi Browserから移行」からのネイティブ移行、元日時を保持する履歴取り込み
+- Android SAF経由のZIP／CRX／展開済み拡張機能の実読み込み
 - 英語・日本語リソース
 
 完全移植ではありません。実機での6種類のNight mode、全7タブ切り替え、backup/restore、各popupの最終確認は継続中です。
@@ -24,9 +26,18 @@ Titaniumの現行Chromiumと拡張機能基盤を保ち、Kiwi風UIを機能別p
 
 | 順序 | 機能 | 主な責務 |
 |---|---|---|
-| `010-resources.patch` | resources | メニューID、英語・日本語ラベル、GN登録 |
-| `020-app-menu-actions.patch` | app-menu-actions | 拡張機能行、実行経路、基本Night mode |
-| `030-menu-presentation.patch` | menu-presentation | popup外観、下部メニュー・サブメニュー制御 |
+| 010 | resources | メニューID、英語・日本語ラベル、GN登録 |
+| 020 | app-menu-actions | 拡張機能行、実行経路、基本Night mode |
+| 030 | menu-presentation | compact popupとdark surface |
+| 040 | preference-registry | preference登録と起動クラッシュ修正 |
+| 050 | night-mode-presets | 6種類のrenderer Night mode |
+| 060 | runtime-night-mode | Night mode即時反映 |
+| 070 | renderer-force-dark-runtime | renderer force-dark連携 |
+| 080 | extension-mobile-ui | responsive拡張機能管理画面 |
+| 090 | black-statusbar-full-backup | OLED黒化と完全backup |
+| 100 | kiwi-tab-switcher | 7種類のタブ切り替え |
+| 110 | amoled-surfaces | 新しいタブ・omniboxの純黒化 |
+| 120 | kiwi-migration-extension-import | Kiwi移行、履歴日時保持、ZIP/CRX/展開済み拡張読み込み |
 
 拡張機能とNight modeは同じActivity/メニュー生成箇所を変更するため、競合しやすいファイルを二重patchにせず、一つの依存単位にしています。
 
@@ -112,6 +123,7 @@ python3 kiwi_port/regenerate_patches.py /path/to/modified/chromium/src --base HE
 
 ```bash
 python3 -m py_compile kiwi_port/apply.py kiwi_port/regenerate_patches.py
+python3 -m unittest kiwi_port.test_reapply kiwi_port.test_incremental_sources kiwi_port.test_night_mode_patch
 python3 kiwi_port/apply.py /path/to/clean/test-worktree
 python3 kiwi_port/apply.py /path/to/clean/test-worktree
 git diff --check
