@@ -552,7 +552,6 @@ new file mode 100644
 +#include "chrome/browser/extensions/chrome_zipfile_installer.h"
 +#include "chrome/browser/history/history_service_factory.h"
 +#include "chrome/browser/profiles/profile.h"
-+#include "chrome/browser/ui/browser_finder.h"
 +#include "components/bookmarks/browser/bookmark_model.h"
 +#include "components/bookmarks/browser/bookmark_node.h"
 +#include "components/history/core/browser/history_service.h"
@@ -666,7 +665,8 @@ new file mode 100644
 +            continue;
 +          }
 +          history_service->AddPage(
-+              url, base::Time::FromMillisecondsSinceUnixEpoch(*milliseconds),
++              url, base::Time::FromMillisecondsSinceUnixEpoch(
++                       static_cast<int64_t>(*milliseconds)),
 +              history::SOURCE_BROWSED);
 +          ++visits;
 +        }
