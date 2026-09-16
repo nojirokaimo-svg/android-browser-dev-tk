@@ -7,11 +7,17 @@ import shutil
 import tempfile
 import unittest
 
+import incremental_sources
 from incremental_sources import AGE_NS, PLAN, STATE, digest, restore
 
 
 class IncrementalTest(unittest.TestCase):
     def test_100_actions_restore_edit_and_continue(self):
+        original_patch_owned_files = incremental_sources.patch_owned_files
+        self.addCleanup(
+            setattr, incremental_sources, 'patch_owned_files', original_patch_owned_files)
+        incremental_sources.patch_owned_files = lambda: set()
+
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             src = root/'first'
