@@ -579,7 +579,7 @@ new file mode 100644
 +namespace chrome::android {
 +namespace {
 +
-+void ImportBookmarkChildren(const base::Value::List& children,
++void ImportBookmarkChildren(const base::ListValue& children,
 +                            bookmarks::BookmarkModel* model,
 +                            const bookmarks::BookmarkNode* parent,
 +                            int* imported) {
@@ -587,10 +587,10 @@ new file mode 100644
 +    if (!value.is_dict()) {
 +      continue;
 +    }
-+    const base::Value::Dict& item = value.GetDict();
++    const base::DictValue& item = value.GetDict();
 +    const std::string* title = item.FindString("title");
 +    const std::string* url_string = item.FindString("url");
-+    const base::Value::List* nested = item.FindList("children");
++    const base::ListValue* nested = item.FindList("children");
 +    if (url_string) {
 +      GURL url(*url_string);
 +      if (url.is_valid() && (url.SchemeIsHTTPOrHTTPS())) {
@@ -611,11 +611,11 @@ new file mode 100644
 +}
 +
 +std::string ImportMigrationData(Profile* profile, const std::string& json) {
-+  std::optional<base::Value> parsed = base::JSONReader::Read(json);
++  std::optional<base::Value> parsed = base::JSONReader::Read(json, base::JSON_PARSE_RFC);
 +  if (!parsed || !parsed->is_dict()) {
 +    return "Invalid JSON";
 +  }
-+  const base::Value::Dict& root = parsed->GetDict();
++  const base::DictValue& root = parsed->GetDict();
 +  const std::string* format = root.FindString("format");
 +  if (!format || *format != "titanium-kiwi-migration-v1") {
 +    return "Unsupported migration format";
@@ -627,7 +627,7 @@ new file mode 100644
 +    return "Bookmark model is not ready";
 +  }
 +  int bookmarks = 0;
-+  if (const base::Value::List* roots = root.FindList("bookmarks")) {
++  if (const base::ListValue* roots = root.FindList("bookmarks")) {
 +    const bookmarks::BookmarkNode* folder = model->AddFolder(
 +        model->mobile_node(), model->mobile_node()->children().size(),
 +        u"Kiwi Browserから移行");
@@ -635,7 +635,7 @@ new file mode 100644
 +      if (!value.is_dict()) {
 +        continue;
 +      }
-+      if (const base::Value::List* children = value.GetDict().FindList("children")) {
++      if (const base::ListValue* children = value.GetDict().FindList("children")) {
 +        ImportBookmarkChildren(*children, model, folder, &bookmarks);
 +      }
 +    }
@@ -646,12 +646,12 @@ new file mode 100644
 +      HistoryServiceFactory::GetForProfile(profile,
 +                                           ServiceAccessType::EXPLICIT_ACCESS);
 +  if (history_service) {
-+    if (const base::Value::List* history_items = root.FindList("history")) {
++    if (const base::ListValue* history_items = root.FindList("history")) {
 +      for (const base::Value& value : *history_items) {
 +        if (!value.is_dict()) {
 +          continue;
 +        }
-+        const base::Value::Dict& item = value.GetDict();
++        const base::DictValue& item = value.GetDict();
 +        const std::string* url_string = item.FindString("url");
 +        if (!url_string) {
 +          continue;
@@ -664,7 +664,7 @@ new file mode 100644
 +        if (title && !title->empty()) {
 +          history_service->SetPageTitle(url, base::UTF8ToUTF16(*title));
 +        }
-+        const base::Value::List* item_visits = item.FindList("visits");
++        const base::ListValue* item_visits = item.FindList("visits");
 +        if (!item_visits) {
 +          continue;
 +        }
@@ -696,7 +696,7 @@ new file mode 100644
 +JNI_KiwiMigrationActivity_ImportMigrationData(
 +    JNIEnv* env,
 +    Profile* profile,
-+    const base::android::JavaParamRef<jstring>& j_json) {
++    const base::android::JavaRef<jstring>& j_json) {
 +  return base::android::ConvertUTF8ToJavaString(
 +      env, ImportMigrationData(
 +               profile, base::android::ConvertJavaStringToUTF8(env, j_json)));
@@ -705,7 +705,7 @@ new file mode 100644
 +static jboolean JNI_KiwiMigrationActivity_InstallExtensionFile(
 +    JNIEnv* env,
 +    Profile* profile,
-+    const base::android::JavaParamRef<jstring>& j_path) {
++    const base::android::JavaRef<jstring>& j_path) {
 +  base::FilePath path = base::FilePath::FromUTF8Unsafe(
 +      base::android::ConvertJavaStringToUTF8(env, j_path));
 +  if (!base::PathExists(path)) {
@@ -737,7 +737,7 @@ new file mode 100644
 +static jboolean JNI_KiwiMigrationActivity_LoadUnpacked(
 +    JNIEnv* env,
 +    Profile* profile,
-+    const base::android::JavaParamRef<jstring>& j_uri) {
++    const base::android::JavaRef<jstring>& j_uri) {
 +  base::FilePath uri = base::FilePath::FromUTF8Unsafe(
 +      base::android::ConvertJavaStringToUTF8(env, j_uri));
 +  std::optional<base::FilePath> virtual_path =
