@@ -839,8 +839,8 @@ diff --git a/chrome/browser/ui/webui/extensions/extensions_ui.cc b/chrome/browse
 +#if BUILDFLAG(IS_ANDROID)
 +  web_ui->RegisterMessageCallback(
 +      "openKiwiExtensionPackagePicker",
-+      base::BindRepeating([](const base::Value::List&) {
-+        Java_KiwiMigrationActivity_openExtensionPackagePicker(
++      base::BindRepeating([](const base::ListValue&) {
++        jni_zero_internal::Java_KiwiMigrationActivity_openExtensionPackagePicker(
 +            base::android::AttachCurrentThread());
 +      }));
 +#endif  // BUILDFLAG(IS_ANDROID)

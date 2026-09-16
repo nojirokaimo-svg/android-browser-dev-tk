@@ -166,7 +166,7 @@
         "chrome/browser/resources/extensions/toolbar.ts",
         "chrome/browser/ui/webui/extensions/extensions_ui.cc"
       ],
-      "sha256": "ea3ff27346ec0aa182b843960e4a55d97ce0b7bbad3b88ecfeb41f8d8d92ab81"
+      "sha256": "e9b32a23ab299e2eec924bd1e8d6d58c17adf7e3b8e84664c2e7ed0adb9676a7"
     }
   ]
 }
