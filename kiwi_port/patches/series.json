@@ -87,13 +87,12 @@
     },
     {
       "id": "extension-mobile-ui",
-      "name": "Native responsive extension manager layout with dark colors and explicit removal confirmation",
+      "name": "Native responsive extension manager layout with dark colors",
       "patch": "080-extension-mobile-ui.patch",
       "files": [
-        "chrome/browser/resources/extensions/item.ts",
         "chrome/browser/resources/extensions/item_list.css"
       ],
-      "sha256": "13d6d1c701df4994615327eddf12b7a19c78f27efdafc4db5c6b1642a4f74312"
+      "sha256": "9b907c4d91c12b6cdd97046b66bb3812fc00d5fd62c5e5fc4725f05903171d6b"
     },
     {
       "id": "black-statusbar-full-backup",
