@@ -17,6 +17,17 @@ class IncrementalTest(unittest.TestCase):
             src = root/'first'
             out = src/'out/Default'
             out.mkdir(parents=True)
+            (out/'args.gn').write_text(
+                'target_cpu = "arm64"\n'
+                'chrome_public_manifest_package = "io.github.nojirokaimo.titaniumkiwi"\n'
+                'is_debug = false\n'
+                'is_official_build = true\n'
+                'symbol_level = 0\n'
+                'generate_linker_map = false\n'
+                'blink_symbol_level = 0\n'
+                'v8_symbol_level = 0\n'
+                'treat_warnings_as_errors = false\n'
+            )
             names = [f'input{i}.txt' for i in range(100)]
             for name in names:
                 (src/name).write_text(name)
