@@ -55,6 +55,10 @@ runs:
       run: |
         python3 kiwi_port/verify_series.py
         python3 -m py_compile kiwi_port/apply.py kiwi_port/incremental_sources.py
+        python3 -m unittest \
+          kiwi_port.test_reapply \
+          kiwi_port.test_incremental_sources \
+          kiwi_port.test_night_mode_patch
 
     - name: Enforce checkpoint-only resume
       if: inputs.require-restore == 'true' && inputs.restore-key == ''
