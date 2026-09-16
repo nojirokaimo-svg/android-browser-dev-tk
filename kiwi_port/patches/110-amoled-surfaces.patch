@@ -111,23 +111,31 @@ diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/brow
          return brandedColorScheme == BrandedColorScheme.INCOGNITO
                  ? context.getColor(R.color.omnibox_dropdown_bg_incognito)
                  : ContextCompat.getColor(context, R.color.omnibox_suggestion_dropdown_bg);
-diff --git a/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml b/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml
---- a/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml
-+++ b/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml
-@@ -6,5 +6,5 @@
- -->
- 
- <selector xmlns:android="http://schemas.android.com/apk/res/android">
--  <item android:color="?attr/colorSurface"/>
-+  <item android:color="@android:color/black"/>
- </selector>
-diff --git a/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml b/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml
---- a/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml
-+++ b/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml
-@@ -6,5 +6,5 @@
- -->
- 
- <selector xmlns:android="http://schemas.android.com/apk/res/android">
--  <item android:color="?attr/colorSurfaceContainer"/>
-+  <item android:color="@android:color/black"/>
- </selector>
+diff --git a/components/browser_ui/widget/android/BUILD.gn b/components/browser_ui/widget/android/BUILD.gn
+--- a/components/browser_ui/widget/android/BUILD.gn
++++ b/components/browser_ui/widget/android/BUILD.gn
+@@ -216,6 +216,7 @@ android_resources("java_resources") {
+     "java/res/color/tab_resumption_module_icon_background_color.xml",
+     "java/res/color/tile_view_icon_background_color.xml",
+     "java/res/color/toolbar_text_box_bg_color.xml",
++    "java/res/drawable-night/home_surface_ui_background.xml",
+     "java/res/drawable-hdpi/ic_arrow_back_white_24dp.png",
+     "java/res/drawable-hdpi/ic_check_googblue_24dp.png",
+     "java/res/drawable-hdpi/ic_error_outline_googblue_24dp.png",
+diff --git a/components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml b/components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml
+new file mode 100644
+--- /dev/null
++++ b/components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++Copyright 2026 The Chromium Authors
++Use of this source code is governed by a BSD-style license that can be
++found in the LICENSE file.
++-->
++
++<shape xmlns:android="http://schemas.android.com/apk/res/android"
++    android:shape="rectangle">
++  <solid android:color="@android:color/black"/>
++  <corners android:radius="@dimen/home_surface_ui_background_radius"/>
++</shape>
