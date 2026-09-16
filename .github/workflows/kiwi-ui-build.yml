@@ -122,7 +122,7 @@ jobs:
           final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-4
           titanium-commit: 7584b534f6e1f9c29e8bb98df71d7610960a5db3
           vanadium-commit: 02d87ad8e17aee77d0fea49d122349a5da87ed2e
-          chromium-commit: 507c6ee3b2ca0e660547e5b9ea4820c67f4c
+          chromium-commit: 507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c
           chromium-version: 153.0.8010.36
           patch-mode: best-effort
           build-budget-minutes: ${{ inputs.build_budget_minutes || '40' }}
