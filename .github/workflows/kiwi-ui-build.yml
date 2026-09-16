@@ -7,6 +7,15 @@ on:
         description: Exact Chromium 153 out/Default cache key. Empty uses the latest pinned valid checkpoint; cache miss stops immediately.
         required: false
         default: ""
+      build_budget_minutes:
+        description: Compile budget per stage. Keep this short; the default resumes for 40 minutes only.
+        required: false
+        default: "40"
+      continue_stages:
+        description: Explicitly allow additional continuation stages after the first one.
+        required: false
+        type: boolean
+        default: false
   push:
     branches:
       - codex/kiwi-ui-port
@@ -22,7 +31,7 @@ concurrency:
 jobs:
   stage-1:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 55
     outputs:
       done: ${{ steps.build.outputs.done }}
     steps:
@@ -34,8 +43,8 @@ jobs:
           # checkpoint and never start another cold multi-hour compile.
           restore-key: ${{ inputs.incremental_cache_key || 'kiwi-incremental-153-10e72f109c2821e62c74e63157da04330bc878f4-stage-1' }}
           require-restore: "true"
-          # The pinned checkpoint is the completed M153 release baseline and is restored
-          # only by exact key after all source-producing inputs are verified.
+          # The pinned checkpoint is restored only by exact key after all
+          # source-producing inputs are verified. No clean/source reset here.
           bootstrap-revision: ""
           save-key: kiwi-153-${{ github.sha }}-stage-1
           final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-1
@@ -44,13 +53,16 @@ jobs:
           chromium-commit: 507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c
           chromium-version: 153.0.8010.36
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: ${{ inputs.build_budget_minutes || '40' }}
 
+  # Continuation stages are opt-in for manual dispatch only. Normal pushes and
+  # default manual runs stop after one short resumable stage instead of chaining
+  # several long compiles automatically.
   stage-2:
     needs: stage-1
-    if: needs.stage-1.outputs.done != 'true'
+    if: needs.stage-1.outputs.done != 'true' && inputs.continue_stages == true
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 55
     outputs:
       done: ${{ steps.build.outputs.done }}
     steps:
@@ -67,13 +79,13 @@ jobs:
           chromium-commit: 507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c
           chromium-version: 153.0.8010.36
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: ${{ inputs.build_budget_minutes || '40' }}
 
   stage-3:
     needs: stage-2
-    if: needs.stage-2.outputs.done != 'true'
+    if: needs.stage-2.outputs.done != 'true' && inputs.continue_stages == true
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 55
     outputs:
       done: ${{ steps.build.outputs.done }}
     steps:
@@ -90,13 +102,13 @@ jobs:
           chromium-commit: 507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c
           chromium-version: 153.0.8010.36
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: ${{ inputs.build_budget_minutes || '40' }}
 
   stage-4:
     needs: stage-3
-    if: needs.stage-3.outputs.done != 'true'
+    if: needs.stage-3.outputs.done != 'true' && inputs.continue_stages == true
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 55
     outputs:
       done: ${{ steps.build.outputs.done }}
     steps:
@@ -110,16 +122,16 @@ jobs:
           final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-4
           titanium-commit: 7584b534f6e1f9c29e8bb98df71d7610960a5db3
           vanadium-commit: 02d87ad8e17aee77d0fea49d122349a5da87ed2e
-          chromium-commit: 507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c
+          chromium-commit: 507c6ee3b2ca0e660547e5b9ea4820c67f4c
           chromium-version: 153.0.8010.36
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: ${{ inputs.build_budget_minutes || '40' }}
 
   stage-5:
     needs: stage-4
-    if: needs.stage-4.outputs.done != 'true'
+    if: needs.stage-4.outputs.done != 'true' && inputs.continue_stages == true
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 55
     outputs:
       done: ${{ steps.build.outputs.done }}
     steps:
@@ -136,14 +148,14 @@ jobs:
           chromium-commit: 507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c
           chromium-version: 153.0.8010.36
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: ${{ inputs.build_budget_minutes || '40' }}
 
   require-apk:
     needs: [stage-1, stage-2, stage-3, stage-4, stage-5]
-    if: always()
+    if: always() && inputs.continue_stages == true
     runs-on: ubuntu-latest
     steps:
-      - name: Require one stage to finish the APK
+      - name: Require one explicitly chained stage to finish the APK
         env:
           S1: ${{ needs.stage-1.outputs.done }}
           S2: ${{ needs.stage-2.outputs.done }}
@@ -152,6 +164,6 @@ jobs:
           S5: ${{ needs.stage-5.outputs.done }}
         run: |
           if [[ "$S1" != true && "$S2" != true && "$S3" != true && "$S4" != true && "$S5" != true ]]; then
-            echo "Five compile checkpoints completed without producing an APK." >&2
+            echo "Five explicitly requested compile checkpoints completed without producing an APK." >&2
             exit 1
           fi
