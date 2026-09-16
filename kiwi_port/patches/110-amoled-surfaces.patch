@@ -1,0 +1,127 @@
+--- a/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
++++ b/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
+@@ -5,6 +5,7 @@
+ package org.chromium.chrome.browser.ui.theme;
+ 
+ import android.content.Context;
++import android.graphics.Color;
+ 
+ import androidx.annotation.ColorInt;
+ 
+@@ -53,6 +54,9 @@
+      * color in dark mode.
+      */
+     public static @ColorInt int getHomeSurfaceBackgroundColor(Context context) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         if (BottomBarConfigUtils.isBottomBarEnabled(context)) {
+             if (ColorUtils.inNightMode(context)) {
+                 return SemanticColorUtils.getColorSurface(context);
+--- a/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
++++ b/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
+@@ -25,6 +25,7 @@
+ import org.chromium.chrome.browser.profiles.Profile;
+ import org.chromium.chrome.browser.theme.ThemeUtils;
+ import org.chromium.chrome.browser.ui.theme.BrandedColorScheme;
++import org.chromium.ui.util.ColorUtils;
+ 
+ /** Utility class for the composeplate view. */
+ @NullMarked
+@@ -72,6 +73,16 @@
+      */
+     public static void applySearchBoxBackground(
+             Context context, View view, boolean applyWhiteBackground) {
++        if (ColorUtils.inNightMode(context)) {
++            Drawable background =
++                    context.getDrawable(R.drawable.home_surface_search_box_background);
++            if (background != null) {
++                GradientDrawable amoledBackground = (GradientDrawable) background.mutate();
++                amoledBackground.setColor(Color.BLACK);
++                view.setBackground(amoledBackground);
++            }
++            return;
++        }
+         if (applyWhiteBackground) {
+             if (NewTabPageUtils.isNtpAuroraEnabled()) {
+                 // When Aurora is enabled on customized image theme, use white mixed with 2% primary
+--- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
++++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
+@@ -12,6 +12,7 @@
+ import android.graphics.BlurMaskFilter;
+ import android.graphics.BlurMaskFilter.Blur;
+ import android.graphics.Canvas;
++import android.graphics.Color;
+ import android.graphics.ColorFilter;
+ import android.graphics.Paint;
+ import android.graphics.Paint.Style;
+@@ -298,7 +299,10 @@
+      * @param color The color to set as the background.
+      */
+     public void setBackgroundColor(@ColorInt int color) {
+-        mBackgroundGradient.setColor(color);
++        // Dark location bar colors must stay pure black after focus and animation updates.
++        long luminance =
++                2126L * Color.red(color) + 7152L * Color.green(color) + 722L * Color.blue(color);
++        mBackgroundGradient.setColor(luminance < 1280000L ? Color.BLACK : color);
+         invalidateSelf();
+     }
+ 
+--- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
++++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
+@@ -12,6 +12,7 @@
+ import android.content.res.Configuration;
+ import android.content.res.Resources;
+ import android.graphics.Bitmap;
++import android.graphics.Color;
+ import android.graphics.drawable.ColorDrawable;
+ import android.graphics.drawable.Drawable;
+ import android.graphics.drawable.Drawable.ConstantState;
+@@ -1041,6 +1042,9 @@
+     /** Returns the background color for suggestions in the given color scheme and context. */
+     public static @ColorInt int getStandardSuggestionBackgroundColor(
+             Context context, @BrandedColorScheme int colorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
+                 ? context.getColor(R.color.search_suggestion_bg_color_incognito)
+                 : ContextCompat.getColor(context, R.color.search_suggestion_bg_color);
+@@ -1052,6 +1056,9 @@
+      */
+     public static @ColorInt int getPopoverSuggestionBackgroundColor(
+             Context context, @BrandedColorScheme int colorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
+                 ? context.getColor(R.color.gm3_baseline_surface_container_dark)
+                 : ContextCompat.getColor(context, R.color.omnibox_popover_suggestion_bg_color);
+@@ -1102,6 +1109,9 @@
+      */
+     public static @ColorInt int getSuggestionsDropdownBackgroundColor(
+             Context context, @BrandedColorScheme int brandedColorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return brandedColorScheme == BrandedColorScheme.INCOGNITO
+                 ? context.getColor(R.color.omnibox_dropdown_bg_incognito)
+                 : ContextCompat.getColor(context, R.color.omnibox_suggestion_dropdown_bg);
+--- a/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml
++++ b/components/browser_ui/widget/android/java/res/color-night/home_surface_background_color.xml
+@@ -6,5 +6,5 @@
+ -->
+ 
+ <selector xmlns:android="http://schemas.android.com/apk/res/android">
+-  <item android:color="?attr/colorSurface"/>
++  <item android:color="@android:color/black"/>
+ </selector>
+--- a/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml
++++ b/components/browser_ui/widget/android/java/res/color-night/home_surface_ui_background_color.xml
+@@ -6,5 +6,5 @@
+ -->
+ 
+ <selector xmlns:android="http://schemas.android.com/apk/res/android">
+-  <item android:color="?attr/colorSurfaceContainer"/>
++  <item android:color="@android:color/black"/>
+ </selector>
