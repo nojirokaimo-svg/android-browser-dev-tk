@@ -799,6 +799,9 @@ diff --git a/chrome/browser/resources/extensions/toolbar.ts b/chrome/browser/res
    }
  
 +  protected onLoadPackageClick_() {
++    // This Android-only message opens the native Storage Access Framework.
++    // No Mojo interface exists for launching this Java activity.
++    // eslint-disable-next-line no-restricted-properties
 +    chrome.send('openKiwiExtensionPackagePicker');
 +  }
 +
