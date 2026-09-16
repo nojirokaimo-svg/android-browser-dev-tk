@@ -87,19 +87,17 @@
     },
     {
       "id": "extension-mobile-ui",
-      "name": "Compact Kiwi extension manager geometry with explicit removal confirmation",
+      "name": "Native responsive extension manager layout with dark colors and explicit removal confirmation",
       "patch": "080-extension-mobile-ui.patch",
       "files": [
-        "chrome/browser/resources/extensions/item.css",
         "chrome/browser/resources/extensions/item.ts",
-        "chrome/browser/resources/extensions/item_list.css",
-        "chrome/browser/resources/extensions/manager.css"
+        "chrome/browser/resources/extensions/item_list.css"
       ],
-      "sha256": "e6592a97c8a1ff665403f17188244ada01169e2ddb9d1dfe8a047cf3c1baa0fd"
+      "sha256": "13d6d1c701df4994615327eddf12b7a19c78f27efdafc4db5c6b1642a4f74312"
     },
     {
       "id": "black-statusbar-full-backup",
-      "name": "Pure-black dark system bar, live/composited toolbar, omnibox, and manual full browser-state backup",
+      "name": "Pure-black dark system bar across controller and edge-to-edge paths, live/composited toolbar, omnibox, and manual full browser-state backup",
       "patch": "090-black-statusbar-full-backup.patch",
       "files": [
         "chrome/android/chrome_java_sources.gni",
@@ -110,9 +108,11 @@
         "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java",
         "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java",
         "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java",
-        "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java"
+        "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java",
+        "ui/edge_to_edge/android/java/src/org/chromium/ui/edge_to_edge/BaseSystemBarColorHelper.java",
+        "ui/edge_to_edge/android/java/src/org/chromium/ui/edge_to_edge/EdgeToEdgeSystemBarColorHelper.java"
       ],
-      "sha256": "6148b3050547ba4aa80afd173b03050fc658d7eb70c7ac4e522aa4799d22b314"
+      "sha256": "8ff429300a80cec67641ea20f70e51f1f98391cfe4e3ebbb9e408e628bfeb5b3"
     },
     {
       "id": "kiwi-tab-switcher",
