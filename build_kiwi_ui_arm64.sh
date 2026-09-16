@@ -12,6 +12,24 @@ VERSION="${CHROMIUM_VERSION:-153.0.8010.36}"
 PHASE="${KIWI_BUILD_PHASE:-all}"
 PATCH_MODE="${KIWI_PATCH_MODE:-strict}"
 
+retry_network() {
+  local attempt delay=10
+  for attempt in 1 2 3 4 5; do
+    if "$@"; then
+      return 0
+    fi
+    if (( attempt == 5 )); then
+      echo "Network command failed after $attempt attempts: $*" >&2
+      return 1
+    fi
+    echo "Transient network failure (attempt $attempt/5): $*" >&2
+    echo "Retrying in ${delay}s without touching out/Default." >&2
+    sleep "$delay"
+    delay=$((delay * 2))
+  done
+}
+
+
 if [[ "$PHASE" != "all" && "$PHASE" != "prepare" && "$PHASE" != "compile" ]]; then
   echo "Unknown KIWI_BUILD_PHASE: $PHASE" >&2
   exit 2
@@ -29,7 +47,7 @@ fi
 if ! git -C "$TITANIUM_DIR" remote get-url origin >/dev/null 2>&1; then
   git -C "$TITANIUM_DIR" remote add origin "$TITANIUM_REPOSITORY"
 fi
-git -C "$TITANIUM_DIR" fetch --depth 1 origin "$TITANIUM_COMMIT"
+retry_network git -C "$TITANIUM_DIR" fetch --depth 1 origin "$TITANIUM_COMMIT"
 git -C "$TITANIUM_DIR" checkout --detach --force "$TITANIUM_COMMIT"
 git -C "$TITANIUM_DIR" submodule update --init --recursive --depth 1
 test "$(git -C "$TITANIUM_DIR/vanadium" rev-parse HEAD)" = "$VANADIUM_COMMIT"
@@ -56,8 +74,18 @@ sudo apt-get install -y \
   ninja-build libgcc-s1:i386
 
 if [[ ! -d "$BUILD_ROOT/depot_tools/.git" ]]; then
-  git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git \
-    "$BUILD_ROOT/depot_tools"
+  for attempt in 1 2 3 4 5; do
+    rm -rf "$BUILD_ROOT/depot_tools"
+    if git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git \
+      "$BUILD_ROOT/depot_tools"; then
+      break
+    fi
+    if (( attempt == 5 )); then
+      echo "depot_tools clone failed after $attempt attempts." >&2
+      exit 1
+    fi
+    sleep $((attempt * 10))
+  done
 fi
 export PATH="$BUILD_ROOT/depot_tools:$PATH"
 
@@ -70,7 +98,7 @@ if [[ ! -d .git ]]; then git init; fi
 if ! git remote get-url origin >/dev/null 2>&1; then
   git remote add origin https://chromium.googlesource.com/chromium/src.git
 fi
-git fetch --depth 1 origin "+refs/tags/$VERSION:refs/tags/$VERSION"
+retry_network git fetch --depth 1 origin "+refs/tags/$VERSION:refs/tags/$VERSION"
 git checkout --detach --force "refs/tags/$VERSION"
 test "$(git rev-parse HEAD)" = "$CHROMIUM_COMMIT"
 cp "$TITANIUM_DIR/.gclient" ../.gclient
