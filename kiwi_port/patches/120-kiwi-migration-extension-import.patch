@@ -794,7 +794,7 @@ diff --git a/chrome/browser/resources/extensions/toolbar.html.ts b/chrome/browse
 diff --git a/chrome/browser/resources/extensions/toolbar.ts b/chrome/browser/resources/extensions/toolbar.ts
 --- a/chrome/browser/resources/extensions/toolbar.ts
 +++ b/chrome/browser/resources/extensions/toolbar.ts
-@@ -173,6 +173,10 @@ export class ExtensionsToolbarElement extends ExtensionsToolbarElementBase {
+@@ -173,6 +173,13 @@ export class ExtensionsToolbarElement extends ExtensionsToolbarElementBase {
      this.expanded_ = !this.expanded_;
    }
  
