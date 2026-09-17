@@ -170,12 +170,15 @@
     },
     {
       "id": "credentials-security",
-      "name": "Built-in local password saving by default while preserving explicit third-party autofill choice",
+      "name": "Restore local password saving and migrate existing Android profiles once",
       "patch": "130-credentials-security.patch",
       "files": [
-        "components/autofill/core/common/autofill_prefs.cc"
+        "chrome/browser/prefs/browser_prefs.cc",
+        "components/autofill/core/common/autofill_prefs.cc",
+        "components/password_manager/core/browser/password_manager.cc",
+        "components/password_manager/core/common/password_manager_pref_names.h"
       ],
-      "sha256": "050c5465e05a36a330ae4b5eee4e8a8492f72939f8bc7f60966349d677c43992"
+      "sha256": "fd6d4f028b793c825ea300d31b65e8b6c70bdabb0781b365510b1e1dda076f5c"
     }
   ]
 }
