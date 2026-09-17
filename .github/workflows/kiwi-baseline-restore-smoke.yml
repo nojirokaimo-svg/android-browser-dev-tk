@@ -1,0 +1,105 @@
+name: Smoke-test durable Titanium-Kiwi baseline restore
+
+on:
+  push:
+    branches:
+      - ci/baseline-restore-smoke
+    paths:
+      - .github/workflows/kiwi-baseline-restore-smoke.yml
+
+permissions:
+  contents: read
+  actions: write
+
+env:
+  TITANIUM_COMMIT: 7584b534f6e1f9c29e8bb98df71d7610960a5db3
+  VANADIUM_COMMIT: 02d87ad8e17aee77d0fea49d122349a5da87ed2e
+  CHROMIUM_COMMIT: 507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c
+  CHROMIUM_VERSION: 153.0.8010.36
+  SOURCE_CACHE_KEY: kiwi-incremental-153-fa41ecbd6f784035336214537d19505d52026713-stage-1
+  RELEASE_TAG: kiwi-baseline-m153-fa41ecbd6f784035336214537d19505d52026713
+  SMOKE_CACHE_KEY: kiwi-baseline-restore-smoke-m153-${{ github.sha }}
+
+jobs:
+  release-to-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Ensure archive tools are available
+        shell: bash
+        run: |
+          if ! command -v zstd >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y zstd
+          fi
+
+      - name: Free runner disk
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker system prune --all --force --volumes || true
+          df -h
+
+      - name: Download durable manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          rm -rf "$RUNNER_TEMP/kiwi-baseline-download"
+          mkdir -p "$RUNNER_TEMP/kiwi-baseline-download"
+          gh release download "$RELEASE_TAG"             --repo "$GITHUB_REPOSITORY"             --pattern baseline-manifest.json             --dir "$RUNNER_TEMP/kiwi-baseline-download"             --clobber
+
+      - name: Restore durable baseline from Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          mkdir -p work/titanium/chromium/src/out
+          python3 kiwi_port/baseline_backup.py restore             --manifest "$RUNNER_TEMP/kiwi-baseline-download/baseline-manifest.json"             --destination-parent work/titanium/chromium/src/out             --chromium-version "$CHROMIUM_VERSION"             --chromium-commit "$CHROMIUM_COMMIT"             --titanium-commit "$TITANIUM_COMMIT"             --vanadium-commit "$VANADIUM_COMMIT"             --source-cache-key "$SOURCE_CACHE_KEY"             --fetch-part-command 'gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$BASELINE_PART_NAME" --dir "$(dirname "$BASELINE_PART_PATH")" --clobber'             --delete-part-after-use
+          out=work/titanium/chromium/src/out/Default
+          test -f "$out/.ninja_log"
+          test -f "$out/build.ninja"
+          test -f "$out/args.gn"
+          test -f "$out/kiwi-source-state.json"
+          du -sh "$out"
+
+      - name: Save restored baseline as a fresh Actions cache
+        uses: actions/cache/save@v4
+        with:
+          path: work/titanium/chromium/src/out/Default
+          key: ${{ env.SMOKE_CACHE_KEY }}
+
+  prove-cache-restore:
+    needs: release-to-cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Free runner disk
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker system prune --all --force --volumes || true
+          df -h
+
+      - name: Restore the freshly recreated exact Actions cache
+        uses: actions/cache/restore@v4
+        with:
+          path: work/titanium/chromium/src/out/Default
+          key: ${{ env.SMOKE_CACHE_KEY }}
+          fail-on-cache-miss: true
+
+      - name: Verify the recreated cache on a fresh runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          out=work/titanium/chromium/src/out/Default
+          test -f "$out/.ninja_log"
+          test -f "$out/build.ninja"
+          test -f "$out/args.gn"
+          test -f "$out/kiwi-source-state.json"
+          du -sh "$out"
+          echo "RELEASE_TO_ACTIONS_CACHE_RESTORE_OK"
