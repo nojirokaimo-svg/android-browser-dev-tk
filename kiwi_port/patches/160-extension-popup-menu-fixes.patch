@@ -35,7 +35,6 @@ diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/b
 +        }
 +        return ColorUtils.inNightMode(ContextUtils.getApplicationContext());
      }
-
 diff --git a/chrome/browser/ui/android/extensions/BUILD.gn b/chrome/browser/ui/android/extensions/BUILD.gn
 --- a/chrome/browser/ui/android/extensions/BUILD.gn
 +++ b/chrome/browser/ui/android/extensions/BUILD.gn
@@ -58,7 +57,7 @@ diff --git a/chrome/browser/ui/android/extensions/extension_action_popup_content
  #include "chrome/browser/devtools/devtools_toggle_action.h"
  #include "chrome/browser/devtools/devtools_window.h"
  #include "chrome/browser/extensions/extension_view_host.h"
-@@ -41,6 +42,10 @@ ExtensionActionPopupContents::ExtensionActionPopupContents(
+@@ -41,6 +42,11 @@ ExtensionActionPopupContents::ExtensionActionPopupContents(
      std::unique_ptr<ExtensionViewHost> host,
      bool inspect_with_devtools)
      : host_(std::move(host)), inspect_with_devtools_(inspect_with_devtools) {
