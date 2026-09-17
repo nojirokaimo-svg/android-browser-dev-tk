@@ -78,12 +78,12 @@
     },
     {
       "id": "renderer-force-dark-runtime",
-      "name": "Drive renderer force-dark state from Kiwi Night mode",
+      "name": "Drive renderer force-dark state and keep extension pages on the browser dark theme",
       "patch": "070-force-dark-runtime.patch",
       "files": [
         "chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java"
       ],
-      "sha256": "1d974eea1da24b4e66f5cd1153d94abb75535b462fdee0e086225be43cafe2ab"
+      "sha256": "275daa2bfe228a26d16ed36b703737f7038b6fcd210f9c9da1b8c024670932f2"
     },
     {
       "id": "extension-mobile-ui",

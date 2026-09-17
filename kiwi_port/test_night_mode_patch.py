@@ -24,6 +24,16 @@ class NightModePatchTest(unittest.TestCase):
         self.assertNotIn("is_debug", patch)
         self.assertNotIn("ENABLE_ASSERTS, false", patch)
 
+    def test_extension_pages_follow_browser_dark_theme(self):
+        patch = (ROOT / "patches/070-force-dark-runtime.patch").read_text()
+        self.assertIn('"chrome-extension".equals(url.getScheme())', patch)
+        self.assertIn("return isNightModeEnabled(webContents);", patch)
+        self.assertIn(
+            "WebContentsDarkModeController.isGlobalUserSettingsEnabled(profile)",
+            patch,
+        )
+        self.assertNotIn("FORCE_WEB_CONTENTS_DARK_MODE", patch)
+
     def test_new_files_are_incremental_inputs(self):
         manifest = json.loads((ROOT / "manifest.json").read_text())
         series = json.loads((ROOT / "patches/series.json").read_text())
