@@ -1,16 +1,42 @@
-name: Smoke-test durable Titanium-Kiwi baseline restore
+name: Verify M153 cache survived fork detach
 
-# One-off disaster-recovery proof completed successfully on 2026-09-18.
-# Kept inert for audit/reference; it will not run on push.
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - ci/baseline-restore-smoke
+    paths:
+      - .github/workflows/kiwi-baseline-restore-smoke.yml
 
 permissions:
   contents: read
   actions: read
 
 jobs:
-  archived-proof:
+  verify-cache:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - run: echo "One-off Release -> Actions Cache restore proof already completed successfully."
+      - name: Free runner disk
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker system prune --all --force --volumes || true
+
+      - name: Restore exact M153 baseline cache
+        uses: actions/cache/restore@v4
+        with:
+          path: work/titanium/chromium/src/out/Default
+          key: kiwi-incremental-153-fa41ecbd6f784035336214537d19505d52026713-stage-1
+          fail-on-cache-miss: true
+
+      - name: Verify checkpoint
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          out=work/titanium/chromium/src/out/Default
+          test -f "$out/.ninja_log"
+          test -f "$out/build.ninja"
+          test -f "$out/args.gn"
+          test -f "$out/kiwi-source-state.json"
+          du -sh "$out"
+          echo "DETACH_CACHE_SURVIVED_OK"
