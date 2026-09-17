@@ -83,7 +83,7 @@
       "files": [
         "chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java"
       ],
-      "sha256": "0ca8fc9f5d0c02552575155ab6ac17b31c03e58680c3519e55d331d3e90e1572"
+      "sha256": "2be4b2152dfb372428a5d909419ddfa735c8ffeb07f322bf282b2741d391faf4"
     },
     {
       "id": "extension-mobile-ui",
