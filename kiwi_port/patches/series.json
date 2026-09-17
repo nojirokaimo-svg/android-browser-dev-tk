@@ -199,7 +199,7 @@
         "chrome/browser/ui/android/extensions/BUILD.gn",
         "chrome/browser/ui/android/extensions/extension_action_popup_contents.cc"
       ],
-      "sha256": "3c9fd7f18d106589e3c1eb6cb5387c55a789a5d311ed9dac7b71efd1ce6085e0"
+      "sha256": "82ba37a360fadf98b249b5074ab34b88a55cd6b640418370add2267f183e0cce"
     }
   ]
 }
