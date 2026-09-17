@@ -25,7 +25,12 @@ jobs:
         run: |
           set -Eeuo pipefail
           mkdir -p drive-export
-          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY"             --pattern baseline-manifest.json             --pattern out-default.tar.zst.part-0000             --pattern out-default.tar.zst.part-0001             --dir drive-export             --clobber
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern baseline-manifest.json \
+            --pattern out-default.tar.zst.part-0000 \
+            --pattern out-default.tar.zst.part-0001 \
+            --dir drive-export \
+            --clobber
           echo "ddd53dbcc844b70d82d38c0f34fe73e9bf9aca4252f1e8f5c2e6b3c9f907b04e  drive-export/baseline-manifest.json" | sha256sum -c -
           echo "046ee77cd217aa07efbd718034a50645934342dc3ab037b1700afe19ecf60f0a  drive-export/out-default.tar.zst.part-0000" | sha256sum -c -
           echo "600bccec5001913278af4798e2a1646a9edb7a10f427340dc881abb8d24d449e  drive-export/out-default.tar.zst.part-0001" | sha256sum -c -
@@ -34,13 +39,14 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          split -b 200000000 -d -a 2 drive-export/out-default.tar.zst.part-0000 drive-export/part-0000.chunk-
-          split -b 200000000 -d -a 2 drive-export/out-default.tar.zst.part-0001 drive-export/part-0001.chunk-
+          split -b 100000000 -d -a 2 drive-export/out-default.tar.zst.part-0000 drive-export/part-0000.chunk-
+          split -b 100000000 -d -a 2 drive-export/out-default.tar.zst.part-0001 drive-export/part-0001.chunk-
           cat > drive-export/DRIVE-RESTORE.txt <<'EOF'
           Titanium-Kiwi M153 durable baseline
           Unzip every Drive chunk artifact first, then:
           cat part-0000.chunk-* > out-default.tar.zst.part-0000
           cat part-0001.chunk-* > out-default.tar.zst.part-0001
+
           SHA256:
           baseline-manifest.json ddd53dbcc844b70d82d38c0f34fe73e9bf9aca4252f1e8f5c2e6b3c9f907b04e
           out-default.tar.zst.part-0000 046ee77cd217aa07efbd718034a50645934342dc3ab037b1700afe19ecf60f0a
@@ -50,7 +56,7 @@ jobs:
       - name: Upload manifest
         uses: actions/upload-artifact@v4
         with:
-          name: drive200-manifest
+          name: drive100-manifest
           path: |
             drive-export/baseline-manifest.json
             drive-export/DRIVE-RESTORE.txt
@@ -59,47 +65,113 @@ jobs:
 
       - name: Upload p0000 c00
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c00, path: drive-export/part-0000.chunk-00, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c00, path: drive-export/part-0000.chunk-00, compression-level: 0, retention-days: 1}
+
       - name: Upload p0000 c01
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c01, path: drive-export/part-0000.chunk-01, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c01, path: drive-export/part-0000.chunk-01, compression-level: 0, retention-days: 1}
+
       - name: Upload p0000 c02
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c02, path: drive-export/part-0000.chunk-02, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c02, path: drive-export/part-0000.chunk-02, compression-level: 0, retention-days: 1}
+
       - name: Upload p0000 c03
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c03, path: drive-export/part-0000.chunk-03, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c03, path: drive-export/part-0000.chunk-03, compression-level: 0, retention-days: 1}
+
       - name: Upload p0000 c04
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c04, path: drive-export/part-0000.chunk-04, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c04, path: drive-export/part-0000.chunk-04, compression-level: 0, retention-days: 1}
+
       - name: Upload p0000 c05
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c05, path: drive-export/part-0000.chunk-05, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c05, path: drive-export/part-0000.chunk-05, compression-level: 0, retention-days: 1}
+
       - name: Upload p0000 c06
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c06, path: drive-export/part-0000.chunk-06, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c06, path: drive-export/part-0000.chunk-06, compression-level: 0, retention-days: 1}
+
       - name: Upload p0000 c07
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c07, path: drive-export/part-0000.chunk-07, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c07, path: drive-export/part-0000.chunk-07, compression-level: 0, retention-days: 1}
+
       - name: Upload p0000 c08
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c08, path: drive-export/part-0000.chunk-08, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c08, path: drive-export/part-0000.chunk-08, compression-level: 0, retention-days: 1}
+
       - name: Upload p0000 c09
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0000-c09, path: drive-export/part-0000.chunk-09, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0000-c09, path: drive-export/part-0000.chunk-09, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0000 c10
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0000-c10, path: drive-export/part-0000.chunk-10, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0000 c11
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0000-c11, path: drive-export/part-0000.chunk-11, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0000 c12
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0000-c12, path: drive-export/part-0000.chunk-12, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0000 c13
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0000-c13, path: drive-export/part-0000.chunk-13, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0000 c14
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0000-c14, path: drive-export/part-0000.chunk-14, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0000 c15
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0000-c15, path: drive-export/part-0000.chunk-15, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0000 c16
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0000-c16, path: drive-export/part-0000.chunk-16, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0000 c17
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0000-c17, path: drive-export/part-0000.chunk-17, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0000 c18
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0000-c18, path: drive-export/part-0000.chunk-18, compression-level: 0, retention-days: 1}
 
       - name: Upload p0001 c00
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0001-c00, path: drive-export/part-0001.chunk-00, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0001-c00, path: drive-export/part-0001.chunk-00, compression-level: 0, retention-days: 1}
+
       - name: Upload p0001 c01
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0001-c01, path: drive-export/part-0001.chunk-01, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0001-c01, path: drive-export/part-0001.chunk-01, compression-level: 0, retention-days: 1}
+
       - name: Upload p0001 c02
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0001-c02, path: drive-export/part-0001.chunk-02, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0001-c02, path: drive-export/part-0001.chunk-02, compression-level: 0, retention-days: 1}
+
       - name: Upload p0001 c03
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0001-c03, path: drive-export/part-0001.chunk-03, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0001-c03, path: drive-export/part-0001.chunk-03, compression-level: 0, retention-days: 1}
+
       - name: Upload p0001 c04
         uses: actions/upload-artifact@v4
-        with: {name: drive200-p0001-c04, path: drive-export/part-0001.chunk-04, compression-level: 0, retention-days: 1}
+        with: {name: drive100-p0001-c04, path: drive-export/part-0001.chunk-04, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0001 c05
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0001-c05, path: drive-export/part-0001.chunk-05, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0001 c06
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0001-c06, path: drive-export/part-0001.chunk-06, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0001 c07
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0001-c07, path: drive-export/part-0001.chunk-07, compression-level: 0, retention-days: 1}
+
+      - name: Upload p0001 c08
+        uses: actions/upload-artifact@v4
+        with: {name: drive100-p0001-c08, path: drive-export/part-0001.chunk-08, compression-level: 0, retention-days: 1}
+
