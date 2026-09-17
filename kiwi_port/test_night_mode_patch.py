@@ -36,8 +36,20 @@ class NightModePatchTest(unittest.TestCase):
         added_lines = "\n".join(line[1:] for line in patch.splitlines() if line.startswith("+"))
         self.assertNotIn("FORCE_WEB_CONTENTS_DARK_MODE", added_lines)
 
-    def test_extension_popups_inherit_dark_theme_without_top_level_window(self):
+    def test_extension_popups_attach_android_theme_client(self):
         patch = (ROOT / "patches/160-extension-popup-menu-fixes.patch").read_text()
+        self.assertIn(
+            '"chrome/browser/android/web_contents_theme_client.h"',
+            patch,
+        )
+        self.assertIn(
+            "night_mode::WebContentsThemeClient::CreateForWebContents(host_->host_contents());",
+            patch,
+        )
+        self.assertIn(
+            '"//chrome/browser/android:web_contents_theme_client"',
+            patch,
+        )
         self.assertIn("ContextUtils.getApplicationContext()", patch)
         self.assertIn("ColorUtils.inNightMode(ContextUtils.getApplicationContext())", patch)
 
