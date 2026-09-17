@@ -212,12 +212,12 @@
     },
     {
       "id": "context-menu-shape",
-      "name": "Match Chrome-like web context-menu width without changing theme colors",
+      "name": "Match Chrome-like web context-menu width and Kiwi dark surface",
       "patch": "170-context-menu-shape.patch",
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java"
       ],
-      "sha256": "9e33662a5552d53971c9ca586ff8e01adf2713e4ddab28b77a1aa6bb9c7fe4d6"
+      "sha256": "44bbcddf74e3bb5d94434ad92d0ceb5434be9683826c92c907300fae7c27d399"
     }
   ]
 }
