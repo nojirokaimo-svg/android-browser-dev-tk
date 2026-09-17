@@ -26,7 +26,8 @@ class NightModePatchTest(unittest.TestCase):
 
     def test_extension_pages_follow_browser_dark_theme(self):
         patch = (ROOT / "patches/070-force-dark-runtime.patch").read_text()
-        self.assertIn('"chrome-extension".equals(url.getScheme())', patch)
+        self.assertIn('"chrome-extension".equals(scheme)', patch)
+        self.assertIn('"kiwi-extension".equals(scheme)', patch)
         self.assertIn("return isNightModeEnabled(webContents);", patch)
         self.assertIn(
             "WebContentsDarkModeController.isGlobalUserSettingsEnabled(profile)",
