@@ -1,0 +1,24 @@
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java b/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java
+--- a/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java
+@@ -84,10 +84,19 @@ public class ContextMenuListView extends ListView {
+         final int parentLateralPadding = frame.getPaddingLeft() + frame.getPaddingRight();
+ 
+         int contentWidth = mCalculatedItemWidth + parentLateralPadding;
++        int minAllowedWidth =
++                mIsFlyout
++                        ? mMinWidth
++                        : getResources()
++                                .getDimensionPixelSize(R.dimen.context_menu_popup_max_width);
+         int maxAllowedWidth = mIsFlyout ? mFlyoutMaxWidth : mMaxWidth;
+         int menuWidth =
+                 UiUtils.computeMenuWidth(
+-                        contentWidth, mMinWidth, maxAllowedWidth, mLateralMargin, windowWidthPx);
++                        contentWidth,
++                        minAllowedWidth,
++                        maxAllowedWidth,
++                        mLateralMargin,
++                        windowWidthPx);
+ 
+         return Math.max(0, menuWidth - parentLateralPadding);
+     }
