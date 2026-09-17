@@ -179,6 +179,15 @@
         "components/password_manager/core/common/password_manager_pref_names.h"
       ],
       "sha256": "fd6d4f028b793c825ea300d31b65e8b6c70bdabb0781b365510b1e1dda076f5c"
+    },
+    {
+      "id": "kiwi-settings-dark",
+      "name": "Kiwi-like near-black Android settings surfaces in dark mode",
+      "patch": "150-kiwi-settings-dark.patch",
+      "files": [
+        "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
+      ],
+      "sha256": "5c075ec2280dd26d3615077802d56cd331cfc629e6e048470d0b23304369b3eb"
     }
   ]
 }

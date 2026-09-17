@@ -32,7 +32,16 @@ class NightModePatchTest(unittest.TestCase):
             "WebContentsDarkModeController.isGlobalUserSettingsEnabled(profile)",
             patch,
         )
-        self.assertNotIn("FORCE_WEB_CONTENTS_DARK_MODE", patch)
+        added_lines = "\n".join(line[1:] for line in patch.splitlines() if line.startswith("+"))
+        self.assertNotIn("FORCE_WEB_CONTENTS_DARK_MODE", added_lines)
+
+    def test_settings_dark_surfaces_match_kiwi_palette(self):
+        patch = (ROOT / "patches/150-kiwi-settings-dark.patch").read_text()
+        self.assertIn("ColorUtils.inNightMode(context)", patch)
+        self.assertIn("Color.rgb(16, 17, 20)", patch)
+        self.assertIn("Color.rgb(27, 28, 33)", patch)
+        self.assertIn("getSettingsBackgroundColor", patch)
+        self.assertIn("getSettingsContainerBackgroundColor", patch)
 
     def test_new_files_are_incremental_inputs(self):
         manifest = json.loads((ROOT / "manifest.json").read_text())
