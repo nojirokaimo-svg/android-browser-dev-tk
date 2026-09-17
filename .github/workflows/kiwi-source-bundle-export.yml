@@ -1,0 +1,41 @@
+name: Export full source bundle for fork detach safety
+
+on:
+  push:
+    branches:
+      - ci/drive-baseline-export
+    paths:
+      - .github/workflows/kiwi-source-bundle-export.yml
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Fetch every branch and tag
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --force origin '+refs/heads/*:refs/remotes/origin/*' '+refs/tags/*:refs/tags/*'
+          git show-ref > all-refs.txt
+          git bundle create android-titanium-browser-all-refs.bundle --all
+          sha256sum android-titanium-browser-all-refs.bundle > android-titanium-browser-all-refs.bundle.sha256
+          ls -lh android-titanium-browser-all-refs.bundle
+          git bundle verify android-titanium-browser-all-refs.bundle
+
+      - name: Upload source bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: titanium-kiwi-source-bundle-before-detach
+          path: |
+            android-titanium-browser-all-refs.bundle
+            android-titanium-browser-all-refs.bundle.sha256
+            all-refs.txt
+          compression-level: 0
+          retention-days: 1
