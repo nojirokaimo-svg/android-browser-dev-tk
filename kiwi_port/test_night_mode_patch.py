@@ -60,10 +60,15 @@ class NightModePatchTest(unittest.TestCase):
         self.assertIn('":web_contents_theme_client"', patch)
         self.assertNotIn('"web_contents_theme_client.cc",\n      "web_contents_theme_client.h"', patch)
 
-    def test_context_menu_shape_fix_is_geometry_only(self):
+    def test_context_menu_matches_chrome_width_and_kiwi_dark_surface(self):
         patch = (ROOT / "patches/170-context-menu-shape.patch").read_text()
-        self.assertIn("context_menu_popup_max_width", patch)
+        self.assertIn("TypedValue.COMPLEX_UNIT_DIP", patch)
+        self.assertIn("320", patch)
         self.assertIn("minAllowedWidth", patch)
+        self.assertIn("ColorUtils.inNightMode(getContext())", patch)
+        self.assertIn("Color.rgb(32, 33, 36)", patch)
+        self.assertIn("PorterDuff.Mode.SRC_IN", patch)
+        self.assertIn("PorterDuff.Mode.MULTIPLY", patch)
         series = json.loads((ROOT / "patches/series.json").read_text())
         feature = next(item for item in series["features"] if item["id"] == "context-menu-shape")
         self.assertEqual(
@@ -75,8 +80,8 @@ class NightModePatchTest(unittest.TestCase):
             for line in patch.splitlines()
             if line.startswith("+") and not line.startswith("+++")
         )
-        for forbidden in ("ColorUtils", "night_mode", "SemanticColor", "background"):
-            self.assertNotIn(forbidden, added_lines)
+        self.assertNotIn("SemanticColorUtils", added_lines)
+        self.assertNotIn("night_mode", added_lines)
 
     def test_night_mode_toggle_is_present_with_and_without_submenus(self):
         patch = "\n".join(
