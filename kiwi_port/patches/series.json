@@ -200,6 +200,24 @@
         "chrome/browser/ui/android/extensions/extension_action_popup_contents.cc"
       ],
       "sha256": "82ba37a360fadf98b249b5074ab34b88a55cd6b640418370add2267f183e0cce"
+    },
+    {
+      "id": "web-contents-theme-target",
+      "name": "Backport standalone Android WebContents theme target for extension popups",
+      "patch": "165-web-contents-theme-target.patch",
+      "files": [
+        "chrome/browser/android/BUILD.gn"
+      ],
+      "sha256": "62da7505bf5be48fd00c759ba8ecccad401df847bafab97302e21b5ff99e33f1"
+    },
+    {
+      "id": "context-menu-shape",
+      "name": "Match Chrome-like web context-menu width without changing theme colors",
+      "patch": "170-context-menu-shape.patch",
+      "files": [
+        "chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java"
+      ],
+      "sha256": "6d1ce5578c8fee612d119f55f9f02938cc903529a411676965f2a91395a7617e"
     }
   ]
 }
