@@ -23,7 +23,7 @@
         "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinator.java",
         "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinatorImpl.java"
       ],
-      "sha256": "9f2b2f9ddd8ec9784efad3aa2b1fcbc5f832bcd7b766f726345c5128f4a5d18f"
+      "sha256": "2195b77fac7fef0bcf28dfae4cd2bd1da90239b36e4170486e89f1e17e58a742"
     },
     {
       "id": "menu-presentation",

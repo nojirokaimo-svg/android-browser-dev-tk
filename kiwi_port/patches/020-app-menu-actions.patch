@@ -192,10 +192,46 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
          // Settings
          modelList.add(buildSettingsItem());
  
-@@ -1128,6 +1189,20 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -633,10 +694,10 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+         AppMenuItemUtils.maybeAddDividerLine(modelList, R.id.divider_line_id);
+ 
+-        // History and autofill parent
+-        if (mHistoryItemBuilder.shouldShowHistoryParentItem()) {
+-            modelList.add(mHistoryItemBuilder.buildHistoryParentItem());
++        // Kiwi: open History directly instead of showing the recent-tabs submenu.
++        if (!IncognitoUtils.shouldOpenIncognitoAsWindow() || !isIncognitoShowing()) {
++            modelList.add(buildKiwiHistoryItem());
+         }
+ 
+         // Delete browsing data
+         if (shouldShowQuickDeleteItem()) {
+             modelList.add(buildQuickDeleteItem());
+@@ -655,8 +716,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+         modelList.add(mBookmarksItemBuilder.buildBookmarksParentItem(currentTab));
+ 
+         // Extensions
+         if (shouldShowExtensionsItem()) {
+-            modelList.add(buildExtensionsParentItem());
++            modelList.add(buildKiwiManageExtensionsItem());
+         }
+ 
+         // Passwords and autofill
+@@ -1128,6 +1189,32 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                  /* showIcon= */ false);
      }
  
++    private ListItem buildKiwiHistoryItem() {
++        return AppMenuItemUtils.createStandardListItem(
++                AppMenuItemUtils.buildModelForStandardMenuItem(
++                        mContext,
++                        getAppMenuItemTheme(),
++                        R.id.open_history_menu_id,
++                        R.string.menu_history,
++                        R.drawable.ic_history_24dp,
++                        isMenuIconAtStart()),
++                /* showIcon= */ true);
++    }
++
 +    private ListItem buildKiwiManageExtensionsItem() {
 +        assert shouldShowExtensionsItem();
 +
