@@ -1,4 +1,4 @@
-name: Verify M153 cache survived fork detach
+name: Verify recreated M153 default-branch cache
 
 on:
   push:
@@ -39,4 +39,4 @@ jobs:
           test -f "$out/args.gn"
           test -f "$out/kiwi-source-state.json"
           du -sh "$out"
-          echo "DETACH_CACHE_SURVIVED_OK"
+          echo "RECREATED_DEFAULT_CACHE_RESTORE_OK"
