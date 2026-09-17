@@ -208,7 +208,7 @@
       "files": [
         "chrome/browser/android/BUILD.gn"
       ],
-      "sha256": "62da7505bf5be48fd00c759ba8ecccad401df847bafab97302e21b5ff99e33f1"
+      "sha256": "6971cbec1b522f0d298b0209e4ea58f459c43d619fb3c9a0632fda0235a63586"
     },
     {
       "id": "context-menu-shape",
@@ -217,7 +217,7 @@
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java"
       ],
-      "sha256": "6d1ce5578c8fee612d119f55f9f02938cc903529a411676965f2a91395a7617e"
+      "sha256": "9e33662a5552d53971c9ca586ff8e01adf2713e4ddab28b77a1aa6bb9c7fe4d6"
     }
   ]
 }
