@@ -1,0 +1,40 @@
+diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
+--- a/chrome/browser/android/BUILD.gn
++++ b/chrome/browser/android/BUILD.gn
+@@ -126,7 +126,19 @@ if (is_android) {
+       "//url",
+     ]
+   }
+ 
++  # A leaf target so extension popup WebContents can opt into the Android
++  # app theme without depending on the monolithic :android target.
++  source_set("web_contents_theme_client") {
++    sources = [ "web_contents_theme_client.cc" ]
++    public = [ "web_contents_theme_client.h" ]
++    public_deps = [ "//content/public/browser" ]
++    deps = [
++      "//base",
++      "//chrome/browser/ui/android/night_mode:jni_headers",
++    ]
++  }
++
+   source_set("android") {
+     sources = [
+       "background_sync_launcher_android.cc",
+@@ -418,8 +429,6 @@ if (is_android) {
+       "usage_stats/usage_stats_database.h",
+       "warmup_manager.cc",
+       "web_contents_printer.cc",
+-      "web_contents_theme_client.cc",
+-      "web_contents_theme_client.h",
+       "webapk/pwa_restore_bottom_sheet_mediator.cc",
+       "webapk/pwa_restore_bottom_sheet_mediator.h",
+       "webapk/webapk_database.cc",
+@@ -469,6 +478,7 @@ if (is_android) {
+       ":tabs_impl",
+       ":tabs_public",
+       ":usage_stats_proto",
++      ":web_contents_theme_client",
+       "//cc/slim",
+       "//chrome/android:jni_headers",
+       "//chrome/app:command_ids",
