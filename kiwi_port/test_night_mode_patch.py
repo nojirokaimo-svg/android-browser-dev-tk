@@ -36,6 +36,15 @@ class NightModePatchTest(unittest.TestCase):
         added_lines = "\n".join(line[1:] for line in patch.splitlines() if line.startswith("+"))
         self.assertNotIn("FORCE_WEB_CONTENTS_DARK_MODE", added_lines)
 
+    def test_extension_popups_inherit_dark_theme_without_top_level_window(self):
+        patch = (ROOT / "patches/070-force-dark-runtime.patch").read_text()
+        self.assertIn("ContextUtils.getApplicationContext()", patch)
+        self.assertIn("ColorUtils.inNightMode(ContextUtils.getApplicationContext())", patch)
+
+    def test_night_mode_toggle_is_present_with_and_without_submenus(self):
+        patch = (ROOT / "patches/020-app-menu-actions.patch").read_text()
+        self.assertGreaterEqual(patch.count("modelList.add(buildKiwiNightModeItem());"), 2)
+
     def test_settings_dark_surfaces_match_kiwi_palette(self):
         patch = (ROOT / "patches/150-kiwi-settings-dark.patch").read_text()
         self.assertIn("ColorUtils.inNightMode(context)", patch)
