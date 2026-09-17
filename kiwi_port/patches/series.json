@@ -167,6 +167,15 @@
         "chrome/browser/ui/webui/extensions/extensions_ui.cc"
       ],
       "sha256": "e9b32a23ab299e2eec924bd1e8d6d58c17adf7e3b8e84664c2e7ed0adb9676a7"
+    },
+    {
+      "id": "credentials-security",
+      "name": "Built-in local password saving by default while preserving explicit third-party autofill choice",
+      "patch": "130-credentials-security.patch",
+      "files": [
+        "components/autofill/core/common/autofill_prefs.cc"
+      ],
+      "sha256": "050c5465e05a36a330ae4b5eee4e8a8492f72939f8bc7f60966349d677c43992"
     }
   ]
 }

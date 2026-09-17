@@ -32,7 +32,7 @@ jobs:
         with:
           # Resume is deliberately exact: never fall back to an older/empty
           # checkpoint and never start another cold multi-hour compile.
-          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-incremental-153-3fefd81c80ff80f5dadee212aabcc4d98329b09c-stage-1' }}
+          restore-key: ${{ inputs.incremental_cache_key || 'kiwi-incremental-153-52ae8c24a97bc7af64017326f62cbe5ff7312ff1-stage-1' }}
           require-restore: "true"
           # The pinned checkpoint is the completed M153 release baseline and is restored
           # only by exact key after all source-producing inputs are verified.
