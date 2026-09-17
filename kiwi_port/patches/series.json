@@ -191,13 +191,15 @@
     },
     {
       "id": "extension-popup-menu-fixes",
-      "name": "Keep extension popups dark and Night mode toggle visible with submenu app menu",
+      "name": "Keep extension action popups dark and Night mode toggle visible with submenu app menu",
       "patch": "160-extension-popup-menu-fixes.patch",
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java",
-        "chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java"
+        "chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java",
+        "chrome/browser/ui/android/extensions/BUILD.gn",
+        "chrome/browser/ui/android/extensions/extension_action_popup_contents.cc"
       ],
-      "sha256": "86f49efb77b56295732d376100427801df09a83b709befa55e64dd42f5a086ff"
+      "sha256": "b168d33d68050e3c7b10a584ff4758b6bcbd4b2249def010c2f68c1099777a4f"
     }
   ]
 }
