@@ -197,7 +197,7 @@
         "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java",
         "chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java"
       ],
-      "sha256": "decdc6189cc75c2c78fc48c7d77663908f9b7ea7c199710e42dc11ec3552046b"
+      "sha256": "86f49efb77b56295732d376100427801df09a83b709befa55e64dd42f5a086ff"
     }
   ]
 }
