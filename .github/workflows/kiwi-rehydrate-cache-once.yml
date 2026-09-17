@@ -1,0 +1,88 @@
+name: Rehydrate M153 baseline cache after fork detach
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/kiwi-rehydrate-cache-once.yml
+
+permissions:
+  contents: read
+  actions: write
+
+env:
+  TITANIUM_COMMIT: 7584b534f6e1f9c29e8bb98df71d7610960a5db3
+  VANADIUM_COMMIT: 02d87ad8e17aee77d0fea49d122349a5da87ed2e
+  CHROMIUM_COMMIT: 507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c
+  CHROMIUM_VERSION: 153.0.8010.36
+  SOURCE_CACHE_KEY: kiwi-incremental-153-fa41ecbd6f784035336214537d19505d52026713-stage-1
+  RELEASE_TAG: kiwi-baseline-m153-fa41ecbd6f784035336214537d19505d52026713
+
+jobs:
+  rehydrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: codex/kiwi-ui-port
+
+      - name: Ensure zstd
+        shell: bash
+        run: |
+          if ! command -v zstd >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y zstd
+          fi
+
+      - name: Free runner disk
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker system prune --all --force --volumes || true
+          df -h
+
+      - name: Download durable manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          rm -rf "$RUNNER_TEMP/kiwi-baseline-download"
+          mkdir -p "$RUNNER_TEMP/kiwi-baseline-download"
+          gh release download "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern baseline-manifest.json \
+            --dir "$RUNNER_TEMP/kiwi-baseline-download" \
+            --clobber
+
+      - name: Restore durable baseline
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          mkdir -p work/titanium/chromium/src/out
+          python3 kiwi_port/baseline_backup.py restore \
+            --manifest "$RUNNER_TEMP/kiwi-baseline-download/baseline-manifest.json" \
+            --destination-parent work/titanium/chromium/src/out \
+            --chromium-version "$CHROMIUM_VERSION" \
+            --chromium-commit "$CHROMIUM_COMMIT" \
+            --titanium-commit "$TITANIUM_COMMIT" \
+            --vanadium-commit "$VANADIUM_COMMIT" \
+            --source-cache-key "$SOURCE_CACHE_KEY" \
+            --fetch-part-command 'gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$BASELINE_PART_NAME" --dir "$(dirname "$BASELINE_PART_PATH")" --clobber' \
+            --delete-part-after-use
+          out=work/titanium/chromium/src/out/Default
+          test -f "$out/.ninja_log"
+          test -f "$out/build.ninja"
+          test -f "$out/args.gn"
+          test -f "$out/kiwi-source-state.json"
+          du -sh "$out"
+
+      - name: Save exact M153 baseline cache on default branch
+        uses: actions/cache/save@v4
+        with:
+          path: work/titanium/chromium/src/out/Default
+          key: ${{ env.SOURCE_CACHE_KEY }}
