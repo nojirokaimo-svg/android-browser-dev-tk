@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Download durable Release assets
+      - name: Download and verify durable Release assets
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -26,7 +26,6 @@ jobs:
           set -Eeuo pipefail
           mkdir -p drive-export
           gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY"             --pattern baseline-manifest.json             --pattern out-default.tar.zst.part-0000             --pattern out-default.tar.zst.part-0001             --dir drive-export             --clobber
-          ls -lh drive-export
           test "$(stat -c %s drive-export/baseline-manifest.json)" -eq 851
           test "$(stat -c %s drive-export/out-default.tar.zst.part-0000)" -eq 1900000000
           test "$(stat -c %s drive-export/out-default.tar.zst.part-0001)" -eq 863690414
@@ -34,26 +33,94 @@ jobs:
           echo "046ee77cd217aa07efbd718034a50645934342dc3ab037b1700afe19ecf60f0a  drive-export/out-default.tar.zst.part-0000" | sha256sum -c -
           echo "600bccec5001913278af4798e2a1646a9edb7a10f427340dc881abb8d24d449e  drive-export/out-default.tar.zst.part-0001" | sha256sum -c -
 
+      - name: Split large baseline parts for connector handoff
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          split -b 400000000 -d -a 2 drive-export/out-default.tar.zst.part-0000 drive-export/part-0000.chunk-
+          split -b 400000000 -d -a 2 drive-export/out-default.tar.zst.part-0001 drive-export/part-0001.chunk-
+          ls -lh drive-export/part-*.chunk-*
+          cat > drive-export/DRIVE-RESTORE.txt <<'EOF'
+          Titanium-Kiwi M153 durable baseline
+
+          Reconstruct after downloading/unzipping every Drive chunk artifact:
+
+          cat part-0000.chunk-00 part-0000.chunk-01 part-0000.chunk-02 part-0000.chunk-03 part-0000.chunk-04 > out-default.tar.zst.part-0000
+          cat part-0001.chunk-00 part-0001.chunk-01 part-0001.chunk-02 > out-default.tar.zst.part-0001
+
+          Verify:
+          baseline-manifest.json
+            sha256 ddd53dbcc844b70d82d38c0f34fe73e9bf9aca4252f1e8f5c2e6b3c9f907b04e
+          out-default.tar.zst.part-0000
+            sha256 046ee77cd217aa07efbd718034a50645934342dc3ab037b1700afe19ecf60f0a
+          out-default.tar.zst.part-0001
+            sha256 600bccec5001913278af4798e2a1646a9edb7a10f427340dc881abb8d24d449e
+          EOF
+
       - name: Upload manifest handoff artifact
         uses: actions/upload-artifact@v4
         with:
-          name: drive-baseline-manifest
-          path: drive-export/baseline-manifest.json
+          name: drive-baseline-manifest-v2
+          path: |
+            drive-export/baseline-manifest.json
+            drive-export/DRIVE-RESTORE.txt
           compression-level: 0
           retention-days: 1
 
-      - name: Upload part 0000 handoff artifact
+      - name: Upload part 0000 chunk 00
         uses: actions/upload-artifact@v4
         with:
-          name: drive-baseline-part-0000
-          path: drive-export/out-default.tar.zst.part-0000
+          name: drive-baseline-p0000-c00
+          path: drive-export/part-0000.chunk-00
+          compression-level: 0
+          retention-days: 1
+      - name: Upload part 0000 chunk 01
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-baseline-p0000-c01
+          path: drive-export/part-0000.chunk-01
+          compression-level: 0
+          retention-days: 1
+      - name: Upload part 0000 chunk 02
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-baseline-p0000-c02
+          path: drive-export/part-0000.chunk-02
+          compression-level: 0
+          retention-days: 1
+      - name: Upload part 0000 chunk 03
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-baseline-p0000-c03
+          path: drive-export/part-0000.chunk-03
+          compression-level: 0
+          retention-days: 1
+      - name: Upload part 0000 chunk 04
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-baseline-p0000-c04
+          path: drive-export/part-0000.chunk-04
           compression-level: 0
           retention-days: 1
 
-      - name: Upload part 0001 handoff artifact
+      - name: Upload part 0001 chunk 00
         uses: actions/upload-artifact@v4
         with:
-          name: drive-baseline-part-0001
-          path: drive-export/out-default.tar.zst.part-0001
+          name: drive-baseline-p0001-c00
+          path: drive-export/part-0001.chunk-00
+          compression-level: 0
+          retention-days: 1
+      - name: Upload part 0001 chunk 01
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-baseline-p0001-c01
+          path: drive-export/part-0001.chunk-01
+          compression-level: 0
+          retention-days: 1
+      - name: Upload part 0001 chunk 02
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-baseline-p0001-c02
+          path: drive-export/part-0001.chunk-02
           compression-level: 0
           retention-days: 1
