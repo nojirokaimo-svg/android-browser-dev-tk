@@ -240,7 +240,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
 +                        mContext,
 +                        getAppMenuItemTheme(),
 +                        R.id.manage_extensions_menu_id,
-+                        R.string.menu_extensions_menu,
++                        R.string.menu_extensions,
 +                        R.drawable.ic_extension_24dp,
 +                        isMenuIconAtStart()),
 +                /* showIcon= */ true);
