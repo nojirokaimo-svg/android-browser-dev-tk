@@ -1,15 +1,75 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java b/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java
 --- a/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java
-@@ -84,10 +84,19 @@ public class ContextMenuListView extends ListView {
+@@ -5,7 +5,11 @@
+ package org.chromium.chrome.browser.contextmenu;
+ 
+ import android.content.Context;
++import android.graphics.Color;
++import android.graphics.PorterDuff;
++import android.graphics.drawable.Drawable;
+ import android.util.AttributeSet;
++import android.util.TypedValue;
+ import android.view.View;
+ import android.widget.ListAdapter;
+ import android.widget.ListView;
+@@ -14,6 +18,7 @@
+ import org.chromium.chrome.R;
+ import org.chromium.chrome.browser.contextmenu.ContextMenuCoordinator.ContextMenuItemType;
+ import org.chromium.ui.UiUtils;
++import org.chromium.ui.util.ColorUtils;
+ 
+ import java.util.Set;
+ 
+@@ -63,6 +68,37 @@
+     }
+ 
+     @Override
++    protected void onAttachedToWindow() {
++        super.onAttachedToWindow();
++        applyKiwiDarkSurface();
++    }
++
++    private void applyKiwiDarkSurface() {
++        if (!ColorUtils.inNightMode(getContext())) {
++            return;
++        }
++
++        final int kiwiMenuBackground = Color.rgb(32, 33, 36);
++        final View innerFrame = (View) getParent();
++        final Drawable innerBackground = innerFrame.getBackground();
++        if (innerBackground != null) {
++            final Drawable tintedInner = innerBackground.mutate();
++            tintedInner.setTint(kiwiMenuBackground);
++            tintedInner.setTintMode(PorterDuff.Mode.SRC_IN);
++            innerFrame.setBackground(tintedInner);
++        }
++
++        final View outerFrame = (View) innerFrame.getParent();
++        final Drawable outerBackground = outerFrame.getBackground();
++        if (outerBackground != null) {
++            final Drawable tintedOuter = outerBackground.mutate();
++            tintedOuter.setTint(kiwiMenuBackground);
++            tintedOuter.setTintMode(PorterDuff.Mode.MULTIPLY);
++            outerFrame.setBackground(tintedOuter);
++        }
++    }
++
++    @Override
+     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+         widthMeasureSpec = MeasureSpec.makeMeasureSpec(calculateWidth(), MeasureSpec.EXACTLY);
+         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+@@ -84,10 +120,21 @@
          final int parentLateralPadding = frame.getPaddingLeft() + frame.getPaddingRight();
  
          int contentWidth = mCalculatedItemWidth + parentLateralPadding;
-+        int minAllowedWidth =
-+                mIsFlyout
-+                        ? mMinWidth
-+                        : getResources()
-+                                .getDimensionPixelSize(R.dimen.context_menu_popup_max_width);
++        int chromeLikeLinkWidth =
++                Math.round(
++                        TypedValue.applyDimension(
++                                TypedValue.COMPLEX_UNIT_DIP,
++                                320,
++                                getResources().getDisplayMetrics()));
++        int minAllowedWidth = mIsFlyout ? mMinWidth : chromeLikeLinkWidth;
          int maxAllowedWidth = mIsFlyout ? mFlyoutMaxWidth : mMaxWidth;
          int menuWidth =
                  UiUtils.computeMenuWidth(
