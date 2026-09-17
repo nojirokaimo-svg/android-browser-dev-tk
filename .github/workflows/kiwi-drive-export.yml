@@ -1,0 +1,59 @@
+name: Export Titanium-Kiwi baseline for Drive handoff
+
+on:
+  push:
+    branches:
+      - ci/drive-baseline-export
+    paths:
+      - .github/workflows/kiwi-drive-export.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download durable Release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: kiwi-baseline-m153-fa41ecbd6f784035336214537d19505d52026713
+        run: |
+          set -Eeuo pipefail
+          mkdir -p drive-export
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY"             --pattern baseline-manifest.json             --pattern out-default.tar.zst.part-0000             --pattern out-default.tar.zst.part-0001             --dir drive-export             --clobber
+          ls -lh drive-export
+          test "$(stat -c %s drive-export/baseline-manifest.json)" -eq 851
+          test "$(stat -c %s drive-export/out-default.tar.zst.part-0000)" -eq 1900000000
+          test "$(stat -c %s drive-export/out-default.tar.zst.part-0001)" -eq 863690414
+          echo "ddd53dbcc844b70d82d38c0f34fe73e9bf9aca4252f1e8f5c2e6b3c9f907b04e  drive-export/baseline-manifest.json" | sha256sum -c -
+          echo "046ee77cd217aa07efbd718034a50645934342dc3ab037b1700afe19ecf60f0a  drive-export/out-default.tar.zst.part-0000" | sha256sum -c -
+          echo "600bccec5001913278af4798e2a1646a9edb7a10f427340dc881abb8d24d449e  drive-export/out-default.tar.zst.part-0001" | sha256sum -c -
+
+      - name: Upload manifest handoff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-baseline-manifest
+          path: drive-export/baseline-manifest.json
+          compression-level: 0
+          retention-days: 1
+
+      - name: Upload part 0000 handoff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-baseline-part-0000
+          path: drive-export/out-default.tar.zst.part-0000
+          compression-level: 0
+          retention-days: 1
+
+      - name: Upload part 0001 handoff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-baseline-part-0001
+          path: drive-export/out-default.tar.zst.part-0001
+          compression-level: 0
+          retention-days: 1
