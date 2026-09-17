@@ -14,7 +14,7 @@ diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/b
  
  /** A client to provide dark mode information for a given WebContents. */
  @NullMarked
-@@ -36,18 +36,19 @@
+@@ -36,18 +36,21 @@
      public static boolean isForceDarkWebContentEnabled(
              @JniType("content::WebContents*") WebContents webContents) {
          if (webContents == null) return false;
@@ -28,9 +28,11 @@ diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/b
 +        GURL url = webContents.getVisibleUrl();
 +        // Extension pages are browser-owned surfaces. Match Kiwi by following
 +        // the browser theme directly instead of the per-site Auto Dark content
-+        // setting, which rejects the chrome-extension scheme and leaves these
-+        // pages with a light preferred color scheme.
-+        if ("chrome-extension".equals(url.getScheme())) {
++        // setting. Titanium/Kiwi can expose these pages through either
++        // chrome-extension:// or kiwi-extension://, and the per-site controller
++        // rejects these internal schemes.
++        String scheme = url.getScheme();
++        if ("chrome-extension".equals(scheme) || "kiwi-extension".equals(scheme)) {
 +            return isNightModeEnabled(webContents);
          }
          Profile profile = Profile.fromWebContents(webContents);
