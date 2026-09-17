@@ -1,0 +1,37 @@
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
+--- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
+@@ -807,6 +807,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+         // Divider Line
+         AppMenuItemUtils.maybeAddDividerLine(modelList, R.id.divider_line_id);
+ 
++        // Kiwi global Night Mode
++        modelList.add(buildKiwiNightModeItem());
++
+         // Settings
+         modelList.add(buildSettingsItem());
+ 
+diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java
+--- a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java
++++ b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java
+@@ -10,6 +10,7 @@ import org.jni_zero.CalledByNative;
+ import org.jni_zero.JNINamespace;
+ import org.jni_zero.JniType;
+ 
++import org.chromium.base.ContextUtils;
+ import org.chromium.build.annotations.NullMarked;
+ import org.chromium.chrome.browser.profiles.Profile;
+ import org.chromium.content_public.browser.WebContents;
+@@ -27,7 +28,8 @@ public class WebContentsThemeClient {
+         if (webContents == null) return false;
+         WindowAndroid window = webContents.getTopLevelNativeWindow();
+-        if (window == null) return false;
+-        Context context = window.getContext().get();
+-        if (context == null) return false;
+-        return ColorUtils.inNightMode(context);
++        if (window != null) {
++            Context context = window.getContext().get();
++            if (context != null) return ColorUtils.inNightMode(context);
++        }
++        return ColorUtils.inNightMode(ContextUtils.getApplicationContext());
+     }
