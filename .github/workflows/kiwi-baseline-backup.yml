@@ -1,0 +1,427 @@
+name: Backup Titanium-Kiwi build baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Backup/test the durable baseline, or recreate an evicted Actions cache from it.
+        required: true
+        type: choice
+        options:
+          - backup-and-test
+          - restore-cache
+        default: backup-and-test
+      source_cache_key:
+        description: Exact completed out/Default cache to preserve.
+        required: true
+        default: kiwi-incremental-153-fa41ecbd6f784035336214537d19505d52026713-stage-1
+      release_tag:
+        description: GitHub Release tag holding the durable split baseline.
+        required: true
+        default: kiwi-baseline-m153-fa41ecbd6f784035336214537d19505d52026713
+      restore_cache_key:
+        description: Exact cache key to recreate in restore-cache mode.
+        required: true
+        default: kiwi-incremental-153-fa41ecbd6f784035336214537d19505d52026713-stage-1
+      force_rebuild_release:
+        description: Re-upload the Release backup even if a matching manifest already exists.
+        required: false
+        type: boolean
+        default: false
+  push:
+    branches:
+      - codex/kiwi-ui-port
+    paths:
+      - .github/workflows/kiwi-baseline-backup.yml
+      - kiwi_port/baseline_backup.py
+      - kiwi_port/test_baseline_backup.py
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: titanium-kiwi-baseline-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TITANIUM_COMMIT: 7584b534f6e1f9c29e8bb98df71d7610960a5db3
+  VANADIUM_COMMIT: 02d87ad8e17aee77d0fea49d122349a5da87ed2e
+  CHROMIUM_COMMIT: 507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c
+  CHROMIUM_VERSION: 153.0.8010.36
+  DEFAULT_SOURCE_CACHE_KEY: kiwi-incremental-153-fa41ecbd6f784035336214537d19505d52026713-stage-1
+  DEFAULT_RELEASE_TAG: kiwi-baseline-m153-fa41ecbd6f784035336214537d19505d52026713
+
+jobs:
+  backup-release:
+    if: github.event_name == 'push' || inputs.mode == 'backup-and-test'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      source_cache_key: ${{ steps.config.outputs.source_cache_key }}
+      release_tag: ${{ steps.config.outputs.release_tag }}
+      reused: ${{ steps.release.outputs.reused }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Resolve immutable baseline identity
+        id: config
+        shell: bash
+        env:
+          INPUT_CACHE_KEY: ${{ inputs.source_cache_key }}
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -Eeuo pipefail
+          cache_key="${INPUT_CACHE_KEY:-$DEFAULT_SOURCE_CACHE_KEY}"
+          release_tag="${INPUT_RELEASE_TAG:-$DEFAULT_RELEASE_TAG}"
+          [[ -n "$cache_key" && -n "$release_tag" ]]
+          echo "source_cache_key=$cache_key" >> "$GITHUB_OUTPUT"
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Test baseline backup helper
+        run: |
+          cd kiwi_port
+          PYTHONWARNINGS='error::ResourceWarning' python3 -m unittest -v test_baseline_backup.py
+          python3 -m py_compile baseline_backup.py test_baseline_backup.py
+
+      - name: Ensure archive tools are available
+        shell: bash
+        run: |
+          if ! command -v zstd >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y zstd
+          fi
+          zstd --version
+          gh --version
+
+      - name: Reuse a matching durable Release when possible
+        id: release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.config.outputs.release_tag }}
+          SOURCE_CACHE_KEY: ${{ steps.config.outputs.source_cache_key }}
+          FORCE_REBUILD: ${{ inputs.force_rebuild_release }}
+        run: |
+          set -Eeuo pipefail
+          echo "reused=false" >> "$GITHUB_OUTPUT"
+          if [[ "${FORCE_REBUILD:-false}" == "true" ]]; then
+            echo "Forced rebuild requested; existing Release assets will be replaced."
+            exit 0
+          fi
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            exit 0
+          fi
+          rm -rf "$RUNNER_TEMP/existing-baseline"
+          mkdir -p "$RUNNER_TEMP/existing-baseline"
+          if ! gh release download "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern baseline-manifest.json \
+              --dir "$RUNNER_TEMP/existing-baseline" \
+              --clobber; then
+            exit 0
+          fi
+          python3 - "$RUNNER_TEMP/existing-baseline/baseline-manifest.json" <<'PY'
+          import json, os, sys
+          data = json.load(open(sys.argv[1], encoding="utf-8"))
+          expected = {
+              "chromium_version": os.environ["CHROMIUM_VERSION"],
+              "chromium_commit": os.environ["CHROMIUM_COMMIT"],
+              "titanium_commit": os.environ["TITANIUM_COMMIT"],
+              "vanadium_commit": os.environ["VANADIUM_COMMIT"],
+              "source_cache_key": os.environ["SOURCE_CACHE_KEY"],
+          }
+          if data.get("schema") != 1 or data.get("metadata") != expected or not data.get("parts"):
+              raise SystemExit("Existing Release manifest does not match this baseline")
+          print(f"Existing durable baseline manifest matches ({len(data['parts'])} parts).")
+          PY
+          echo "reused=true" >> "$GITHUB_OUTPUT"
+
+      - name: Free runner disk before restoring baseline
+        if: steps.release.outputs.reused != 'true'
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker system prune --all --force --volumes || true
+          df -h
+
+      - name: Restore exact completed Actions cache
+        if: steps.release.outputs.reused != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: work/titanium/chromium/src/out/Default
+          key: ${{ steps.config.outputs.source_cache_key }}
+          fail-on-cache-miss: true
+
+      - name: Verify restored checkpoint before durable backup
+        if: steps.release.outputs.reused != 'true'
+        shell: bash
+        run: |
+          out=work/titanium/chromium/src/out/Default
+          test -f "$out/.ninja_log"
+          test -f "$out/build.ninja"
+          test -f "$out/args.gn"
+          test -f "$out/kiwi-source-state.json"
+          du -sh "$out"
+          df -h
+
+      - name: Create Release container
+        if: steps.release.outputs.reused != 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.config.outputs.release_tag }}
+        run: |
+          set -Eeuo pipefail
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "Titanium-Kiwi M153 build baseline" \
+              --notes "Durable disaster-recovery copy of Chromium 153 out/Default. Use the checked manifest and recovery workflow; this is not an APK release."
+          fi
+
+      - name: Stream compressed baseline parts directly to Release
+        if: steps.release.outputs.reused != 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.config.outputs.release_tag }}
+          SOURCE_CACHE_KEY: ${{ steps.config.outputs.source_cache_key }}
+        run: |
+          set -Eeuo pipefail
+          backup_dir="$RUNNER_TEMP/kiwi-baseline-upload"
+          rm -rf "$backup_dir"
+          mkdir -p "$backup_dir"
+          python3 kiwi_port/baseline_backup.py create \
+            --source work/titanium/chromium/src/out/Default \
+            --output-dir "$backup_dir" \
+            --chromium-version "$CHROMIUM_VERSION" \
+            --chromium-commit "$CHROMIUM_COMMIT" \
+            --titanium-commit "$TITANIUM_COMMIT" \
+            --vanadium-commit "$VANADIUM_COMMIT" \
+            --source-cache-key "$SOURCE_CACHE_KEY" \
+            --split-bytes 1900000000 \
+            --compression-level 6 \
+            --part-command 'gh release upload "$RELEASE_TAG" "$BASELINE_PART_PATH" --repo "$GITHUB_REPOSITORY" --clobber' \
+            --delete-part-after-command
+          gh release upload "$RELEASE_TAG" "$backup_dir/baseline-manifest.json" \
+            --repo "$GITHUB_REPOSITORY" --clobber
+          test "$(find "$backup_dir" -maxdepth 1 -name 'out-default.tar.zst.part-*' | wc -l)" -eq 0
+          cat "$backup_dir/baseline-manifest.json"
+          df -h
+
+  prove-release-restore:
+    needs: backup-release
+    if: github.event_name == 'push' || inputs.mode == 'backup-and-test'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Ensure archive tools are available
+        shell: bash
+        run: |
+          if ! command -v zstd >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y zstd
+          fi
+
+      - name: Free runner disk before Release restore
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker system prune --all --force --volumes || true
+          df -h
+
+      - name: Download durable manifest only
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.backup-release.outputs.release_tag }}
+        run: |
+          set -Eeuo pipefail
+          rm -rf "$RUNNER_TEMP/kiwi-baseline-download"
+          mkdir -p "$RUNNER_TEMP/kiwi-baseline-download"
+          gh release download "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern baseline-manifest.json \
+            --dir "$RUNNER_TEMP/kiwi-baseline-download" \
+            --clobber
+
+      - name: Restore Release baseline one verified part at a time
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.backup-release.outputs.release_tag }}
+          SOURCE_CACHE_KEY: ${{ needs.backup-release.outputs.source_cache_key }}
+        run: |
+          set -Eeuo pipefail
+          mkdir -p work/titanium/chromium/src/out
+          python3 kiwi_port/baseline_backup.py restore \
+            --manifest "$RUNNER_TEMP/kiwi-baseline-download/baseline-manifest.json" \
+            --destination-parent work/titanium/chromium/src/out \
+            --chromium-version "$CHROMIUM_VERSION" \
+            --chromium-commit "$CHROMIUM_COMMIT" \
+            --titanium-commit "$TITANIUM_COMMIT" \
+            --vanadium-commit "$VANADIUM_COMMIT" \
+            --source-cache-key "$SOURCE_CACHE_KEY" \
+            --fetch-part-command 'gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$BASELINE_PART_NAME" --dir "$(dirname "$BASELINE_PART_PATH")" --clobber' \
+            --delete-part-after-use
+          out=work/titanium/chromium/src/out/Default
+          test -f "$out/.ninja_log"
+          test -f "$out/build.ninja"
+          test -f "$out/args.gn"
+          test -f "$out/kiwi-source-state.json"
+          test "$(find "$RUNNER_TEMP/kiwi-baseline-download" -maxdepth 1 -name 'out-default.tar.zst.part-*' | wc -l)" -eq 0
+          du -sh "$out"
+          df -h
+
+      - name: Protect restored out Default from source preparation
+        shell: bash
+        run: |
+          root=work/titanium/chromium/src/out
+          checkpoint="$root/.kiwi-restored-Default"
+          test ! -e "$checkpoint"
+          mv "$root/Default" "$checkpoint"
+
+      - name: Prepare current pinned and patched Chromium tree
+        shell: bash
+        env:
+          KIWI_BUILD_PHASE: prepare
+          KIWI_PATCH_MODE: best-effort
+          KIWI_PATCH_REPORT: ${{ github.workspace }}/output/kiwi-patch-report.md
+        run: ./build_kiwi_ui_arm64.sh
+
+      - name: Put durable checkpoint back unchanged
+        if: always()
+        shell: bash
+        run: |
+          root=work/titanium/chromium/src/out
+          checkpoint="$root/.kiwi-restored-Default"
+          generated="$root/.kiwi-prepare-generated"
+          if [[ -d "$checkpoint" ]]; then
+            test ! -e "$generated"
+            if [[ -e "$root/Default" ]]; then
+              mv "$root/Default" "$generated"
+            fi
+            mv "$checkpoint" "$root/Default"
+          fi
+          test -f "$root/Default/.ninja_log"
+          test -f "$root/Default/build.ninja"
+          test -f "$root/Default/args.gn"
+
+      - name: Reconcile current Kiwi sources without rewriting Ninja history
+        shell: bash
+        env:
+          SOURCE_CACHE_KEY: ${{ needs.backup-release.outputs.source_cache_key }}
+        run: |
+          python3 kiwi_port/incremental_sources.py work/titanium/chromium/src \
+            --cache-key "$SOURCE_CACHE_KEY" \
+            --identity "$TITANIUM_COMMIT:$VANADIUM_COMMIT:$CHROMIUM_COMMIT:validation"
+
+      - name: Prove the restored baseline can perform the current incremental build
+        shell: bash
+        env:
+          KIWI_BUILD_PHASE: compile
+          KIWI_BUILD_BUDGET_MINUTES: "90"
+          KIWI_INCREMENTAL_NINJA: "true"
+        run: |
+          set -Eeuo pipefail
+          mkdir -p output
+          plan=work/titanium/chromium/src/out/Default/kiwi-incremental-plan.json
+          if [[ -f "$plan" ]] && python3 - "$plan" <<'PY'
+          import json, sys
+          raise SystemExit(0 if json.load(open(sys.argv[1]))["changed_sources"] else 1)
+          PY
+          then
+            env INVOKED_BY_BUILD_SERVER=1 /usr/bin/ninja \
+              -C work/titanium/chromium/src/out/Default -n chrome_public_apk \
+              > output/ninja-plan.log 2>&1
+            cat output/ninja-plan.log
+            if grep -q 'ninja: no work to do' output/ninja-plan.log; then
+              echo 'Changed Kiwi sources were not detected by Ninja; refusing stale APK.' >&2
+              exit 1
+            fi
+            date +%s%N > output/incremental-build-start-ns
+          fi
+          ./build_kiwi_ui_arm64.sh 2>&1 | tee output/build.log
+          test -f output/BUILD_COMPLETE
+          test -f output/Titanium-Kiwi-core-*-arm64-v8a.apk
+          cat output/SHA256SUMS.txt
+
+      - name: Upload proof APK and logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: Titanium-Kiwi-baseline-restore-proof-${{ github.run_id }}
+          path: |
+            output/Titanium-Kiwi-core-*-arm64-v8a.apk
+            output/SHA256SUMS.txt
+            output/build.log
+            output/ninja-plan.log
+          if-no-files-found: error
+          retention-days: 7
+
+  restore-cache:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'restore-cache'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Ensure archive tools are available
+        shell: bash
+        run: |
+          if ! command -v zstd >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y zstd
+          fi
+
+      - name: Free runner disk
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker system prune --all --force --volumes || true
+          df -h
+
+      - name: Download durable manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -Eeuo pipefail
+          rm -rf "$RUNNER_TEMP/kiwi-baseline-download"
+          mkdir -p "$RUNNER_TEMP/kiwi-baseline-download"
+          gh release download "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern baseline-manifest.json \
+            --dir "$RUNNER_TEMP/kiwi-baseline-download" \
+            --clobber
+
+      - name: Restore and verify durable baseline
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          SOURCE_CACHE_KEY: ${{ inputs.source_cache_key }}
+        run: |
+          set -Eeuo pipefail
+          mkdir -p work/titanium/chromium/src/out
+          python3 kiwi_port/baseline_backup.py restore \
+            --manifest "$RUNNER_TEMP/kiwi-baseline-download/baseline-manifest.json" \
+            --destination-parent work/titanium/chromium/src/out \
+            --chromium-version "$CHROMIUM_VERSION" \
+            --chromium-commit "$CHROMIUM_COMMIT" \
+            --titanium-commit "$TITANIUM_COMMIT" \
+            --vanadium-commit "$VANADIUM_COMMIT" \
+            --source-cache-key "$SOURCE_CACHE_KEY" \
+            --fetch-part-command 'gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$BASELINE_PART_NAME" --dir "$(dirname "$BASELINE_PART_PATH")" --clobber' \
+            --delete-part-after-use
+          du -sh work/titanium/chromium/src/out/Default
+
+      - name: Recreate exact Actions cache
+        uses: actions/cache/save@v4
+        with:
+          path: work/titanium/chromium/src/out/Default
+          key: ${{ inputs.restore_cache_key }}
