@@ -63,7 +63,7 @@ class NightModePatchTest(unittest.TestCase):
     def test_context_menu_matches_chrome_width_and_kiwi_dark_surface(self):
         patch = (ROOT / "patches/170-context-menu-shape.patch").read_text()
         self.assertIn("TypedValue.COMPLEX_UNIT_DIP", patch)
-        self.assertIn("320", patch)
+        self.assertIn("336", patch)
         self.assertIn("minAllowedWidth", patch)
         self.assertIn("ColorUtils.inNightMode(getContext())", patch)
         self.assertIn("Color.rgb(32, 33, 36)", patch)

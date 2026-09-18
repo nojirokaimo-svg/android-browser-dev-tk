@@ -261,3 +261,14 @@ Cause: the checksum recorded for `170-context-menu-shape.patch` after changing t
 - actual patch SHA-256 reported by `verify_series.py`: `da3133bf83aafea1ccb0635fc44e390712e279470a2a4a9e905bb4c256ef483b`
 
 `kiwi_port/patches/series.json` is corrected to the actual checksum. No `out/Default` cache was restored, modified, or cleaned in the failed run.
+
+
+## 2026-09-19 Actions #139 immediate test failure
+
+Run #139 (Run ID `35395133551`) passed patch checksum/registration verification, then failed in the repository unit tests before cache restore or source preparation.
+
+Cause: `kiwi_port/test_night_mode_patch.py` still asserted the old context-menu width string `"320"` after the implementation was intentionally widened to `336dp`.
+
+The assertion is updated to `"336"`. This is a test expectation sync only; no browser behavior was changed beyond the already-intended 336dp long-press link menu width.
+
+No `out/Default` cache was restored, modified, or cleaned in Run #139.
