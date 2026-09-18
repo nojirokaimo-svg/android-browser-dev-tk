@@ -249,3 +249,15 @@ Reported conflicts were limited to two hunks from `kiwi-omnibox-history`:
 At the same time, the long-press web link context menu was widened slightly: the non-flyout minimum width in `170-context-menu-shape.patch` changed from **320dp to 336dp**. Flyout submenu sizing remains unchanged.
 
 After this fix, validate the newest Actions run. Preserve the exact M153 cache and do not clean `out/Default`.
+
+
+## 2026-09-19 Actions #138 immediate integrity failure
+
+Run #138 (Run ID `35394663024`) failed immediately in `Verify complete patch series integrity` before any cache restore or source preparation.
+
+Cause: the checksum recorded for `170-context-menu-shape.patch` after changing the long-press context-menu minimum width from 320dp to 336dp was incorrect.
+
+- incorrect recorded SHA-256: `dffb52e3490547b7b543c753ffde12550c9b97b5a715ef306b12fa0ea6fa2e00`
+- actual patch SHA-256 reported by `verify_series.py`: `da3133bf83aafea1ccb0635fc44e390712e279470a2a4a9e905bb4c256ef483b`
+
+`kiwi_port/patches/series.json` is corrected to the actual checksum. No `out/Default` cache was restored, modified, or cleaned in the failed run.

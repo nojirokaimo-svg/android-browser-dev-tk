@@ -217,7 +217,7 @@
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java"
       ],
-      "sha256": "dffb52e3490547b7b543c753ffde12550c9b97b5a715ef306b12fa0ea6fa2e00"
+      "sha256": "da3133bf83aafea1ccb0635fc44e390712e279470a2a4a9e905bb4c256ef483b"
     },
     {
       "id": "kiwi-omnibox-history",
