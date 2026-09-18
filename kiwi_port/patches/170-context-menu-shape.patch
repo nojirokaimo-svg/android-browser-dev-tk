@@ -67,7 +67,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/Con
 +                Math.round(
 +                        TypedValue.applyDimension(
 +                                TypedValue.COMPLEX_UNIT_DIP,
-+                                320,
++                                336,
 +                                getResources().getDisplayMetrics()));
 +        int minAllowedWidth = mIsFlyout ? mMinWidth : chromeLikeLinkWidth;
          int maxAllowedWidth = mIsFlyout ? mFlyoutMaxWidth : mMaxWidth;

@@ -105,6 +105,60 @@ def repair_known_context_drift(
                     (source / f"{relative}.rej").unlink(missing_ok=True)
                     remaining.remove(relative)
 
+    if feature_id == "kiwi-omnibox-history":
+        relative = "chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java"
+        if relative in remaining:
+            target = source / relative
+            if target.is_file():
+                text = target.read_text(encoding="utf-8")
+                method_start = "        public boolean isLocationBarShownInNtp() {\n"
+                next_override = "\n        @Override\n"
+                start = text.find(method_start)
+                end = text.find(next_override, start + len(method_start)) if start >= 0 else -1
+                desired = (
+                    "        public boolean isLocationBarShownInNtp() {\n"
+                    "            if (mIsDestroyed) return false;\n"
+                    "            // Kiwi keeps the real toolbar omnibox pinned at the top of a new tab instead of\n"
+                    "            // morphing it into Chromium's large in-page fake search box.\n"
+                    "            return false;\n"
+                    "        }\n"
+                )
+                if desired in text:
+                    repaired = True
+                elif start >= 0 and end >= 0:
+                    target.write_text(text[:start] + desired + text[end:], encoding="utf-8")
+                    repaired = True
+                else:
+                    repaired = False
+                if repaired:
+                    (source / f"{relative}.rej").unlink(missing_ok=True)
+                    remaining.remove(relative)
+
+        relative = (
+            "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/"
+            "omnibox/suggestions/SuggestionListViewBinder.java"
+        )
+        if relative in remaining:
+            target = source / relative
+            if target.is_file():
+                text = target.read_text(encoding="utf-8")
+                old = "            holder.container.setBackgroundColor(backgroundColor);\n"
+                new = (
+                    "            // Kiwi leaves the current page visible behind the focused omnibox and darkens it\n"
+                    "            // with a translucent scrim instead of an opaque black fill.\n"
+                    "            holder.container.setBackgroundColor(Color.argb(179, 0, 0, 0));\n"
+                )
+                if new in text:
+                    repaired = True
+                elif text.count(old) == 1:
+                    target.write_text(text.replace(old, new, 1), encoding="utf-8")
+                    repaired = True
+                else:
+                    repaired = False
+                if repaired:
+                    (source / f"{relative}.rej").unlink(missing_ok=True)
+                    remaining.remove(relative)
+
     return remaining
 
 

@@ -212,12 +212,12 @@
     },
     {
       "id": "context-menu-shape",
-      "name": "Match Chrome-like web context-menu width and Kiwi dark surface",
+      "name": "Slightly wider Chrome-like web context-menu width and Kiwi dark surface",
       "patch": "170-context-menu-shape.patch",
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java"
       ],
-      "sha256": "44bbcddf74e3bb5d94434ad92d0ceb5434be9683826c92c907300fae7c27d399"
+      "sha256": "dffb52e3490547b7b543c753ffde12550c9b97b5a715ef306b12fa0ea6fa2e00"
     },
     {
       "id": "kiwi-omnibox-history",

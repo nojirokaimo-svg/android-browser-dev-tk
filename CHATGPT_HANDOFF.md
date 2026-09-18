@@ -16,11 +16,11 @@ When resuming, read this file first, then inspect the current HEAD of `codex/kiw
 
 ## Current active state
 
-Active branch HEAD at the time this handoff was written:
+Last fully validated production-style build baseline:
 
 `493b537ca243a603336738500ee9285bc5d7a5d5`
 
-That commit only added a harmless cache-rehydration marker after the actual backup implementation. The last known normal production-style build from this branch succeeded.
+The active development branch has moved beyond that baseline. Always inspect the live `codex/kiwi-ui-port` HEAD and latest Actions run before resuming.
 
 Normal build workflow:
 `.github/workflows/kiwi-ui-build.yml`
@@ -234,3 +234,18 @@ The patch is registered in `kiwi_port/patches/series.json`. It intentionally doe
 Validation rule for this change: inspect the newest `Build Titanium-Kiwi core` Actions run for the current branch HEAD. If it fails, fix only the reported patch/source/build error, preserve the exact M153 cache, and rerun by pushing the fix. Do not clean `out/Default`, do not replace the newest known-good baseline, and do not fall back to an empty/older cache.
 
 The handoff intentionally does not hard-code the Actions run ID for this newest change, because updating this file again solely to record a run ID would itself trigger another expensive build. The latest Actions state is authoritative.
+
+
+## 2026-09-19 Actions #137 failure and immediate fix
+
+Run #137 (Run ID `35392744649`) failed during patch preparation, before compilation. The exact M153 `out/Default` checkpoint was restored unchanged afterward; the failure did not replace or clean the 15 GB cache.
+
+Reported conflicts were limited to two hunks from `kiwi-omnibox-history`:
+- `chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java`
+- `chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java`
+
+`kiwi_port/apply.py` now contains narrow M153 context-drift repairs for exactly those two files. The NewTabPage repair replaces only the unique `isLocationBarShownInNtp()` method body; the suggestion-list repair replaces only the unique phone-container opaque background line. Unknown drift still remains a hard conflict.
+
+At the same time, the long-press web link context menu was widened slightly: the non-flyout minimum width in `170-context-menu-shape.patch` changed from **320dp to 336dp**. Flyout submenu sizing remains unchanged.
+
+After this fix, validate the newest Actions run. Preserve the exact M153 cache and do not clean `out/Default`.
