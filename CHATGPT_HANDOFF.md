@@ -286,3 +286,13 @@ Device verification found two follow-up issues:
 The M153 context-drift repair for `SuggestionListViewBinder.java` was updated to use the same alpha 140 value. A repository unit test now checks the hidden history-card behavior marker, lighter scrim value, and dismiss callback.
 
 Preserve the exact M153 cache; do not clean `out/Default`.
+
+
+## 2026-09-19 Actions #141 integrity correction
+
+Run #141 (Run ID `35400020438`) failed immediately in patch-series integrity verification because the recorded SHA-256 for `180-kiwi-omnibox-history.patch` did not match the exact checked-in bytes.
+
+Actual SHA-256 reported by `verify_series.py`:
+`18be9a0d6aee41a7f0ef32d1f4517d44200aa599791c2de315b89888ea9489d3`
+
+`series.json` is corrected to that exact value. The run failed before cache restore, so `out/Default` was not touched.

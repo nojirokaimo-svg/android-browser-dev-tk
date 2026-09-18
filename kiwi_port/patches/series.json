@@ -231,7 +231,7 @@
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/OmniboxSuggestionsContainer.java",
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java"
       ],
-      "sha256": "fe6929b879a7b36866cd7012f5d8eb857577d04f05e1af100a7aa223a1cd2ad5"
+      "sha256": "18be9a0d6aee41a7f0ef32d1f4517d44200aa599791c2de315b89888ea9489d3"
     }
   ]
 }
