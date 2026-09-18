@@ -296,3 +296,21 @@ Actual SHA-256 reported by `verify_series.py`:
 `18be9a0d6aee41a7f0ef32d1f4517d44200aa599791c2de315b89888ea9489d3`
 
 `series.json` is corrected to that exact value. The run failed before cache restore, so `out/Default` was not touched.
+
+
+## 2026-09-19 portable full-backup upgrade and lighter omnibox scrim
+
+Run #142 (Run ID `35400060482`) succeeded for HEAD `5357c39d34c4a85aa32bf554d5be7422445efb74`.
+
+A new feature patch `185-portable-full-backup.patch` adds a second backup mode:
+
+- **Normal backup** keeps the existing raw Chromium profile/tab-state ZIP behavior.
+- **Migration backup** additionally exports the regular-profile cookies and the password store credentials through Chromium APIs, serializes them, and encrypts the sensitive migration payload with a user passphrase using PBKDF2-HMAC-SHA256 (200,000 iterations) + AES-256-GCM.
+- The portable sensitive payload is stored as `portable/sensitive-v1.bin` inside the ZIP; plaintext passwords/cookies are not written to the archive.
+- During restore, the raw profile/tab state is staged as before. If a portable payload exists, the browser restarts into the backup activity, asks for the passphrase again, starts the regular profile, restores saved credentials into the local profile password store, and restores canonical cookies through the Chromium cookie service.
+- The Chromium cookie restore helper is deliberately relaxed from OTR-only to permit this explicit user-initiated regular-profile restore path.
+- Old format-1 backups without a portable payload remain accepted.
+
+The omnibox focus scrim was also made slightly more transparent again: black alpha changed from **140/255 to 115/255**. The dim-area tap-to-dismiss behavior is unchanged.
+
+Preserve the exact M153 build cache and do not clean `out/Default`.

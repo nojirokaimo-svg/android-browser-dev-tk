@@ -68,7 +68,7 @@ diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/brow
              holder.container.setBackgroundColor(Color.TRANSPARENT);
          } else {
 -            holder.container.setBackgroundColor(backgroundColor);
-+            holder.container.setBackgroundColor(Color.argb(140, 0, 0, 0));
++            holder.container.setBackgroundColor(Color.argb(115, 0, 0, 0));
          }
      }
  

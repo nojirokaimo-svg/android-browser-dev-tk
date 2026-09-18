@@ -43,6 +43,23 @@ class CredentialsPatchTest(unittest.TestCase):
             patch.count("kTitaniumLocalPasswordBackendMigrated, true"), 1
         )
 
+    def test_portable_backup_encrypts_passwords_and_cookies(self):
+        patch_path = ROOT / "kiwi_port" / "patches" / "185-portable-full-backup.patch"
+        patch = patch_path.read_text(encoding="utf-8")
+        manifest = json.loads(SERIES.read_text(encoding="utf-8"))
+        feature = next(item for item in manifest["features"] if item["id"] == "portable-full-backup")
+        self.assertEqual(hashlib.sha256(patch_path.read_bytes()).hexdigest(), feature["sha256"])
+        for token in (
+            "PBKDF2WithHmacSHA256",
+            "AES/GCM/NoPadding",
+            "PORTABLE_SENSITIVE_ENTRY",
+            "getAllCredentials()",
+            "fetchCookiesForPortableBackup",
+            "restoreCookiesFromPortableBackup",
+            "insertPasswordCredentialInProfileStore",
+        ):
+            self.assertIn(token, patch)
+
 
 if __name__ == "__main__":
     unittest.main()

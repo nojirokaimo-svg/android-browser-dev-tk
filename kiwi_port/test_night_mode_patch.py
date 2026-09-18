@@ -87,7 +87,7 @@ class NightModePatchTest(unittest.TestCase):
         patch = (ROOT / "patches/180-kiwi-omnibox-history.patch").read_text()
         self.assertIn("boolean getShouldShowPrivacyDisclaimersIfAvailable()", patch)
         self.assertIn("header is a separate item and remains visible", patch)
-        self.assertIn("Color.argb(140, 0, 0, 0)", patch)
+        self.assertIn("Color.argb(115, 0, 0, 0)", patch)
         self.assertIn("setDismissOmniboxCallback(delegate::clearOmniboxFocus)", patch)
 
     def test_night_mode_toggle_is_present_with_and_without_submenus(self):

@@ -231,7 +231,18 @@
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/OmniboxSuggestionsContainer.java",
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java"
       ],
-      "sha256": "18be9a0d6aee41a7f0ef32d1f4517d44200aa599791c2de315b89888ea9489d3"
+      "sha256": "6d03163c3abf19154cf8a7a14a2027405d3acb602559b5fe90e7e52d5ff8c8e2"
+    },
+    {
+      "id": "portable-full-backup",
+      "name": "Passphrase-encrypted portable cookie/password migration backup",
+      "patch": "185-portable-full-backup.patch",
+      "files": [
+        "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
+        "chrome/browser/android/cookies/java/src/org/chromium/chrome/browser/cookies/CookiesFetcher.java",
+        "chrome/browser/android/cookies/cookies_fetcher_restore_util.cc"
+      ],
+      "sha256": "9c38c4d49997798f1247ee03690718188b7fa64c46bcab175a7ecccbfaf7221d"
     }
   ]
 }
