@@ -1,4 +1,4 @@
-name: Verify recreated M153 default-branch cache
+name: Verify private M153 default-branch cache
 
 on:
   push:
@@ -39,4 +39,4 @@ jobs:
           test -f "$out/args.gn"
           test -f "$out/kiwi-source-state.json"
           du -sh "$out"
-          echo "RECREATED_DEFAULT_CACHE_RESTORE_OK"
+          echo "PRIVATE_CACHE_RESTORE_OK"
