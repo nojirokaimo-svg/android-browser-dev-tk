@@ -146,7 +146,7 @@ def repair_known_context_drift(
                 new = (
                     "            // Kiwi leaves the current page visible behind the focused omnibox and darkens it\n"
                     "            // with a translucent scrim instead of an opaque black fill.\n"
-                    "            holder.container.setBackgroundColor(Color.argb(179, 0, 0, 0));\n"
+                    "            holder.container.setBackgroundColor(Color.argb(140, 0, 0, 0));\n"
                 )
                 if new in text:
                     repaired = True

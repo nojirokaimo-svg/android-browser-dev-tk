@@ -272,3 +272,17 @@ Cause: `kiwi_port/test_night_mode_patch.py` still asserted the old context-menu 
 The assertion is updated to `"336"`. This is a test expectation sync only; no browser behavior was changed beyond the already-intended 336dp long-press link menu width.
 
 No `out/Default` cache was restored, modified, or cleaned in Run #139.
+
+
+## 2026-09-19 post-#140 UI follow-up
+
+Run #140 (Run ID `35395385484`) succeeded for HEAD `116f9e32593e860cc1bb9b5eff192c919399980e`.
+
+Device verification found two follow-up issues:
+
+1. The History page still showed the card containing “You may see the history from other apps that open links in Titanium.” The earlier `isInfoHeaderAvailable() = false` change only suppressed info availability/menu state; the actual privacy/app-history header visibility is controlled separately through `getShouldShowPrivacyDisclaimersIfAvailable()`. The Kiwi patch now forces that getter false too, which removes the entire informational card/frame while leaving the separate **Clear browsing data** header untouched.
+2. The working omnibox focus scrim was still too opaque. Phone scrim alpha changed from `179/255` to `140/255` so more of the current web page remains visible. Tapping the dimmed area still calls `clearOmniboxFocus()` and returns to the page.
+
+The M153 context-drift repair for `SuggestionListViewBinder.java` was updated to use the same alpha 140 value. A repository unit test now checks the hidden history-card behavior marker, lighter scrim value, and dismiss callback.
+
+Preserve the exact M153 cache; do not clean `out/Default`.

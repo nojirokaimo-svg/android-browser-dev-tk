@@ -221,7 +221,7 @@
     },
     {
       "id": "kiwi-omnibox-history",
-      "name": "Kiwi top omnibox, history cleanup, and tappable focused-page scrim",
+      "name": "Kiwi top omnibox, hidden history info card, and lighter tappable focused-page scrim",
       "patch": "180-kiwi-omnibox-history.patch",
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java",
@@ -231,7 +231,7 @@
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/OmniboxSuggestionsContainer.java",
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java"
       ],
-      "sha256": "206cb0dc51453d44a607b5e226d1f92dbca29c18f1b7b9479afd954a82c464bd"
+      "sha256": "fe6929b879a7b36866cd7012f5d8eb857577d04f05e1af100a7aa223a1cd2ad5"
     }
   ]
 }

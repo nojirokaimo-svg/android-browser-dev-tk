@@ -43,6 +43,17 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/History
      }
  
      /** Called after a user clicks the privacy disclaimer link. */
+@@ -610,7 +608,9 @@
+      * Note that this may return true even if there are currently no privacy disclaimers.
+      */
+     boolean getShouldShowPrivacyDisclaimersIfAvailable() {
+-        return mShouldShowPrivacyDisclaimers;
++        // Kiwi omits the informational privacy/app-history card entirely. The clear-browsing-data
++        // header is a separate item and remains visible.
++        return false;
+     }
+ 
+     /** Called to notify when the privacy disclaimer visibility has changed. */
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
@@ -57,7 +68,7 @@ diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/brow
              holder.container.setBackgroundColor(Color.TRANSPARENT);
          } else {
 -            holder.container.setBackgroundColor(backgroundColor);
-+            holder.container.setBackgroundColor(Color.argb(179, 0, 0, 0));
++            holder.container.setBackgroundColor(Color.argb(140, 0, 0, 0));
          }
      }
  
