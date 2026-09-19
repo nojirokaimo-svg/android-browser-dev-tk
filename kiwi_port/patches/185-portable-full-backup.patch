@@ -154,7 +154,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
          } else if (requestCode == RESTORE_BACKUP_REQUEST) {
              stageRestore(uri);
          }
-@@ -179,7 +239,70 @@
+@@ -179,7 +239,74 @@
                  .start();
      }
  

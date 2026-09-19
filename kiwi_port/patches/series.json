@@ -242,7 +242,7 @@
         "chrome/browser/android/cookies/java/src/org/chromium/chrome/browser/cookies/CookiesFetcher.java",
         "chrome/browser/android/cookies/cookies_fetcher_restore_util.cc"
       ],
-      "sha256": "b3b6cd221008a395d56c4a686de3187c8b3790e274839c58ca4a74b7f9d48967"
+      "sha256": "aadce2e0a1cba75d057cb409ec3495cc3f93a650ed6637d49dfaa1464be5de0b"
     }
   ]
 }
