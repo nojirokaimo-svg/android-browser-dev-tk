@@ -164,6 +164,10 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
 +                        isJapanese() ? "移行データを準備中…" : "Preparing migration data…",
 +                        Toast.LENGTH_SHORT)
 +                .show();
++        // This standalone backup Activity can be opened before Chromium native/profile startup.
++        // Migration export uses profile-backed password/cookie APIs, so initialize first just as
++        // the portable restore path already does.
++        ChromeBrowserInitializer.getInstance().handleSynchronousStartup();
 +        final Profile profile = ProfileManager.getLastUsedRegularProfile();
 +        PasswordStoreBridge passwordStore = new PasswordStoreBridge(profile);
 +        PasswordStoreCredential[] credentials = passwordStore.getAllCredentials();
