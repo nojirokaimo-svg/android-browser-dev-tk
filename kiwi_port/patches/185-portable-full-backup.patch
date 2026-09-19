@@ -1,19 +1,12 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java
 --- a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java
-@@ -5,6 +5,7 @@
- package org.chromium.chrome.browser.backup;
- 
- import android.app.Activity;
-+import android.app.AlertDialog;
- import android.app.AlarmManager;
- import android.app.PendingIntent;
- import android.content.Context;
-@@ -14,18 +15,33 @@
+@@ -14,18 +14,34 @@
  import android.os.Bundle;
  import android.os.Process;
  import android.os.SystemClock;
 +import android.text.InputType;
++import android.view.ContextThemeWrapper;
  import android.view.Gravity;
  import android.view.View;
  import android.widget.Button;
@@ -314,7 +307,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
          if (launch == null) {
              showToast(isJapanese() ? "再起動できません" : "Unable to restart browser");
              return;
-@@ -351,6 +516,247 @@
+@@ -351,6 +516,248 @@
          Process.killProcess(Process.myPid());
      }
  
@@ -327,7 +320,8 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
 +        input.setSingleLine(true);
 +        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 +        input.setHint(isJapanese() ? "8文字以上" : "At least 8 characters");
-+        new AlertDialog.Builder(this)
++        new android.app.AlertDialog.Builder(
++                        new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault_Dialog_Alert))
 +                .setTitle(title)
 +                .setView(input)
 +                .setNegativeButton(android.R.string.cancel, null)
