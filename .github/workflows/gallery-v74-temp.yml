@@ -1,0 +1,235 @@
+name: Temporary Gallery SAFE2 v74 Build
+
+on:
+  push:
+    branches:
+      - tmp/gallery-v74-build-20260920
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Download build inputs
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl -fL 'https://sdmntprjapaneast.oaiusercontent.com/files/00000000-272c-8209-a77b-76dc1b595be0/raw?se=2026-09-20T06%3A28%3A57Z&sp=r&sv=2026-02-06&sr=b&scid=291219bb-28aa-5211-b0f7-af8ef7c752d5&skoid=9063adf3-a524-4acf-b70a-8731b33f2f50&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-19T23%3A24%3A41Z&ske=2026-09-20T23%3A24%3A41Z&sks=b&skv=2026-02-06&sig=jAM/1A1QAsTyC49LE3tRGzE95oOiCTVqzurKPWXd9Xo%3D' -o base-v72.apk
+          curl -fL 'https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-7188-8206-a453-f58422970898/raw?se=2026-09-20T06%3A28%3A59Z&sp=r&sv=2026-02-06&sr=b&scid=5a4c202f-e5e2-5b3a-9d47-947f7e2b7556&skoid=9063adf3-a524-4acf-b70a-8731b33f2f50&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-19T22%3A06%3A15Z&ske=2026-09-20T22%3A06%3A15Z&sks=b&skv=2026-02-06&sig=rqWDX9dzj6XcZFPi94MnI21rdCcJGypaujQaigBtTsw%3D' -o v72-source-patch.zip
+          curl -fL 'https://sdmntprcentralus.oaiusercontent.com/files/00000000-5194-81f5-9d11-e9bce7d3356b/raw?se=2026-09-20T06%3A29%3A29Z&sp=r&sv=2026-02-06&sr=b&scid=413be914-fec6-58fb-9cb6-bd2cf68276ff&skoid=9063adf3-a524-4acf-b70a-8731b33f2f50&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-20T01%3A33%3A21Z&ske=2026-09-21T01%3A33%3A21Z&sks=b&skv=2026-02-06&sig=5bHzaHmf%2BHuDbmWAActR%2BNpvjFxPdd1ES0ci8zoKOkA%3D' -o recovery-v70.zip
+          ls -lh base-v72.apk v72-source-patch.zip recovery-v70.zip
+          sha256sum base-v72.apk v72-source-patch.zip recovery-v70.zip
+
+      - name: Prepare tools and signing key
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p recovery patch
+          unzip -q recovery-v70.zip -d recovery
+          unzip -q v72-source-patch.zip -d patch
+          echo "Recovery contents:"
+          find recovery -maxdepth 3 -type f -printf '%p %s bytes\n' | sort | head -200
+          echo "Patch contents:"
+          find patch -maxdepth 6 -type f -printf '%p %s bytes\n' | sort | head -200
+          KS="$(find recovery -type f -name 'Gallery_SAFE2_SIGNING_debug.keystore' | head -n1)"
+          test -n "$KS"
+          cp "$KS" Gallery_SAFE2_SIGNING_debug.keystore
+          if find recovery -type f -name 'apktool_3.0.3.jar' | grep -q .; then
+            cp "$(find recovery -type f -name 'apktool_3.0.3.jar' | head -n1)" apktool_3.0.3.jar
+          else
+            curl -fL https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar -o apktool_3.0.3.jar
+          fi
+          if find recovery -type f -name 'uber-apk-signer-1.3.0.jar' | grep -q .; then
+            cp "$(find recovery -type f -name 'uber-apk-signer-1.3.0.jar' | head -n1)" uber-apk-signer-1.3.0.jar
+          else
+            curl -fL https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar -o uber-apk-signer-1.3.0.jar
+          fi
+          ls -lh apktool_3.0.3.jar uber-apk-signer-1.3.0.jar Gallery_SAFE2_SIGNING_debug.keystore
+
+      - name: Decode v72
+        shell: bash
+        run: |
+          set -euxo pipefail
+          java -jar apktool_3.0.3.jar d -f base-v72.apk -o decoded
+          test -f decoded/smali_classes6/org/fossify/gallery/fragments/PhotoFragment.smali
+          grep -n -A80 -B10 'quiesceGestureController' decoded/smali_classes6/org/fossify/gallery/fragments/PhotoFragment.smali | head -200 || true
+
+      - name: Apply v74 zoom-page fix
+        shell: bash
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, sys
+
+          p = Path("decoded/smali_classes6/org/fossify/gallery/fragments/PhotoFragment.smali")
+          s = p.read_text(encoding="utf-8")
+          lines = s.splitlines(True)
+
+          start = None
+          end = None
+          for i, line in enumerate(lines):
+              if line.lstrip().startswith(".method") and "quiesceGestureController" in line:
+                  start = i
+                  break
+          if start is None:
+              raise SystemExit("quiesceGestureController method not found")
+          for i in range(start + 1, len(lines)):
+              if lines[i].lstrip().startswith(".end method"):
+                  end = i
+                  break
+          if end is None:
+              raise SystemExit("quiesceGestureController end not found")
+
+          block = lines[start:end+1]
+          hits = []
+          for j, line in enumerate(block):
+              if "removeCallbacksAndMessages(Ljava/lang/Object;)V" in line and "invoke-" in line:
+                  hits.append(j)
+
+          if not hits:
+              raise SystemExit("No remaining removeCallbacksAndMessages call found in quiesceGestureController")
+
+          # v72 already removed stateChangeHandler.clear-all. The remaining call is the
+          # animationEngine/handler callback purge that kills zoom after page recreation.
+          for j in hits:
+              indent = block[j][:len(block[j]) - len(block[j].lstrip())]
+              block[j] = indent + "nop\n"
+
+          new_lines = lines[:start] + block + lines[end+1:]
+          p.write_text("".join(new_lines), encoding="utf-8")
+
+          verify = "".join(block)
+          if "removeCallbacksAndMessages(Ljava/lang/Object;)V" in verify:
+              raise SystemExit("removeCallbacksAndMessages still present in target method")
+          if "stopAllAnimations" not in verify:
+              raise SystemExit("stopAllAnimations unexpectedly missing")
+
+          y = Path("decoded/apktool.yml")
+          ys = y.read_text(encoding="utf-8")
+          ys2, n1 = re.subn(r"(?m)^(\s*versionCode:\s*).*$", r"\g<1>'74'", ys, count=1)
+          ys3, n2 = re.subn(r"(?m)^(\s*versionName:\s*).*$", r"\g<1>1.13.2-SAFE2-v74-zoom-page-fix", ys2, count=1)
+          if n1 != 1 or n2 != 1:
+              raise SystemExit(f"version metadata replacement failed: code={n1} name={n2}")
+          y.write_text(ys3, encoding="utf-8")
+
+          print("Patched removeCallbacksAndMessages calls:", len(hits))
+          print("versionCode=74 / versionName=1.13.2-SAFE2-v74-zoom-page-fix")
+          PY
+          grep -n -A80 -B10 'quiesceGestureController' decoded/smali_classes6/org/fossify/gallery/fragments/PhotoFragment.smali | head -200
+          grep -nE 'versionCode|versionName' decoded/apktool.yml | head -10
+
+      - name: Build unsigned APK
+        shell: bash
+        run: |
+          set -euxo pipefail
+          java -jar apktool_3.0.3.jar b decoded -o v74-unsigned.apk
+          ls -lh v74-unsigned.apk
+          python3 - <<'PY'
+          import zipfile
+          for fn in ["base-v72.apk","v74-unsigned.apk"]:
+              with zipfile.ZipFile(fn) as z:
+                  data=z.read("classes.dex")
+                  print(fn, "classes.dex", len(data))
+          PY
+
+      - name: Force-preserve original primary classes.dex
+        shell: bash
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          import zipfile, shutil, os
+          base="base-v72.apk"
+          src="v74-unsigned.apk"
+          out="v74-fixed-unsigned.apk"
+          with zipfile.ZipFile(base,"r") as zb:
+              primary=zb.read("classes.dex")
+          assert len(primary)==39779012, len(primary)
+          with zipfile.ZipFile(src,"r") as zin, zipfile.ZipFile(out,"w") as zout:
+              for info in zin.infolist():
+                  data = primary if info.filename=="classes.dex" else zin.read(info.filename)
+                  # preserve metadata/compression method from apktool output
+                  zout.writestr(info, data)
+          with zipfile.ZipFile(out,"r") as z:
+              assert len(z.read("classes.dex"))==39779012
+          print("Primary classes.dex force-preserved:", len(primary))
+          PY
+          ls -lh v74-fixed-unsigned.apk
+
+      - name: Sign and verify
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p signed
+          java -jar uber-apk-signer-1.3.0.jar             -a v74-fixed-unsigned.apk             --ksDebug Gallery_SAFE2_SIGNING_debug.keystore             -o signed             --verifySha256 1E08A903AEF9C3A721510B64EC764D01D3D094EB954161B62544EA8F187B5953             --verbose | tee signer.log
+          APK="$(find signed -maxdepth 1 -type f -name '*.apk' | head -n1)"
+          test -n "$APK"
+          cp "$APK" Gallery_SAFE2_v74_ZOOM_PAGE_FIX.apk
+          sha256sum Gallery_SAFE2_v74_ZOOM_PAGE_FIX.apk | tee Gallery_SAFE2_v74_SHA256.txt
+
+      - name: Static verification and package artifacts
+        shell: bash
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          import zipfile
+          with zipfile.ZipFile("Gallery_SAFE2_v74_ZOOM_PAGE_FIX.apk") as z:
+              size=len(z.read("classes.dex"))
+              print("final classes.dex =", size)
+              assert size==39779012
+          PY
+          java -jar apktool_3.0.3.jar d -f Gallery_SAFE2_v74_ZOOM_PAGE_FIX.apk -o verify-decoded
+          grep -nE 'versionCode|versionName' verify-decoded/apktool.yml
+          grep -n 'package=' verify-decoded/AndroidManifest.xml | head -3 || true
+
+          mkdir -p source-patch/smali_classes6/org/fossify/gallery/fragments
+          cp decoded/smali_classes6/org/fossify/gallery/fragments/PhotoFragment.smali source-patch/smali_classes6/org/fossify/gallery/fragments/
+          cp decoded/apktool.yml source-patch/
+          cp signer.log source-patch/
+          cat > Gallery_SAFE2_PROJECT_HANDOFF_v74.txt <<'EOF'
+          Gallery SAFE2 / 星ギャラリー 引継ぎメモ v74
+          作成日: 2026-09-20
+
+          APK: Gallery_SAFE2_v74_ZOOM_PAGE_FIX.apk
+          package: org.fossify.gallery.custom46.debug
+          versionCode: 74
+          versionName: 1.13.2-SAFE2-v74-zoom-page-fix
+
+          ベース: v72
+
+          v74修正:
+          - 横スワイプ/ページ移動後にピンチズーム・ダブルタップズームが死ぬ問題を修正。
+          - Deep IdleのquiesceGestureController内で、v72に残っていたanimationEngine側の
+            Handler.removeCallbacksAndMessages(null)を実行しない。
+          - stopAllAnimationsは維持。
+          - stateChangeHandlerの全消し禁止（v72修正）も維持。
+          - RGB感度、ピンチ二重表示対策、スワイプ中隣接1ページ補正、Deep Idle/Static Snapshot、
+            hardware-layer cache等の既存省電力設計は変更しない。
+
+          ビルド注意:
+          - primary classes.dex は v72原本の 39,779,012 bytes を強制保持。
+          - 同一署名鍵 Gallery_SAFE2_SIGNING_debug.keystore を使用。
+          - certificate SHA-256:
+            1E:08:A9:03:AE:F9:C3:A7:21:51:0B:64:EC:76:4D:01:D3:D0:94:EB:95:41:61:B6:25:44:EA:8F:18:7B:59:53
+          EOF
+          (cd source-patch && zip -qr ../Gallery_SAFE2_v74_ZOOM_PAGE_FIX_SOURCE_PATCH.zip .)
+          ls -lh Gallery_SAFE2_v74_ZOOM_PAGE_FIX.apk Gallery_SAFE2_v74_ZOOM_PAGE_FIX_SOURCE_PATCH.zip Gallery_SAFE2_PROJECT_HANDOFF_v74.txt Gallery_SAFE2_v74_SHA256.txt
+
+      - name: Upload v74 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gallery_SAFE2_v74_ZOOM_PAGE_FIX
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            Gallery_SAFE2_v74_ZOOM_PAGE_FIX.apk
+            Gallery_SAFE2_v74_ZOOM_PAGE_FIX_SOURCE_PATCH.zip
+            Gallery_SAFE2_PROJECT_HANDOFF_v74.txt
+            Gallery_SAFE2_v74_SHA256.txt
+            signer.log
