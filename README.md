@@ -10,11 +10,17 @@ Patch-level transitions restore an exact immutable completed `out/Default`
 checkpoint, prepare the new pinned source tree, regenerate GN metadata, and let
 Ninja rebuild dirty edges across staged jobs. The workflow never runs a clean
 build, deletes `out/Default`, overwrites an existing cache key, or falls back to
-an older or empty cache. The pinned stage 1 restores the completed Build #146
-checkpoint. The upstream-update workflow requires `incremental_cache_key`
-and its matching `transition_from_identity`; the default pair refers to that
-same checkpoint. A cache miss stops before source preparation. Successful
-stages save new immutable keys, with the upstream-update run ID in each key.
+an older or empty cache. Build #148 performed the upstream transition from the completed Build #146
+cache. Its stage-5 compilation ended at the 90-minute budget with about
+5,000 of 16,863 Ninja edges complete and saved the exact immutable checkpoint
+`kiwi-153-d7d74a667baca929bea9be32749c8a7c301c1333-stage-5`.
+The next workflow starts at stage 6 and restores this key literally. It keeps
+`.ninja_log`, `.ninja_deps`, object files and generated outputs; stage 7 and
+later restore only the preceding checkpoint from that same run. A cache miss
+stops before source preparation. The upstream-update workflow separately
+requires `incremental_cache_key` and matching
+`transition_from_identity`. Do not rerun the upstream transition while
+resuming stage 5, and do not substitute a new commit SHA in its restore key.
 
 On Android, returning after a long pause retains the selected tab instead of
 creating/selecting an NTP. The NTP itself can still be opened intentionally.

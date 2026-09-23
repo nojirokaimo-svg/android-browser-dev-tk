@@ -87,6 +87,7 @@ runs:
       run: |
         out=work/titanium/chromium/src/out/Default
         test -f "$out/.ninja_log"
+        test -f "$out/.ninja_deps"
         test -f "$out/build.ninja"
         test -f "$out/args.gn"
         echo "Restored exact checkpoint: ${{ inputs.restore-key }}"
@@ -144,6 +145,7 @@ runs:
           exit 0
         fi
         test -f "$root/Default/.ninja_log"
+        test -f "$root/Default/.ninja_deps"
         test -f "$root/Default/build.ninja"
         test -f "$root/Default/args.gn"
         echo 'Original restored out/Default is back in place unchanged by prepare/gn gen.'

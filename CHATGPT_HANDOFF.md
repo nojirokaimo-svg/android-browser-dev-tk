@@ -1,5 +1,23 @@
 # ChatGPT Project Handoff — Titanium Android Browser
 
+## 2026-09-23: Exact continuation after Build #148 stage 5
+
+Build #148, commit `d7d74a667baca929bea9be32749c8a7c301c1333`,
+ended with `require-apk` failing because the 90-minute stage-5 budget
+expired before the APK completed. The stage-5 job itself succeeded and logged
+`Cache saved with key: kiwi-153-d7d74a667baca929bea9be32749c8a7c301c1333-stage-5`
+after preserving the 15 GB `out/Default`. Ninja reached about 4,976/16,863
+edges during stage 5. This was a timed checkpoint, not a compile error.
+
+The normal build workflow now resumes at stage 6 using that exact literal
+stage-5 key. It does not repeat the upstream transition. Its composite action
+rejects cache misses and checks `.ninja_log`, `.ninja_deps`, `build.ninja`,
+and `args.gn` before continuation. Stages 7-10 use only new immutable
+checkpoints created by their immediate predecessor. Do not derive stage-5
+key from a new `${{ github.sha }}`, delete `out/Default`, invoke `gn clean`,
+or fall back to old/empty cache. Verify the next workflow's stage-6 restore
+log before claiming any resumed work or APK success.
+
 ## 2026-09-23: v153.0.8010.52 target and Android resume/omnibox fixes
 
 - User baseline: Build #146 / commit `8816925c2c1c0f2b96c723a4b5f7509c2816cb56`.
