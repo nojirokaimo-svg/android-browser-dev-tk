@@ -1,3 +1,24 @@
+## 2026-09-24: Build #150 did not show the clipboard row
+
+The user installed Build #150 and confirmed that the copied-link row still does
+not appear on the empty NTP omnibox. Build #151 only updated metadata, so it
+cannot repair this behavior. Do not ask the user to install #150 again or claim
+that the feature is fixed on a device.
+
+Pinned Chromium's `AndroidNTPZpsSection` reserves a dedicated
+`GROUP_MOBILE_CLIPBOARD` slot, but `ClipboardProvider` assigned NTP clipboard
+matches to `GROUP_PERSONALIZED_ZERO_SUGGEST`. The latter group's capacity
+can be zero or suppressed by a field trial. Feature patch 200 now assigns the
+clipboard group directly. The patch replays cleanly against the pinned .52
+Chromium source, and `series.json` and `manifest.json` have updated SHA-256
+values. This is a source-level cause for a disappearing row, not yet confirmed
+as the user's complete runtime cause. Check the next signed APK on the device.
+
+Build #151 completed successfully and saved the exact immutable checkpoint
+`kiwi-incremental-153-addbe54fe875cd72e8c0c1543930ea0549fef857-stage-11`.
+The next build must restore that literal key; retain `.ninja_log`,
+`.ninja_deps`, object files, and generated outputs. No clean build or fallback.
+
 # ChatGPT Project Handoff — Titanium Android Browser
 
 ## 2026-09-24: Build #150 clipboard follow-up completed

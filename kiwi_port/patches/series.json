@@ -271,7 +271,7 @@
         "components/omnibox/browser/clipboard_provider.cc",
         "components/open_from_clipboard/clipboard_recent_content.cc"
       ],
-      "sha256": "bc384d6fe74f64a591b48902499affdb19b1ad1a72ad4cc467620bbcd9b93adb"
+      "sha256": "2600b0aa42cd489c72aad450bcd9424c1ffc4734687defb13e0cc5b5bde71a6e"
     }
   ]
 }

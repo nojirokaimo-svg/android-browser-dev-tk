@@ -6,9 +6,11 @@ The empty Android new-tab omnibox restricts zero-prefix suggestions to the
 clipboard provider. Android Chromium ordinarily expires that provider's copied
 link after three minutes; the new-tab path now accepts an item up to 24 hours
 old when Android still retains it. Other pages keep short-lived clipboard
-suggestions. Selecting the candidate uses Chromium's existing URL navigation or
-text-search handling. On-device behavior needs confirmation with a recently
-copied URL and with text after installing the new APK.
+suggestions. The user confirmed that Build #150 still showed no clipboard row.
+The follow-up patch routes the candidate to Android's dedicated clipboard
+suggestion group, which has its own slot even when the recent-search group is
+suppressed. Selecting it uses Chromium's existing URL navigation or text-search
+handling. The follow-up APK still needs a device check.
 
 ## Titanium-Kiwi incremental upstream updates
 
@@ -24,7 +26,9 @@ an older or empty cache. Build #150 restored the exact completed Build #149
 checkpoint, applied all 22 feature patches, and completed the incremental APK
 build. Its immutable checkpoint is
 `kiwi-incremental-153-9099484be06bb034d1efd4d120e9bd8aa1262dd0-stage-11`.
-The workflow restores that literal key for metadata-only follow-ups and keeps
+Build #151 subsequently saved immutable checkpoint
+`kiwi-incremental-153-addbe54fe875cd72e8c0c1543930ea0549fef857-stage-11`.
+The workflow restores this latest literal key for the follow-up and keeps
 `.ninja_log`, `.ninja_deps`, object files, and generated outputs. A cache miss
 stops before source preparation. The upstream-update workflow separately
 requires `incremental_cache_key` and matching `transition_from_identity`.
@@ -34,13 +38,14 @@ Scheme v2. APK SHA-256:
 `3d62524b3f69a666507704aa3e2ba3eb47a95522e1cd375fffaa4520c31965b9`.
 The artifact ZIP SHA-256 is
 `1ade241813369addd8cf4cc0abccb339851ecc7d2f0c43c15de56c5049fe7219`.
-The new-tab clipboard behavior is compiled and statically validated, but still
-requires on-device confirmation.
+Build #150 compiled the earlier candidate, but the user confirmed it did not
+appear on the device. The dedicated-group correction needs a new APK and
+device confirmation.
 
 On Android, returning after a long pause retains the selected tab instead of
 creating/selecting an NTP. The NTP itself can still be opened intentionally.
-Focusing its empty toolbar URL field shows a recent clipboard link/text
-suggestion; typing restores normal search/history suggestions. Selecting the
+Focusing its empty toolbar URL field is intended to show a recent clipboard
+link/text suggestion; typing restores normal search/history suggestions. Selecting the
 clipboard row uses Chromium's existing URL navigation or text search handling.
 
 If a transition fails, keep the last completed cache intact, fix the named

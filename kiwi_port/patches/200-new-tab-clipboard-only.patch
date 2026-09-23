@@ -1,20 +1,10 @@
 diff --git a/components/omnibox/browser/autocomplete_controller.cc b/components/omnibox/browser/autocomplete_controller.cc
 --- a/components/omnibox/browser/autocomplete_controller.cc
 +++ b/components/omnibox/browser/autocomplete_controller.cc
-@@ -1113,13 +1113,22 @@
- }
+@@ -1118,6 +1118,15 @@
+     return false;
+   }
  
- bool AutocompleteController::ShouldRunProvider(
-     AutocompleteProvider* provider) const {
--  if (!provider) {
--    return false;
--  }
--
--  // If zero prefix suggest is disabled for the Lens contextual searchbox, only
-+  if (!provider) {
-+    return false;
-+  }
-+
 +#if BUILDFLAG(IS_ANDROID)
 +  // On a new tab Kiwi shows the clipboard suggestion alone until the user types.
 +  // Keep the existing ClipboardProvider so URLs navigate and text searches work.
@@ -24,11 +14,9 @@ diff --git a/components/omnibox/browser/autocomplete_controller.cc b/components/
 +  }
 +#endif
 +
-+  // If zero prefix suggest is disabled for the Lens contextual searchbox, only
+   // If zero prefix suggest is disabled for the Lens contextual searchbox, only
    // run the typed search provider. Else, will use the IsLensSearchbox check
    // below.
-   if (input_.current_page_classification() == OEP::CONTEXTUAL_SEARCHBOX &&
-       !lens::features::ShowContextualSearchboxZeroPrefixSuggest()) {
 diff --git a/components/omnibox/browser/clipboard_provider.cc b/components/omnibox/browser/clipboard_provider.cc
 --- a/components/omnibox/browser/clipboard_provider.cc
 +++ b/components/omnibox/browser/clipboard_provider.cc
@@ -48,6 +36,24 @@ diff --git a/components/omnibox/browser/clipboard_provider.cc b/components/omnib
    done_ = true;
  
    // On iOS and Android, accessing the clipboard contents shows a notification
+@@ -217,14 +226,9 @@
+                                            matches_.empty(), match.type,
+                                            clipboard_contents_age);
+ 
+-  if (is_android && omnibox::IsNTPPage(input.current_page_classification())) {
+-    // Assign the Clipboard to the PZPS group on NTP pages to improve the use
+-    // of the suggest space.
+-    match.suggestion_group_id = omnibox::GROUP_PERSONALIZED_ZERO_SUGGEST;
+-  } else {
+-    // Leave the clipboard in its dedicated section otherwise.
+-    match.suggestion_group_id = omnibox::GROUP_MOBILE_CLIPBOARD;
+-  }
++  // The Android NTP has a dedicated clipboard group with a guaranteed slot.
++  // The personalized suggestions group can be disabled by field trial.
++  match.suggestion_group_id = omnibox::GROUP_MOBILE_CLIPBOARD;
+ 
+   matches_.push_back(match);
+ }
 diff --git a/components/open_from_clipboard/clipboard_recent_content.cc b/components/open_from_clipboard/clipboard_recent_content.cc
 --- a/components/open_from_clipboard/clipboard_recent_content.cc
 +++ b/components/open_from_clipboard/clipboard_recent_content.cc

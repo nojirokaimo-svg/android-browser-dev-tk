@@ -124,7 +124,7 @@
     },
     "components/omnibox/browser/clipboard_provider.cc": {
       "before_sha256": "b3df287914e67863f616adbd8bd16b893fe4938ca21da54083e17ddd7e77525d",
-      "after_sha256": "5e94ea7d1dc5945db80357b9dcb4417c41c14c15b46393d1b6d8bd1afa826470"
+      "after_sha256": "bdc27067594c66af18757674cbea183852f8f532794bf38a5b94a67fbd0ebc42"
     },
     "components/open_from_clipboard/clipboard_recent_content.cc": {
       "before_sha256": "baaca5b46c8d0e945f7002d21ed4ded02ec983d7f0637929abeb5ce652902920",
