@@ -1,5 +1,15 @@
 # Titanium Browser for Android
 
+## New-tab clipboard candidate
+
+The empty Android new-tab omnibox restricts zero-prefix suggestions to the
+clipboard provider. Android Chromium ordinarily expires that provider's copied
+link after three minutes; the new-tab path now accepts an item up to 24 hours
+old when Android still retains it. Other pages keep short-lived clipboard
+suggestions. Selecting the candidate uses Chromium's existing URL navigation or
+text-search handling. On-device behavior needs confirmation with a recently
+copied URL and with text after installing the new APK.
+
 ## Titanium-Kiwi incremental upstream updates
 
 The `codex/kiwi-ui-port` workflow applies the feature-scoped patches in

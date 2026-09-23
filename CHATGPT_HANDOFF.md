@@ -1,5 +1,22 @@
 # ChatGPT Project Handoff — Titanium Android Browser
 
+## 2026-09-24: Build #149 APK and new-tab clipboard follow-up
+
+Build #149, commit `1e12cd8c1de871752c41e476d85960875dae2cc7`,
+completed the exact stage-5 continuation through stage 10. The action reported
+a 324,184,408-byte signed APK (Android v2 verified); its immutable completed
+`out/Default` checkpoint is
+`kiwi-incremental-153-1e12cd8c1de871752c41e476d85960875dae2cc7-stage-10`.
+Artifact: https://github.com/nojirokaimo-svg/android-titanium-browser/actions/runs/35860203425/artifacts/10778255669.
+The user tested this APK and reported that the new-tab clipboard row still does
+not appear. Chromium Android's clipboard recency default is three minutes.
+The next feature patch extends the NTP candidate to one day while keeping
+short-lived suggestions outside NTP, then rebuilds changed sources from that
+exact completed checkpoint. Recheck with a copied URL and text on device;
+static tests cannot establish the user's device result. The exact pre/post
+ChromeTabbedActivity.java hashes must still be read from the next prepared
+.52 build and recorded in `kiwi_port/manifest.json`.
+
 ## 2026-09-23: Exact continuation after Build #148 stage 5
 
 Build #148, commit `d7d74a667baca929bea9be32749c8a7c301c1333`,

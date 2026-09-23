@@ -128,6 +128,13 @@ version_lt() {
   [[ "$1" != "$2" ]] && [[ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1)" == "$1" ]]
 }
 source "$TITANIUM_DIR/patch.sh"
+for kiwi_hash_file in \
+  chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java \
+  components/omnibox/browser/clipboard_provider.cc \
+  components/open_from_clipboard/clipboard_recent_content.cc; do
+  printf "KIWI_SOURCE_SHA256 before %s " "$kiwi_hash_file"
+  sha256sum "$kiwi_hash_file" | cut -d" " -f1
+done
 PATCH_ARGS=()
 if [[ "$PATCH_MODE" == "best-effort" ]]; then
   PATCH_ARGS+=(--best-effort --report "${KIWI_PATCH_REPORT:-$KIT_ROOT/output/kiwi-patch-report.md}")
@@ -136,6 +143,13 @@ elif [[ "$PATCH_MODE" != "strict" ]]; then
   exit 2
 fi
 python3 "$KIT_ROOT/kiwi_port/apply.py" "$PWD" "${PATCH_ARGS[@]}"
+for kiwi_hash_file in \
+  chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java \
+  components/omnibox/browser/clipboard_provider.cc \
+  components/open_from_clipboard/clipboard_recent_content.cc; do
+  printf "KIWI_SOURCE_SHA256 after %s " "$kiwi_hash_file"
+  sha256sum "$kiwi_hash_file" | cut -d" " -f1
+done
 
 # Install compiler packages only after every source patch has applied cleanly.
 ./build/install-build-deps.sh --no-prompt

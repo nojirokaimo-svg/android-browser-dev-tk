@@ -267,9 +267,11 @@
       "name": "Show clipboard instead of history on empty Android new-tab omnibox",
       "patch": "200-new-tab-clipboard-only.patch",
       "files": [
-        "components/omnibox/browser/autocomplete_controller.cc"
+        "components/omnibox/browser/autocomplete_controller.cc",
+        "components/omnibox/browser/clipboard_provider.cc",
+        "components/open_from_clipboard/clipboard_recent_content.cc"
       ],
-      "sha256": "6011aef450f708bd23a9c897a313928a1edcf2ee15e3dc3d42cd85e30f0fe358"
+      "sha256": "bc384d6fe74f64a591b48902499affdb19b1ad1a72ad4cc467620bbcd9b93adb"
     }
   ]
 }

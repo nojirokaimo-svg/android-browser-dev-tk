@@ -121,6 +121,14 @@
     "components/omnibox/browser/autocomplete_controller.cc": {
       "before_sha256": "370dce7aa22ab3e6f7e9b7c013b670aa0fa2bddb3662d47b47455f5d1e4c317e",
       "after_sha256": "c4ac242cff548cacfed101a61d1ddc2deb69485dea4cec0b2f78399211d68f82"
+    },
+    "components/omnibox/browser/clipboard_provider.cc": {
+      "before_sha256": "b3df287914e67863f616adbd8bd16b893fe4938ca21da54083e17ddd7e77525d",
+      "after_sha256": "5e94ea7d1dc5945db80357b9dcb4417c41c14c15b46393d1b6d8bd1afa826470"
+    },
+    "components/open_from_clipboard/clipboard_recent_content.cc": {
+      "before_sha256": "baaca5b46c8d0e945f7002d21ed4ded02ec983d7f0637929abeb5ce652902920",
+      "after_sha256": "0411ad4cdd1345f6b4a24e04a533f92a4552962b242e077f8923e2dab309987b"
     }
   }
 }

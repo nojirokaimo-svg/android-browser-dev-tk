@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  stage-6:
+  stage-11:
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -27,14 +27,14 @@ jobs:
         with:
           # Resume is deliberately exact: never fall back to an older/empty
           # checkpoint and never start another cold multi-hour compile.
-          restore-key: kiwi-153-d7d74a667baca929bea9be32749c8a7c301c1333-stage-5
+          restore-key: kiwi-incremental-153-1e12cd8c1de871752c41e476d85960875dae2cc7-stage-10
           require-restore: "true"
-          # Build #148 saved this immutable stage-5 checkpoint after the
-          # upstream transition. Resume its Ninja history without repeating GN.
+          # Build #149 saved the signed APK and the immutable stage-10 output.
+          # Recompile only changed sources while retaining all Ninja outputs.
           bootstrap-revision: ""
           transition-from-identity: ""
-          save-key: kiwi-153-${{ github.sha }}-stage-6
-          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-6
+          save-key: kiwi-153-${{ github.sha }}-stage-11
+          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-11
           titanium-commit: 97a21b7a98e4446142a39bd38190023ebb34cd74
           vanadium-commit: 2aaf9dfc919e620564409f94beedaedca5301e81
           chromium-commit: 78e5e45d4bb41035e17ea4da2cc257f496416ac9
@@ -42,9 +42,9 @@ jobs:
           patch-mode: best-effort
           build-budget-minutes: "90"
 
-  stage-7:
-    needs: stage-6
-    if: needs.stage-6.outputs.done != 'true'
+  stage-12:
+    needs: stage-11
+    if: needs.stage-11.outputs.done != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -54,10 +54,10 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-153-${{ github.sha }}-stage-6
+          restore-key: kiwi-153-${{ github.sha }}-stage-11
           require-restore: "true"
-          save-key: kiwi-153-${{ github.sha }}-stage-7
-          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-7
+          save-key: kiwi-153-${{ github.sha }}-stage-12
+          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-12
           titanium-commit: 97a21b7a98e4446142a39bd38190023ebb34cd74
           vanadium-commit: 2aaf9dfc919e620564409f94beedaedca5301e81
           chromium-commit: 78e5e45d4bb41035e17ea4da2cc257f496416ac9
@@ -65,9 +65,9 @@ jobs:
           patch-mode: best-effort
           build-budget-minutes: "90"
 
-  stage-8:
-    needs: stage-7
-    if: needs.stage-7.outputs.done != 'true'
+  stage-13:
+    needs: stage-12
+    if: needs.stage-12.outputs.done != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -77,10 +77,10 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-153-${{ github.sha }}-stage-7
+          restore-key: kiwi-153-${{ github.sha }}-stage-12
           require-restore: "true"
-          save-key: kiwi-153-${{ github.sha }}-stage-8
-          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-8
+          save-key: kiwi-153-${{ github.sha }}-stage-13
+          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-13
           titanium-commit: 97a21b7a98e4446142a39bd38190023ebb34cd74
           vanadium-commit: 2aaf9dfc919e620564409f94beedaedca5301e81
           chromium-commit: 78e5e45d4bb41035e17ea4da2cc257f496416ac9
@@ -88,9 +88,9 @@ jobs:
           patch-mode: best-effort
           build-budget-minutes: "90"
 
-  stage-9:
-    needs: stage-8
-    if: needs.stage-8.outputs.done != 'true'
+  stage-14:
+    needs: stage-13
+    if: needs.stage-13.outputs.done != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -100,10 +100,10 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-153-${{ github.sha }}-stage-8
+          restore-key: kiwi-153-${{ github.sha }}-stage-13
           require-restore: "true"
-          save-key: kiwi-153-${{ github.sha }}-stage-9
-          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-9
+          save-key: kiwi-153-${{ github.sha }}-stage-14
+          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-14
           titanium-commit: 97a21b7a98e4446142a39bd38190023ebb34cd74
           vanadium-commit: 2aaf9dfc919e620564409f94beedaedca5301e81
           chromium-commit: 78e5e45d4bb41035e17ea4da2cc257f496416ac9
@@ -111,9 +111,9 @@ jobs:
           patch-mode: best-effort
           build-budget-minutes: "90"
 
-  stage-10:
-    needs: stage-9
-    if: needs.stage-9.outputs.done != 'true'
+  stage-15:
+    needs: stage-14
+    if: needs.stage-14.outputs.done != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -123,10 +123,10 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-153-${{ github.sha }}-stage-9
+          restore-key: kiwi-153-${{ github.sha }}-stage-14
           require-restore: "true"
-          save-key: kiwi-153-${{ github.sha }}-stage-10
-          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-10
+          save-key: kiwi-153-${{ github.sha }}-stage-15
+          final-cache-key: kiwi-incremental-153-${{ github.sha }}-stage-15
           titanium-commit: 97a21b7a98e4446142a39bd38190023ebb34cd74
           vanadium-commit: 2aaf9dfc919e620564409f94beedaedca5301e81
           chromium-commit: 78e5e45d4bb41035e17ea4da2cc257f496416ac9
@@ -135,19 +135,19 @@ jobs:
           build-budget-minutes: "90"
 
   require-apk:
-    needs: [stage-6, stage-7, stage-8, stage-9, stage-10]
+    needs: [stage-11, stage-12, stage-13, stage-14, stage-15]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Require one stage to finish the APK
         env:
-          S6: ${{ needs.stage-6.outputs.done }}
-          S7: ${{ needs.stage-7.outputs.done }}
-          S8: ${{ needs.stage-8.outputs.done }}
-          S9: ${{ needs.stage-9.outputs.done }}
-          S10: ${{ needs.stage-10.outputs.done }}
+          S11: ${{ needs.stage-11.outputs.done }}
+          S12: ${{ needs.stage-12.outputs.done }}
+          S13: ${{ needs.stage-13.outputs.done }}
+          S14: ${{ needs.stage-14.outputs.done }}
+          S15: ${{ needs.stage-15.outputs.done }}
         run: |
-          if [[ "$S6" != true && "$S7" != true && "$S8" != true && "$S9" != true && "$S10" != true ]]; then
-            echo "Stage 6-10 continuation checkpoints completed without producing an APK." >&2
+          if [[ "$S11" != true && "$S12" != true && "$S13" != true && "$S14" != true && "$S15" != true ]]; then
+            echo "Stage 11-15 exact-cache continuation completed without producing an APK." >&2
             exit 1
           fi
