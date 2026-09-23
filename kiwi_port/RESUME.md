@@ -1,9 +1,19 @@
 # Current implementation checkpoint
 
+The current target is Titanium `v153.0.8010.52` with upstream commits
+`97a21b7a98e4446142a39bd38190023ebb34cd74` (Titanium),
+`2aaf9dfc919e620564409f94beedaedca5301e81` (Vanadium), and
+`78e5e45d4bb41035e17ea4da2cc257f496416ac9` (Chromium). Build #146 is
+the most recent completed baseline, with exact immutable cache
+`kiwi-incremental-153-8816925c2c1c0f2b96c723a4b5f7509c2816cb56-stage-1`.
+See `CHATGPT_HANDOFF.md` for build status and unresolved validation. Later
+sections document the historical 153.0.8010.36 checkpoint.
+
+## Historical 153.0.8010.36 checkpoint
+
 Chromium/Titanium 153.0.8010.36 release build, including native Kiwi migration
 and extension-file loading, completed successfully in GitHub Actions run 87.
-Continue from this point; do not clean, delete `out/Default`, overwrite an
-existing cache key, or fall back to an older/empty cache.
+Do not use its old cache for current work.
 
 Pinned upstream revisions:
 
@@ -25,7 +35,8 @@ Completed build checkpoint:
 - Completed incremental baseline:
   `kiwi-incremental-153-3fefd81c80ff80f5dadee212aabcc4d98329b09c-stage-1`
 
-The workflow default must remain pinned to that exact completed M153 baseline.
+That was the workflow default at this historical checkpoint; the active default
+is now the exact Build #146 cache listed above.
 Exact cache misses fail immediately; no restore-key fallback is permitted.
 
 Compiled feature series retained:

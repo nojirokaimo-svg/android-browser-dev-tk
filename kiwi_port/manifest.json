@@ -1,9 +1,9 @@
 {
-  "titanium_commit": "1c05bb4cb552b54bbcfc29ee6f208be4d8129b36",
-  "chromium_commit": "73934a44f61e6b3878d1943064c141a5a820f5f7",
-  "vanadium_commit": "9919fca315ddb291441122f7c694bd1cb74be33e",
-  "chromium_version": "153.0.8010.47",
-  "scope": "Build 146 Kiwi UI, extension, migration, backup, credentials, six Night mode presets, and disabled single-tab resume card on Chromium 153.0.8010.47",
+  "titanium_commit": "97a21b7a98e4446142a39bd38190023ebb34cd74",
+  "chromium_commit": "78e5e45d4bb41035e17ea4da2cc257f496416ac9",
+  "vanadium_commit": "2aaf9dfc919e620564409f94beedaedca5301e81",
+  "chromium_version": "153.0.8010.52",
+  "scope": "Build 146 Kiwi UI, extensions, migration, backups, credentials and six Night mode presets on Chromium 153.0.8010.52; preserve active tab after inactivity and show clipboard only on new-tab empty omnibox",
   "complete_kiwi_ui_port": false,
   "files": {
     "chrome/android/chrome_java_resources.gni": {
@@ -19,8 +19,8 @@
       "after_sha256": "584e17ca31623b8e7d129f805ff372e350996fd01d4dfda5a6dfa0acae1105d9"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java": {
-      "before_sha256": "184d4becc8834d34f3a348e7e9d61de07dcc60c9e1ebf2d61d3b33cfb8d6b1bb",
-      "after_sha256": "c07667c380fd45f81500e77c33e2ce31796333961ddd57f63ae69692a7a0d075"
+      "before_sha256": null,
+      "after_sha256": null
     },
     "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java": {
       "before_sha256": "e37d1f6a8fb3e92cbd8f5fb2763ebcc7ebafc9b0b81f9d8dd90b6e93d563155b",
@@ -117,6 +117,10 @@
     "third_party/blink/renderer/platform/graphics/dark_mode_filter_test.cc": {
       "before_sha256": "093682608b2ce4ad1cd23675bc80f424a91d16ae36494eae598b88b9cb997265",
       "after_sha256": "0f90652a107c87cbcd133439ef50d716f31f7412545d3e6496c946f78fbc0aab"
+    },
+    "components/omnibox/browser/autocomplete_controller.cc": {
+      "before_sha256": "370dce7aa22ab3e6f7e9b7c013b670aa0fa2bddb3662d47b47455f5d1e4c317e",
+      "after_sha256": "c4ac242cff548cacfed101a61d1ddc2deb69485dea4cec0b2f78399211d68f82"
     }
   }
 }

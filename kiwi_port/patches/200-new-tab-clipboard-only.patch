@@ -1,0 +1,31 @@
+diff --git a/components/omnibox/browser/autocomplete_controller.cc b/components/omnibox/browser/autocomplete_controller.cc
+--- a/components/omnibox/browser/autocomplete_controller.cc
++++ b/components/omnibox/browser/autocomplete_controller.cc
+@@ -1113,13 +1113,22 @@
+ }
+ 
+ bool AutocompleteController::ShouldRunProvider(
+     AutocompleteProvider* provider) const {
+-  if (!provider) {
+-    return false;
+-  }
+-
+-  // If zero prefix suggest is disabled for the Lens contextual searchbox, only
++  if (!provider) {
++    return false;
++  }
++
++#if BUILDFLAG(IS_ANDROID)
++  // On a new tab Kiwi shows the clipboard suggestion alone until the user types.
++  // Keep the existing ClipboardProvider so URLs navigate and text searches work.
++  if (input_.IsZeroSuggest() &&
++      omnibox::IsNTPPage(input_.current_page_classification())) {
++    return provider->type() == AutocompleteProvider::TYPE_CLIPBOARD;
++  }
++#endif
++
++  // If zero prefix suggest is disabled for the Lens contextual searchbox, only
+   // run the typed search provider. Else, will use the IsLensSearchbox check
+   // below.
+   if (input_.current_page_classification() == OEP::CONTEXTUAL_SEARCHBOX &&
+       !lens::features::ShowContextualSearchboxZeroPrefixSuggest()) {

@@ -4,13 +4,23 @@
 
 The `codex/kiwi-ui-port` workflow applies the feature-scoped patches in
 `kiwi_port/patches/series.json` to pinned Titanium, Vanadium, and Chromium
-commits. The current target is Titanium `v153.0.8010.47`.
+commits. The current target is Titanium `v153.0.8010.52`.
 
 Patch-level transitions restore an exact immutable completed `out/Default`
 checkpoint, prepare the new pinned source tree, regenerate GN metadata, and let
 Ninja rebuild dirty edges across staged jobs. The workflow never runs a clean
 build, deletes `out/Default`, overwrites an existing cache key, or falls back to
-an older or empty cache.
+an older or empty cache. The pinned stage 1 restores the completed Build #146
+checkpoint. The upstream-update workflow requires `incremental_cache_key`
+and its matching `transition_from_identity`; the default pair refers to that
+same checkpoint. A cache miss stops before source preparation. Successful
+stages save new immutable keys, with the upstream-update run ID in each key.
+
+On Android, returning after a long pause retains the selected tab instead of
+creating/selecting an NTP. The NTP itself can still be opened intentionally.
+Focusing its empty toolbar URL field shows a recent clipboard link/text
+suggestion; typing restores normal search/history suggestions. Selecting the
+clipboard row uses Chromium's existing URL navigation or text search handling.
 
 If a transition fails, keep the last completed cache intact, fix the named
 feature patch or build configuration, and push a new commit. Regenerate patch

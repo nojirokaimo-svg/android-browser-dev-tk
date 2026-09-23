@@ -1,5 +1,31 @@
 # ChatGPT Project Handoff — Titanium Android Browser
 
+## 2026-09-23: v153.0.8010.52 target and Android resume/omnibox fixes
+
+- User baseline: Build #146 / commit `8816925c2c1c0f2b96c723a4b5f7509c2816cb56`.
+- Target release: Titanium `97a21b7a98e4446142a39bd38190023ebb34cd74`,
+  Vanadium `2aaf9dfc919e620564409f94beedaedca5301e81`,
+  Chromium `78e5e45d4bb41035e17ea4da2cc257f496416ac9`
+  (`153.0.8010.52`).
+- Feature `190` hides the “Continue with this tab” Magic Stack card; feature
+  `195` disables the inactive-startup NTP switch so the selected tab stays in
+  front. It does not remove restored tabs.
+- Feature `200` lets only Chromium's clipboard provider run on an empty
+  Android NTP omnibox. Typed input and other pages retain ordinary suggestions;
+  clipboard URL/text selection follows Chromium's existing navigation/search.
+- The pinned build restores only exact Build #146 completed `out/Default` key
+  `kiwi-incremental-153-8816925c2c1c0f2b96c723a4b5f7509c2816cb56-stage-1`;
+  no clean build, cache deletion, overwrite or fallback. The upstream-update
+  workflow now uses exact restore and source identity too.
+- Build #147 on the earlier .47 attempt failed in stage 1; its job-log redirect
+  returned BlobNotFound when retrieved. Do not claim .47 succeeded or use it as a
+  checkpoint. Inspect current Actions run before further changes.
+- `manifest.json` records the verified raw .52 omnibox hashes. The
+  ChromeTabbedActivity hash after Titanium's upstream patch and features
+  `020`/`195` must be populated after a prepared .52 checkout; it remains
+  unknown until that checkpoint is available. Do not claim full manifest
+  verification or APK completion before checking those generated hashes.
+
 ## 2026-09-23: v153.0.8010.47 transition from Build #146
 
 - Baseline: Build #146 / `8816925c2c1c0f2b96c723a4b5f7509c2816cb56`.

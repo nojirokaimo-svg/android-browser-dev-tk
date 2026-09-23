@@ -252,6 +252,24 @@
         "chrome/browser/single_tab/android/java/src/org/chromium/chrome/browser/single_tab/SingleTabModuleBuilder.java"
       ],
       "sha256": "fedc9e403158d49ce80f977bce07be6f252bae1a96c050bf89e905d568dd34a0"
+    },
+    {
+      "id": "preserve-active-tab",
+      "name": "Keep the selected tab in front after a long background pause",
+      "patch": "195-preserve-active-tab.patch",
+      "files": [
+        "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java"
+      ],
+      "sha256": "8d47c3178cc60c792663524f08da6b8e598d932489b49d5ff0c2baef1bd10a50"
+    },
+    {
+      "id": "new-tab-clipboard-only",
+      "name": "Show clipboard instead of history on empty Android new-tab omnibox",
+      "patch": "200-new-tab-clipboard-only.patch",
+      "files": [
+        "components/omnibox/browser/autocomplete_controller.cc"
+      ],
+      "sha256": "6011aef450f708bd23a9c897a313928a1edcf2ee15e3dc3d42cd85e30f0fe358"
     }
   ]
 }

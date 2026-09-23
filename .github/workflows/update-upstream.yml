@@ -7,6 +7,14 @@ on:
         description: Titanium branch, tag, or commit; blank uses upstream's default branch HEAD.
         required: false
         default: ""
+      incremental_cache_key:
+        description: Exact completed out/Default cache key. Cache miss stops; no cold build.
+        required: false
+        default: "kiwi-incremental-153-8816925c2c1c0f2b96c723a4b5f7509c2816cb56-stage-1"
+      transition_from_identity:
+        description: Source identity stamped in that exact completed cache.
+        required: false
+        default: "7584b534f6e1f9c29e8bb98df71d7610960a5db3:02d87ad8e17aee77d0fea49d122349a5da87ed2e:507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c:validation"
 
 permissions:
   contents: read
@@ -47,8 +55,11 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-stage-1
-          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-stage-1
+          restore-key: ${{ inputs.incremental_cache_key }}
+          require-restore: "true"
+          transition-from-identity: ${{ inputs.transition_from_identity }}
+          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-1
+          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-1
           titanium-commit: ${{ needs.resolve.outputs.titanium }}
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
@@ -68,10 +79,10 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-stage-1
+          restore-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-1
           require-restore: "true"
-          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-stage-2
-          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-stage-2
+          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-2
+          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-2
           titanium-commit: ${{ needs.resolve.outputs.titanium }}
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
@@ -91,10 +102,10 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-stage-2
+          restore-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-2
           require-restore: "true"
-          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-stage-3
-          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-stage-3
+          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-3
+          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-3
           titanium-commit: ${{ needs.resolve.outputs.titanium }}
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
@@ -114,10 +125,10 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-stage-3
+          restore-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-3
           require-restore: "true"
-          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-stage-4
-          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-stage-4
+          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-4
+          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-4
           titanium-commit: ${{ needs.resolve.outputs.titanium }}
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
@@ -137,10 +148,10 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-stage-4
+          restore-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-4
           require-restore: "true"
-          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-stage-5
-          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-stage-5
+          save-key: kiwi-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-5
+          final-cache-key: kiwi-incremental-upstream-${{ needs.resolve.outputs.titanium }}-${{ github.run_id }}-stage-5
           titanium-commit: ${{ needs.resolve.outputs.titanium }}
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
