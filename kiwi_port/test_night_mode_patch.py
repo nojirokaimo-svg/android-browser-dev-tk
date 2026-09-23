@@ -7,6 +7,13 @@ ROOT = Path(__file__).resolve().parent
 
 
 class NightModePatchTest(unittest.TestCase):
+    def test_single_tab_resume_card_is_disabled_without_disabling_tab_restore(self):
+        text = (ROOT / 'patches/190-disable-single-tab-resumption.patch').read_text()
+        self.assertIn('SingleTabModuleBuilder.java', text)
+        self.assertIn('+        return false;', text)
+        self.assertNotIn('TabPersistentStore', text)
+        self.assertNotIn('closeAllTabs', text)
+
     def test_registry_and_all_six_presets_are_present(self):
         registry = (ROOT / "patches/040-preference-registry.patch").read_text()
         self.assertIn('"titanium.night_mode_preset"', registry)

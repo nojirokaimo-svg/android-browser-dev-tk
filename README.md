@@ -1,5 +1,24 @@
 # Titanium Browser for Android
 
+## Titanium-Kiwi incremental upstream updates
+
+The `codex/kiwi-ui-port` workflow applies the feature-scoped patches in
+`kiwi_port/patches/series.json` to pinned Titanium, Vanadium, and Chromium
+commits. The current target is Titanium `v153.0.8010.47`.
+
+Patch-level transitions restore an exact immutable completed `out/Default`
+checkpoint, prepare the new pinned source tree, regenerate GN metadata, and let
+Ninja rebuild dirty edges across staged jobs. The workflow never runs a clean
+build, deletes `out/Default`, overwrites an existing cache key, or falls back to
+an older or empty cache.
+
+If a transition fails, keep the last completed cache intact, fix the named
+feature patch or build configuration, and push a new commit. Regenerate patch
+checksums in `series.json`, update matching before/after hashes in
+`manifest.json`, then run `python3 kiwi_port/verify_series.py` and the Kiwi port
+unit tests before restarting the staged build. Best-effort reapplication names
+the conflicting feature and target files while applying independent features.
+
 [![Stars](https://img.shields.io/github/stars/jqssun/android-titanium-browser?label=Stars&logo=GitHub)](https://github.com/jqssun/android-titanium-browser)
 [![GitHub](https://img.shields.io/github/downloads/jqssun/android-titanium-browser/total?label=GitHub&logo=GitHub)](https://github.com/jqssun/android-titanium-browser/releases)
 [![license](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://github.com/jqssun/android-titanium-browser/blob/main/LICENSE)

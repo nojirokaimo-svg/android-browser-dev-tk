@@ -84,18 +84,23 @@ def patch_owned_files():
     }
 
 
-def restore(source, cache_key, manifest, legacy, identity, bootstrap_current=False):
+def restore(source, cache_key, manifest, legacy, identity, bootstrap_current=False,
+            transition_from_identity=None):
     out = source / "out/Default"
     state_path = out / STATE
     previous = None
     bootstrapped = False
+    upstream_transition = False
+    source_epoch_ns = None
 
     if state_path.is_file():
         state = json.loads(state_path.read_text())
-        if state["identity"] != identity:
+        if state["identity"] != identity and state["identity"] != transition_from_identity:
             raise RuntimeError(
                 "Cache source/toolchain identity changed; preserving cache and stopping"
             )
+        upstream_transition = state["identity"] != identity
+        source_epoch_ns = state.get("source_epoch_ns")
         previous = state["files"]
     elif cache_key == legacy["cache_key"]:
         previous = {
@@ -127,6 +132,12 @@ def restore(source, cache_key, manifest, legacy, identity, bootstrap_current=Fal
             for name in names
         }
 
+    if upstream_transition:
+        # This is an explicit one-way transition from an immutable completed
+        # checkpoint.  Make the prepared upstream tree newer than cached outputs,
+        # while leaving enough wall-clock margin for GN/Ninja writes.
+        source_epoch_ns = time.time_ns() - 2 * 10**9
+
     # Fresh checkouts have new mtimes and would make Ninja rebuild already cached
     # objects.  Age source files only.  Never enter any out/ or .git/ directory,
     # and never touch .ninja_log, build.ninja, args.gn, objects, or generated files
@@ -141,7 +152,8 @@ def restore(source, cache_key, manifest, legacy, identity, bootstrap_current=Fal
         for name in files:
             p = Path(directory) / name
             if name != ".git" and not p.is_symlink():
-                os.utime(p, ns=(AGE_NS, AGE_NS))
+                stamp = source_epoch_ns if source_epoch_ns is not None else AGE_NS
+                os.utime(p, ns=(stamp, stamp))
 
     now = time.time_ns()
     changed = []
@@ -149,7 +161,10 @@ def restore(source, cache_key, manifest, legacy, identity, bootstrap_current=Fal
     for name, p in paths.items():
         old = previous.get(name)
         different = old is None or old["sha256"] != current[name]
-        stamp = now if different else old["mtime_ns"]
+        if source_epoch_ns is not None:
+            stamp = source_epoch_ns
+        else:
+            stamp = now if different else old["mtime_ns"]
         if different:
             changed.append(name)
         if p.is_file():
@@ -161,18 +176,27 @@ def restore(source, cache_key, manifest, legacy, identity, bootstrap_current=Fal
     # Only metadata is written into out/Default.  The Ninja database, GN files,
     # object files and generated build outputs remain byte-for-byte untouched.
     state_path.write_text(
-        json.dumps({"identity": identity, "files": records}, indent=2) + "\n"
+        json.dumps({
+            "identity": identity,
+            "source_epoch_ns": source_epoch_ns,
+            "files": records,
+        }, indent=2) + "\n"
     )
     plan = {
         "cache_key": cache_key,
         "identity": identity,
         "bootstrapped_exact_checkpoint": bootstrapped,
-        "changed_sources": changed,
+        "changed_sources": (
+            ["<upstream-source-transition>", *changed]
+            if upstream_transition else changed
+        ),
         "tracked_sources": len(records),
+        "upstream_transition": upstream_transition,
+        "source_epoch_ns": source_epoch_ns,
     }
     (out / PLAN).write_text(json.dumps(plan, indent=2) + "\n")
     print(json.dumps(plan, indent=2))
-    return changed
+    return plan["changed_sources"]
 
 
 def main():
@@ -188,6 +212,13 @@ def main():
             "state. The caller must first prove source-producing inputs are unchanged."
         ),
     )
+    parser.add_argument(
+        "--transition-from-identity",
+        help=(
+            "Allow a single explicit source transition from this exact previous "
+            "identity while preserving the restored output checkpoint."
+        ),
+    )
     args = parser.parse_args()
     restore(
         args.source.resolve(),
@@ -196,6 +227,7 @@ def main():
         json.loads((HERE / "legacy-cache-source-hashes.json").read_text()),
         args.identity,
         bootstrap_current=args.bootstrap_current,
+        transition_from_identity=args.transition_from_identity,
     )
 
 

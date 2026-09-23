@@ -1,5 +1,24 @@
 # ChatGPT Project Handoff — Titanium Android Browser
 
+## 2026-09-23: v153.0.8010.47 transition from Build #146
+
+- Baseline: Build #146 / `8816925c2c1c0f2b96c723a4b5f7509c2816cb56`.
+- Target Titanium: `1c05bb4cb552b54bbcfc29ee6f208be4d8129b36`.
+- Target Vanadium: `9919fca315ddb291441122f7c694bd1cb74be33e`.
+- Target Chromium: `73934a44f61e6b3878d1943064c141a5a820f5f7`
+  (`153.0.8010.47`).
+- Stage 1 restores only the immutable Build #146 completed cache. The explicit
+  source-identity transition preserves Ninja history, stamps the new source
+  epoch, installs the prepared `.47` GN arguments, and regenerates GN metadata.
+  Later stages retain that epoch so rebuilt outputs are reused and remaining
+  old edges stay dirty. No clean, cache deletion, overwrite, or fallback is
+  permitted.
+- Feature patch `190-disable-single-tab-resumption.patch` disables only the
+  Single Tab Magic Stack module that shows “Continue with this tab”. It does
+  not delete restored tabs or alter `TabPersistentStore`.
+- GitHub Actions is authoritative for APK, v2 signature, artifact hash,
+  feature-patch reapplication, and final cache verification.
+
 Last updated: 2026-09-19 JST
 
 ## Start here

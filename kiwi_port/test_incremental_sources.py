@@ -12,6 +12,69 @@ from incremental_sources import AGE_NS, PLAN, STATE, digest, restore
 
 
 class IncrementalTest(unittest.TestCase):
+    def test_upstream_transition_preserves_cache_and_keeps_unrebuilt_edges_dirty(self):
+        original_patch_owned_files = incremental_sources.patch_owned_files
+        self.addCleanup(
+            setattr, incremental_sources, 'patch_owned_files', original_patch_owned_files)
+        incremental_sources.patch_owned_files = lambda: set()
+
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp)
+            out = source/'out/Default'
+            out.mkdir(parents=True)
+            (out/'args.gn').write_text(
+                'target_cpu = "arm64"\n'
+                'chrome_public_manifest_package = "io.github.nojirokaimo.titaniumkiwi"\n'
+                'is_debug = false\n'
+                'is_official_build = true\n'
+                'symbol_level = 0\n'
+                'generate_linker_map = false\n'
+                'blink_symbol_level = 0\n'
+                'v8_symbol_level = 0\n'
+                'treat_warnings_as_errors = false\n'
+            )
+            for name in ('unchanged.cc', 'changed.cc'):
+                (source/name).write_text(name)
+            old_output = out/'unchanged.o'
+            old_output.write_text('cached')
+            os.utime(old_output, ns=(AGE_NS + 1, AGE_NS + 1))
+            state = {
+                'identity': 'old-upstream',
+                'files': {
+                    name: {'sha256': digest(source/name), 'mtime_ns': AGE_NS}
+                    for name in ('unchanged.cc', 'changed.cc')
+                },
+            }
+            (out/STATE).write_text(json.dumps(state))
+            (source/'changed.cc').write_text('new upstream source')
+            manifest = {'files': dict.fromkeys(('unchanged.cc', 'changed.cc'))}
+
+            with contextlib.redirect_stdout(io.StringIO()):
+                changed = restore(
+                    source, 'build-146', manifest, {'cache_key': '', 'files': {}},
+                    'new-upstream', transition_from_identity='old-upstream')
+
+            self.assertIn('<upstream-source-transition>', changed)
+            plan = json.loads((out/PLAN).read_text())
+            self.assertTrue(plan['upstream_transition'])
+            epoch = plan['source_epoch_ns']
+            self.assertGreater(epoch, old_output.stat().st_mtime_ns)
+            self.assertEqual((source/'unchanged.cc').stat().st_mtime_ns, epoch)
+            self.assertEqual((source/'changed.cc').stat().st_mtime_ns, epoch)
+
+            # A later stage must keep source timestamps at the transition epoch so
+            # old, not-yet-rebuilt edges stay dirty while completed edges are reused.
+            rebuilt = out/'changed.o'
+            rebuilt.write_text('rebuilt')
+            os.utime(rebuilt, ns=(epoch + 1, epoch + 1))
+            with contextlib.redirect_stdout(io.StringIO()):
+                restore(
+                    source, 'stage-2', manifest, {'cache_key': '', 'files': {}},
+                    'new-upstream')
+            self.assertEqual((source/'unchanged.cc').stat().st_mtime_ns, epoch)
+            self.assertLess(old_output.stat().st_mtime_ns, epoch)
+            self.assertGreater(rebuilt.stat().st_mtime_ns, epoch)
+
     def test_100_actions_restore_edit_and_continue(self):
         original_patch_owned_files = incremental_sources.patch_owned_files
         self.addCleanup(

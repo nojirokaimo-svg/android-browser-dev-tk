@@ -21,18 +21,22 @@ inputs:
     description: Repository revision that created a checkpoint lacking provenance. Empty disables one-time bootstrap.
     required: false
     default: ""
+  transition-from-identity:
+    description: Exact previous source identity allowed for one patch-level upstream transition.
+    required: false
+    default: ""
   titanium-commit:
     required: false
-    default: "7584b534f6e1f9c29e8bb98df71d7610960a5db3"
+    default: "1c05bb4cb552b54bbcfc29ee6f208be4d8129b36"
   vanadium-commit:
     required: false
-    default: "02d87ad8e17aee77d0fea49d122349a5da87ed2e"
+    default: "9919fca315ddb291441122f7c694bd1cb74be33e"
   chromium-commit:
     required: false
-    default: "507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c"
+    default: "73934a44f61e6b3878d1943064c141a5a820f5f7"
   chromium-version:
     required: false
-    default: "153.0.8010.36"
+    default: "153.0.8010.47"
   patch-mode:
     description: strict for pinned builds; best-effort for a newly resolved upstream.
     required: false
@@ -171,10 +175,22 @@ runs:
         if [[ -n '${{ inputs.bootstrap-revision }}' ]]; then
           bootstrap_args+=(--bootstrap-current)
         fi
+        transition_args=()
+        if [[ -n '${{ inputs.transition-from-identity }}' ]]; then
+          transition_args+=(--transition-from-identity '${{ inputs.transition-from-identity }}')
+          generated=work/titanium/chromium/src/out/.kiwi-prepare-generated/args.gn
+          test -f "$generated"
+          cp "$generated" work/titanium/chromium/src/out/Default/args.gn
+        fi
         python3 kiwi_port/incremental_sources.py work/titanium/chromium/src \
           --cache-key '${{ inputs.restore-key }}' \
           --identity '${{ inputs.titanium-commit }}:${{ inputs.vanadium-commit }}:${{ inputs.chromium-commit }}:validation' \
-          "${bootstrap_args[@]}"
+          "${bootstrap_args[@]}" \
+          "${transition_args[@]}"
+        if [[ -n '${{ inputs.transition-from-identity }}' ]]; then
+          export PATH="$GITHUB_WORKSPACE/work/depot_tools:$PATH"
+          (cd work/titanium/chromium/src && gn gen out/Default)
+        fi
 
     - name: Continue arm64 APK compilation within the stage budget
       id: compile

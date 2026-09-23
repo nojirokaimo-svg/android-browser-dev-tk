@@ -1,9 +1,9 @@
 {
-  "titanium_commit": "80ffcdf1cebe51cddc593f571a6f26c3374aea2e",
-  "chromium_commit": "506c834ecceaa943c5f41e6cfe7f68acb5c45346",
-  "vanadium_commit": "150a27e23302cc265baf8a7fb7c0f0112bddf2fd",
-  "chromium_version": "152.0.7977.64",
-  "scope": "Kiwi-style core app menu, extension action rows, compact popup shape, startup preference registry, and six Chromium 152 Night mode presets",
+  "titanium_commit": "1c05bb4cb552b54bbcfc29ee6f208be4d8129b36",
+  "chromium_commit": "73934a44f61e6b3878d1943064c141a5a820f5f7",
+  "vanadium_commit": "9919fca315ddb291441122f7c694bd1cb74be33e",
+  "chromium_version": "153.0.8010.47",
+  "scope": "Build 146 Kiwi UI, extension, migration, backup, credentials, six Night mode presets, and disabled single-tab resume card on Chromium 153.0.8010.47",
   "complete_kiwi_ui_port": false,
   "files": {
     "chrome/android/chrome_java_resources.gni": {
@@ -109,6 +109,10 @@
     "third_party/blink/renderer/platform/graphics/dark_mode_settings_builder.h": {
       "before_sha256": "217229378c7bb83b6de507fa20fc355374e622607c43e2e66e49be1671d08f33",
       "after_sha256": "383112119bee8415df6c0394c25e76d0ce62d13cbf50b33152aa3253fb65a3a5"
+    },
+    "chrome/browser/single_tab/android/java/src/org/chromium/chrome/browser/single_tab/SingleTabModuleBuilder.java": {
+      "before_sha256": "9fc951a0bdce5032c3806d819f65fc782b5f6a707e4fbedb8d1577576ffcec12",
+      "after_sha256": "98232807185d0352b56766b574e9b8278bbe122e3685a7eff51197da0b10afeb"
     },
     "third_party/blink/renderer/platform/graphics/dark_mode_filter_test.cc": {
       "before_sha256": "093682608b2ce4ad1cd23675bc80f424a91d16ae36494eae598b88b9cb997265",

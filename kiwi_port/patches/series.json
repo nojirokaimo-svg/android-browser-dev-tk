@@ -243,6 +243,15 @@
         "chrome/browser/android/cookies/cookies_fetcher_restore_util.cc"
       ],
       "sha256": "840e80daebbee3a9e96aa9223a6507f5bc489d9d8bada4f04bb7062b5fcbfa76"
+    },
+    {
+      "id": "disable-single-tab-resumption",
+      "name": "Keep restored tabs visible by disabling the single-tab resume card",
+      "patch": "190-disable-single-tab-resumption.patch",
+      "files": [
+        "chrome/browser/single_tab/android/java/src/org/chromium/chrome/browser/single_tab/SingleTabModuleBuilder.java"
+      ],
+      "sha256": "fedc9e403158d49ce80f977bce07be6f252bae1a96c050bf89e905d568dd34a0"
     }
   ]
 }
