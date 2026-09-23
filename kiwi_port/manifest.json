@@ -19,8 +19,8 @@
       "after_sha256": "584e17ca31623b8e7d129f805ff372e350996fd01d4dfda5a6dfa0acae1105d9"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java": {
-      "before_sha256": null,
-      "after_sha256": null
+      "before_sha256": "5bc49448b90cd757443a488677cddf5ecc9655a8496fe60e9f946c238ed9952e",
+      "after_sha256": "75c2367bb50473e1c9c3e2964e0c6048f2cec51a5a9ee2a6699a3ea75bcc708c"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java": {
       "before_sha256": "e37d1f6a8fb3e92cbd8f5fb2763ebcc7ebafc9b0b81f9d8dd90b6e93d563155b",

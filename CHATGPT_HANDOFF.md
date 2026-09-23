@@ -1,5 +1,31 @@
 # ChatGPT Project Handoff — Titanium Android Browser
 
+## 2026-09-24: Build #150 clipboard follow-up completed
+
+Build #150, run `35927329664`, commit
+`9099484be06bb034d1efd4d120e9bd8aa1262dd0`, restored the exact immutable
+Build #149 checkpoint and succeeded in stage 11. It verified all 22 feature
+patches, ran 19 repository tests successfully, and applied the complete patch
+series to the prepared v153.0.8010.52 source tree.
+
+The APK is 324,184,408 bytes and Android v2 signature verification succeeded.
+APK SHA-256:
+`3d62524b3f69a666507704aa3e2ba3eb47a95522e1cd375fffaa4520c31965b9`.
+Artifact ZIP SHA-256:
+`1ade241813369addd8cf4cc0abccb339851ecc7d2f0c43c15de56c5049fe7219`.
+Artifact: https://github.com/nojirokaimo-svg/android-titanium-browser/actions/runs/35927329664/artifacts/10780479140.
+The completed immutable output is
+`kiwi-incremental-153-9099484be06bb034d1efd4d120e9bd8aa1262dd0-stage-11`.
+
+The actual prepared-tree hashes measured by the runner are now authoritative:
+
+- `ChromeTabbedActivity.java` before `5bc49448b90cd757443a488677cddf5ecc9655a8496fe60e9f946c238ed9952e`, after `75c2367bb50473e1c9c3e2964e0c6048f2cec51a5a9ee2a6699a3ea75bcc708c`.
+- `clipboard_provider.cc` before `b3df287914e67863f616adbd8bd16b893fe4938ca21da54083e17ddd7e77525d`, after `5e94ea7d1dc5945db80357b9dcb4417c41c14c15b46393d1b6d8bd1afa826470`.
+- `clipboard_recent_content.cc` before `baaca5b46c8d0e945f7002d21ed4ded02ec983d7f0637929abeb5ce652902920`, after `0411ad4cdd1345f6b4a24e04a533f92a4552962b242e077f8923e2dab309987b`.
+
+The clipboard row change is compiled and statically verified. It is not yet
+confirmed on the user's device; do not describe it as device-verified.
+
 ## 2026-09-24: Build #149 APK and new-tab clipboard follow-up
 
 Build #149, commit `1e12cd8c1de871752c41e476d85960875dae2cc7`,
@@ -14,8 +40,8 @@ The next feature patch extends the NTP candidate to one day while keeping
 short-lived suggestions outside NTP, then rebuilds changed sources from that
 exact completed checkpoint. Recheck with a copied URL and text on device;
 static tests cannot establish the user's device result. The exact pre/post
-ChromeTabbedActivity.java hashes must still be read from the next prepared
-.52 build and recorded in `kiwi_port/manifest.json`.
+ChromeTabbedActivity.java hashes were measured by Build #150 and recorded in
+`kiwi_port/manifest.json`.
 
 ## 2026-09-23: Exact continuation after Build #148 stage 5
 
