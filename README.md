@@ -6,7 +6,7 @@ This repository contains custom Android browser changes, build tooling, and expe
 
 ## Development
 
-Active development is carried out on the `codex/kiwi-ui-port` branch.
+This repository is used for ongoing Android browser development and testing.
 
 The project uses Chromium with upstream work derived from:
 
