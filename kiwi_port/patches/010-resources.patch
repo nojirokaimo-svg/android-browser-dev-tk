@@ -13,25 +13,27 @@ index 7d53b3fcb2528fc88927242763cc5d7870c8d61b..1899980ceafa84ca6bebe5f6f26e6417
    "java/res/anim/activity_open_enter.xml",
 diff --git a/chrome/android/java/res/values-ja/kiwi_ui.xml b/chrome/android/java/res/values-ja/kiwi_ui.xml
 new file mode 100644
-index 0000000000000000000000000000000000000000..f86b54ec780be765d0045ac76b9c9ff74ad495a8
+index 0000000000000000000000000000000000000000..e2ddf8910050379d8c60970a47507bfc0e82907b
 --- /dev/null
 +++ b/chrome/android/java/res/values-ja/kiwi_ui.xml
-@@ -0,0 +1,5 @@
+@@ -0,0 +1,6 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<resources>
 +    <string name="kiwi_night_mode_on">Nightモードをオン</string>
 +    <string name="kiwi_night_mode_off">Nightモードをオフ</string>
++    <string name="kiwi_clipboard_link">コピーしたリンク</string>
 +</resources>
 diff --git a/chrome/android/java/res/values/kiwi_ui.xml b/chrome/android/java/res/values/kiwi_ui.xml
 new file mode 100644
-index 0000000000000000000000000000000000000000..6173e1dd5a62fdcf1bdecc5636f49326a5f948d3
+index 0000000000000000000000000000000000000000..3295e4b176f8c1c3f05331075fde9e0b5d7603e4
 --- /dev/null
 +++ b/chrome/android/java/res/values/kiwi_ui.xml
-@@ -0,0 +1,7 @@
+@@ -0,0 +1,8 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<resources>
 +    <item name="kiwi_extension_action_menu_id" type="id" />
 +    <item name="kiwi_night_mode_menu_id" type="id" />
 +    <string name="kiwi_night_mode_on">Turn on Night mode</string>
 +    <string name="kiwi_night_mode_off">Turn off Night mode</string>
++    <string name="kiwi_clipboard_link">Link you copied</string>
 +</resources>

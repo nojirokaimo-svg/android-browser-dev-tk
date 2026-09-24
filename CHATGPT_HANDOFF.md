@@ -1,3 +1,32 @@
+## 2026-09-24: Build #153 still did not display copied link
+
+The user installed Build #153 and reports that the copied-link suggestion never
+appears, even for a moment, on an empty new-tab omnibox. APK compilation is not
+device verification. Attempts in Builds #150/#152/#153 modified the native C++
+provider (age, group, formats), yet did not make a row visible. The Android Java
+UI currently only renders native clipboard matches and can thus display an empty
+suggestion list when native ClipboardMap or autocomplete fails.
+
+Feature patch 200 now also includes a Java UI candidate in
+AutocompleteMediator/AutocompleteMatch/ClipboardSuggestionProcessor. The focused
+NTP's empty URL field checks Android ClipboardManager.hasPrimaryClip() without
+reading clipboard contents; it shows the row immediately and retains it across
+empty native result callbacks. Tapping reads the current clipboard text and
+calls AutocompleteMediator.loadPastedText() to classify URL versus search.
+Typing returns to ordinary suggestions. The copied-link label is in English
+and Japanese via feature patch 010. The user must test the next signed APK on
+the actual device; Java test additions by themselves do not prove UI behavior.
+
+Build #153 / commit `6891fb00adc2c3adfacf23e893c8827d8f89502d`
+completed at 2026-09-24 02:27:36 UTC (run 35944736196). Its immutable
+`out/Default` key is
+`kiwi-incremental-153-6891fb00adc2c3adfacf23e893c8827d8f89502d-stage-11`,
+confirmed in the stage-11 job log. Restore that exact literal key for the next
+build. Cache miss must stop without cold build, deletion, or older fallback.
+Preserve Ninja logs, deps, object files, and generated outputs. Do not claim
+this Java-side change fixed the UI until the user sees the row and tapping it
+on the installed APK.
+
 ## 2026-09-24: Build #152 also did not show the clipboard row
 
 The user tested Build #152 on a device and reports that the new-tab omnibox
@@ -162,8 +191,8 @@ Last updated: 2026-09-19 JST
 
 This file exists so a different ChatGPT account can resume the project after connecting the same GitHub account.
 
-Repository: `nojirokaimo-svg/android-titanium-browser`
-Visibility: **Private**
+Repository: `nojirokaimo-svg/android-browser-dev-tk` (renamed from `android-titanium-browser`)
+Visibility: **Public**
 Fork status: **Standalone / detached from the original fork network**
 Default branch: `main`
 Active development branch: `codex/kiwi-ui-port`
@@ -477,3 +506,4 @@ Preserve the exact M153 build cache and do not clean `out/Default`.
 User reported that normal backup works but **Create migration backup** crashes. Root cause in `185-portable-full-backup.patch`: the standalone `KiwiFullBackupActivity` export path called `ProfileManager.getLastUsedRegularProfile()`, `PasswordStoreBridge`, and cookie JNI before Chromium native/profile startup. The restore path already performed synchronous startup, but export did not.
 
 Fix: `createPortableBackup()` now calls `ChromeBrowserInitializer.getInstance().handleSynchronousStartup()` before obtaining the regular profile. No cache/build workflow changes; preserve the exact M153 `out/Default` cache and never clean/fall back.
+

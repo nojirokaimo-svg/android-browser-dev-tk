@@ -3,7 +3,7 @@
   "chromium_commit": "78e5e45d4bb41035e17ea4da2cc257f496416ac9",
   "vanadium_commit": "2aaf9dfc919e620564409f94beedaedca5301e81",
   "chromium_version": "153.0.8010.52",
-  "scope": "Build 146 Kiwi UI, extensions, migration, backups, credentials and six Night mode presets on Chromium 153.0.8010.52; preserve active tab after inactivity; create an empty new-tab copied-link candidate from Android clipboard formats without relying on its native timestamp and read its current content on selection",
+  "scope": "Build 146 Kiwi UI, extensions, migration, backups, credentials and six Night mode presets on Chromium 153.0.8010.52; preserve active tab after inactivity; show an Android UI-owned copied-link row on empty new tabs if native clipboard formats return no match; classify current clipboard text as URL/search when tapped",
   "complete_kiwi_ui_port": false,
   "files": {
     "chrome/android/chrome_java_resources.gni": {
@@ -12,11 +12,11 @@
     },
     "chrome/android/java/res/values-ja/kiwi_ui.xml": {
       "before_sha256": null,
-      "after_sha256": "66c2785bc1b0cb8143a74354b8740e72f5deac22bda8f3f8341581de33dd5f14"
+      "after_sha256": "54e9cd1b2547cac54549e428223dade90c0273f0d94a58f5fbd3d30b40051920"
     },
     "chrome/android/java/res/values/kiwi_ui.xml": {
       "before_sha256": null,
-      "after_sha256": "584e17ca31623b8e7d129f805ff372e350996fd01d4dfda5a6dfa0acae1105d9"
+      "after_sha256": "749be76e52dfa7d4ecbbb133182947cc2a52835de753584e8cbda040927359d9"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java": {
       "before_sha256": "5bc49448b90cd757443a488677cddf5ecc9655a8496fe60e9f946c238ed9952e",
@@ -137,6 +137,22 @@
     "components/omnibox/browser/clipboard_provider_unittest.cc": {
       "before_sha256": "36f406c27309bac2734739a876f6773062139cf6754daaf23800583fe740d88b",
       "after_sha256": "3cc10fe3e7c5f5640e01d18edcc3718639425a926af144d464272262c65b3cda"
+    },
+    "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java": {
+      "before_sha256": "0867e4645b07636fb55e4cba3884160370f84662eb156ab0c954dd6afa30025e",
+      "after_sha256": "3a80da728e38f5ebfff1f86d3fff03cad293591c84b46331888d6e2b96f7ee18"
+    },
+    "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java": {
+      "before_sha256": "f5066905ea389a32274179e5baea3461321032ad7048e1d277a19fc275c7444b",
+      "after_sha256": "841436162a1e2c782bf35edacaf471bcf6fad25bf7f37b1cf1140e4a9668f6ea"
+    },
+    "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/clipboard/ClipboardSuggestionProcessor.java": {
+      "before_sha256": "bbc29d408bca7d7119d648b83002b2630192f3d15fac9afbeb8120f4e74dcaf8",
+      "after_sha256": "2b6d051ea0c70ddaaddbfb9240b70eb2e8150a9592a99f22247c9af2523ad56c"
+    },
+    "components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java": {
+      "before_sha256": "111b755e4d0fd12f1f1795ea2a3c9c95ae9f45bbd7a627daddfc4c70d2ef13e1",
+      "after_sha256": "2cad89d674dab40d12c28970ac6679084152256d7c8c29d3462e9fd8414c4b10"
     }
   }
 }

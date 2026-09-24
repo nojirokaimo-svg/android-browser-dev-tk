@@ -11,7 +11,7 @@
         "chrome/android/java/res/values/kiwi_ui.xml",
         "chrome/android/java/res/values-ja/kiwi_ui.xml"
       ],
-      "sha256": "613163e95e7d3de4266459350395b5b0027c42f4b23b9d40eada41436d8fa7b7"
+      "sha256": "ae9ec35ee2389a8f74a365145555f2ac8537ade37a51cfb6fd8c3cb2561dbe96"
     },
     {
       "id": "app-menu-actions",
@@ -264,16 +264,20 @@
     },
     {
       "id": "new-tab-clipboard-only",
-      "name": "Show a live clipboard link instead of history on empty Android new-tab omnibox",
+      "name": "Show a real clipboard row on new tabs with Android UI fallback and live tap routing",
       "patch": "200-new-tab-clipboard-only.patch",
       "files": [
         "components/omnibox/browser/autocomplete_controller.cc",
         "components/omnibox/browser/clipboard_provider.cc",
         "components/omnibox/browser/clipboard_provider.h",
         "components/omnibox/browser/clipboard_provider_unittest.cc",
-        "components/open_from_clipboard/clipboard_recent_content.cc"
+        "components/open_from_clipboard/clipboard_recent_content.cc",
+        "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java",
+        "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java",
+        "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/clipboard/ClipboardSuggestionProcessor.java",
+        "components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java"
       ],
-      "sha256": "04f3ab83a56dbfb6a37e529bdf4e46fd5bff146ab5557445d2ec32228cf1f13c"
+      "sha256": "780e6cfabf4d6ca21b06b263bcbe99750307b804519d7f0f49e780fb7476a580"
     }
   ]
 }

@@ -27,10 +27,10 @@ jobs:
         with:
           # Resume is deliberately exact: never fall back to an older/empty
           # checkpoint and never start another cold multi-hour compile.
-          restore-key: kiwi-incremental-153-92becf4647069d88aa8e59491282422c3ec70d62-stage-11
+          restore-key: kiwi-incremental-153-6891fb00adc2c3adfacf23e893c8827d8f89502d-stage-11
           require-restore: "true"
-          # Build #152 saved the signed APK and immutable stage-11 output.
-          # Recompile the clipboard-provider changes while retaining Ninja outputs.
+          # Build #153 saved the signed APK and immutable stage-11 output.
+          # Recompile the Android clipboard UI fallback while retaining Ninja outputs.
           bootstrap-revision: ""
           transition-from-identity: ""
           save-key: kiwi-153-${{ github.sha }}-stage-11

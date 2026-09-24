@@ -2,27 +2,24 @@
 
 ## New-tab clipboard candidate
 
-Build #152 also fails to show the copied-link row on the user's device.
-The previous changes only extended the default clipboard age and changed its
-suggestion group. Neither guarantees that a match is created: the generic
-clipboard provider rejects an unknown native modification time (and field
-trials may override its default age) before checking clipboard formats.
-The current feature patch instead queries Android clipboard *formats* on an
-empty new-tab omnibox, without reading the value or depending on its age or
-URL classification. If plain text or URL is present, it creates one
-"Copied link" placeholder in the dedicated clipboard group. Tapping it reads
-the current clipboard text: Chromium's existing paste handling opens valid
-URLs and searches other text. Other pages retain the existing age guard.
-The new Android provider regression tests cover a missing timestamp, URL
-navigation, and text search. A successful build alone cannot verify that the
-row is rendered on the user's device; check the signed APK there.
+Build #153 compiled and signed an APK, but the user confirmed on 2026-09-24
+that the copied-link row still never appears on the device. The C++ candidate
+was gated by Android clipboard format reporting and native suggestion delivery.
+The new feature patch adds a Java UI fallback at omnibox focus: for an empty
+new tab with a primary clipboard item, display one localized "Copied link"
+row immediately. When native results arrive without a clipboard suggestion,
+the Java row stays visible; native clipboard matches remain preferred.
+History is hidden only in that empty new-tab context. Tapping the Java row
+reads the **current** clipboard text and invokes Chromium's URL/search
+classifier. Copied links therefore open in the current tab and copied text
+searches; ordinary typed suggestions still work. The fallback does not read
+clipboard text before the user's tap.
 
-Build #150 extended the default age to 24 hours, but the user confirmed
-the row did not appear. Build #152 routed the candidate to Android's
-dedicated clipboard group; the user confirmed that did not appear either.
-Those earlier attempts remain in the patch history for traceability. The
-new-tab path now depends on Android's current clipboard formats and reads
-the actual contents only after the user taps the row.
+Three Android mediator unit tests cover focus/empty native results, updated
+clipboard URL navigation, copied-text search, and hiding new-tab history.
+The repository's patch checks and Python unit tests do not execute these Android
+unit tests. A successful CI APK proves only that the feature compiled; its
+appearance on a device remains unverified until a user installs and tests it.
 
 ## Titanium-Kiwi incremental upstream updates
 
@@ -40,9 +37,11 @@ build. Its immutable checkpoint is
 `kiwi-incremental-153-9099484be06bb034d1efd4d120e9bd8aa1262dd0-stage-11`.
 Build #151 subsequently saved immutable checkpoint
 `kiwi-incremental-153-addbe54fe875cd72e8c0c1543930ea0549fef857-stage-11`.
-Build #152 saved a newer completed immutable checkpoint,
+Build #152 saved checkpoint
 `kiwi-incremental-153-92becf4647069d88aa8e59491282422c3ec70d62-stage-11`.
-The workflow restores this exact literal key for the next fix and keeps
+Build #153 saved the newer completed checkpoint
+`kiwi-incremental-153-6891fb00adc2c3adfacf23e893c8827d8f89502d-stage-11`.
+The Java fallback build restores this exact literal #153 key and keeps
 `.ninja_log`, `.ninja_deps`, object files, and generated outputs. A cache miss
 stops before source preparation. The upstream-update workflow separately
 requires `incremental_cache_key` and matching `transition_from_identity`.
@@ -53,13 +52,11 @@ Scheme v2. APK SHA-256:
 The artifact ZIP SHA-256 is
 `1ade241813369addd8cf4cc0abccb339851ecc7d2f0c43c15de56c5049fe7219`.
 Build #150 compiled the earlier candidate, but the user confirmed it did not
-appear on the device. The dedicated-group correction needs a new APK and
-device confirmation.
+appear on the device. Build #153 also needs a device-visible correction; the Java fallback above is awaiting a new APK and device confirmation.
 
 On Android, returning after a long pause retains the selected tab instead of
 creating/selecting an NTP. The NTP itself can still be opened intentionally.
-Focusing its empty toolbar URL field is intended to show a recent clipboard
-link/text suggestion; typing restores normal search/history suggestions. Selecting the
+Focusing its empty toolbar URL field with an available clipboard item is intended to show one copied-link row; typing restores normal search/history suggestions. Selecting the
 clipboard row uses Chromium's existing URL navigation or text search handling.
 
 If a transition fails, keep the last completed cache intact, fix the named
@@ -169,3 +166,4 @@ To build these releases yourself via CI (e.g. GitHub Actions), fork this reposit
 ## Credits
 
 This project would not have been possible without the huge community contributions from [Vanadium](https://github.com/GrapheneOS/Vanadium), and without the privacy-focused, open-source approach shared by various other Chromium projects. All credit goes to the original authors and contributors. This project started around the same time as [Helium Browser for Linux](https://github.com/imputnet/helium-linux) but it is not affiliated with the desktop Helium project.
+

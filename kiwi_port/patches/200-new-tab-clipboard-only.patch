@@ -254,3 +254,390 @@ diff --git a/components/open_from_clipboard/clipboard_recent_content.cc b/compon
  #else
    int default_maximum_age = base::Minutes(10).InSeconds();
  #endif  // BUILDFLAG(IS_ANDROID)
+diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java
+index ebb0164a2bdc405816002b89f36c675729cb93a3..83dc89016bf8256986ffc49b7af1a7cadd035f45 100644
+--- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java
++++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java
+@@ -9,8 +9,11 @@ import static org.chromium.build.NullUtil.assumeNonNull;
+ import android.animation.Animator;
+ import android.animation.AnimatorListenerAdapter;
+ import android.app.Activity;
++import android.content.ClipData;
++import android.content.ClipboardManager;
+ import android.content.Context;
+ import android.content.Intent;
++import android.net.Uri;
+ import android.os.Handler;
+ import android.os.SystemClock;
+ import android.text.TextUtils;
+@@ -184,6 +187,7 @@ class AutocompleteMediator
+ 
+     private @Nullable AutocompleteController mAutocomplete;
+     private @Nullable AutocompleteResult mAutocompleteResult;
++    private @Nullable AutocompleteMatch mKiwiClipboardCandidate;
+     private @Nullable Runnable mCurrentAutocompleteRequest;
+     private @Nullable PropertyModel mDeleteDialogModel;
+ 
+@@ -424,7 +428,20 @@ class AutocompleteMediator
+     void startZeroSuggest() {
+         if (!isInInputSession()) return;
+ 
+-        if (OmniboxFeatures.sServeJavaCachedZeroSuggest.isEnabled()) {
++        // The native provider can return an empty result on Android even though the
++        // system clipboard still contains a link. Show the UI-owned row on focus so
++        // it does not depend on JNI clipboard format detection or network results.
++        if (isKiwiNewTabClipboardContext(mAutocompleteInput) && hasKiwiClipboard()) {
++            showSuggestions(
++                    mAutocompleteInput,
++                    AutocompleteResult.fromCache(
++                            List.of(getOrCreateKiwiClipboardCandidate()),
++                            mAutocompleteResult == null ? null : mAutocompleteResult.getGroupsInfo()),
++                    false);
++        }
++
++        if (!isKiwiNewTabClipboardContext(mAutocompleteInput)
++                && OmniboxFeatures.sServeJavaCachedZeroSuggest.isEnabled()) {
+             // Serve suggestions anticipating higher latency from the server?
+             serveCachedZeroSuggest(mAutocompleteInput);
+         }
+@@ -432,6 +449,89 @@ class AutocompleteMediator
+         fetchZeroSuggest();
+     }
+ 
++    private static boolean isKiwiNewTabClipboardContext(@Nullable AutocompleteInput input) {
++        if (input == null
++                || !input.isInZeroPrefixContext()
++                || !TextUtils.isEmpty(input.getUserText())) {
++            return false;
++        }
++        int page = input.getPageClassification();
++        return page == PageClassification.NTP
++                || page == PageClassification.INSTANT_NTP_WITH_OMNIBOX_AS_STARTING_FOCUS
++                || page == PageClassification.NTP_REALBOX
++                || page == PageClassification.NTP_ACTION_CHIPS;
++    }
++
++    private boolean hasKiwiClipboard() {
++        try {
++            ClipboardManager clipboard =
++                    (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
++            // hasPrimaryClip() is independent of the Android text classifier and the
++            // native ClipboardMap MIME-format cache. It does not read clipboard text.
++            return clipboard != null && clipboard.hasPrimaryClip();
++        } catch (RuntimeException ignored) {
++            // Android may deny clipboard access while the activity loses focus.
++            return false;
++        }
++    }
++
++    private @Nullable String readKiwiClipboardText() {
++        try {
++            ClipboardManager clipboard =
++                    (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
++            ClipData data = clipboard == null ? null : clipboard.getPrimaryClip();
++            if (data == null || data.getItemCount() == 0) return null;
++            // Reading after the user's tap avoids Android's unsolicited clipboard
++            // notification. Do not coerce content:// URIs into readable file content.
++            ClipData.Item item = data.getItemAt(0);
++            CharSequence text = item.getText();
++            Uri uri = item.getUri();
++            String copied;
++            if (text != null) {
++                copied = text.toString().trim();
++            } else if (uri != null
++                    && ("https".equals(uri.getScheme()) || "http".equals(uri.getScheme()))) {
++                copied = uri.toString();
++            } else {
++                return null;
++            }
++            return copied.isEmpty() ? null : copied;
++        } catch (RuntimeException ignored) {
++            return null;
++        }
++    }
++
++    private AutocompleteMatch getOrCreateKiwiClipboardCandidate() {
++        if (mKiwiClipboardCandidate == null) {
++            mKiwiClipboardCandidate =
++                    AutocompleteMatch.createKiwiClipboardCandidate(
++                            mContext.getString(org.chromium.chrome.R.string.kiwi_clipboard_link));
++        }
++        return mKiwiClipboardCandidate;
++    }
++
++    private AutocompleteResult maybeAddKiwiClipboardCandidate(
++            AutocompleteInput input, AutocompleteResult result) {
++        if (!isKiwiNewTabClipboardContext(input)) {
++            mKiwiClipboardCandidate = null;
++            return result;
++        }
++        if (!hasKiwiClipboard()) {
++            mKiwiClipboardCandidate = null;
++            // Native clipboard detection may fail while returning unrelated history.
++            return AutocompleteResult.fromCache(List.of(), result.getGroupsInfo());
++        }
++        for (AutocompleteMatch match : result.getSuggestionsList()) {
++            if (match.getType() == OmniboxSuggestionType.CLIPBOARD_URL
++                    || match.getType() == OmniboxSuggestionType.CLIPBOARD_TEXT) {
++                mKiwiClipboardCandidate = null;
++                return result;
++            }
++        }
++        return AutocompleteResult.fromCache(
++                List.of(getOrCreateKiwiClipboardCandidate()), result.getGroupsInfo());
++    }
++
+     /** Save AutocompleteResult to Cache for early serving. */
+     private void maybeCacheResult(AutocompleteResult result) {
+         if (!isInInputSession()
+@@ -752,6 +852,19 @@ class AutocompleteMediator
+             AutocompleteMatch suggestion, int matchIndex, GURL url, int modifiers) {
+         if (!isInInputSession()) return;
+ 
++        if (suggestion.isKiwiClipboardCandidate()) {
++            // Read only on an explicit tap, then use Chromium's paste classifier
++            // to navigate for URLs and search for other copied text.
++            String text = readKiwiClipboardText();
++            if (!TextUtils.isEmpty(text)) {
++                loadPastedText(
++                        text,
++                        SystemClock.uptimeMillis(),
++                        AutocompleteCoordinator.NavigationTarget.CURRENT_TAB);
++            }
++            return;
++        }
++
+         if (suggestion.getTakeoverAction() != null) {
+             onOmniboxActionClicked(suggestion.getTakeoverAction(), matchIndex);
+             return;
+@@ -805,6 +918,7 @@ class AutocompleteMediator
+     public void onSuggestionTouchDown(
+             AutocompleteMatch suggestion, int matchIndex, long eventTime) {
+         if (!isInInputSession()) return;
++        if (suggestion.isKiwiClipboardCandidate()) return;
+         if (mNumTouchDownEventForwardedInOmniboxSession
+                 >= OmniboxFeatures.getMaxPrefetchesPerOmniboxSession()) {
+             return;
+@@ -1117,6 +1231,10 @@ class AutocompleteMediator
+         if (!isInInputSession()) return;
+         if (mShouldPreventOmniboxAutocomplete) return;
+ 
++        if (!isKiwiNewTabClipboardContext(mAutocompleteInput)) {
++            mKiwiClipboardCandidate = null;
++        }
++
+         if (mAutocompleteInput.getAutocompleteState() != AutocompleteState.ENABLED) {
+             return;
+         }
+@@ -1198,7 +1316,10 @@ class AutocompleteMediator
+             mAutocomplete.startPrewarm(webContents);
+         }
+ 
+-        showSuggestions(mAutocompleteInput, autocompleteResult, isFinal);
++        showSuggestions(
++                mAutocompleteInput,
++                maybeAddKiwiClipboardCandidate(mAutocompleteInput, autocompleteResult),
++                isFinal);
+     }
+ 
+     /**
+@@ -1903,6 +2024,7 @@ class AutocompleteMediator
+ 
+         mDropdownViewInfoListManager.clear();
+         mAutocompleteResult = null;
++        mKiwiClipboardCandidate = null;
+     }
+ 
+     /**
+diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java
+index becf26c6d4bdd82963a352735fdb569615ab4370..ee4e408c5dabd79c5fe34d699668c51571ccd8a8 100644
+--- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java
++++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java
+@@ -29,6 +29,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
+ import static org.mockito.Mockito.when;
+ 
+ import android.app.Activity;
++import android.content.ClipData;
++import android.content.ClipboardManager;
+ import android.content.Context;
+ import android.os.Handler;
+ import android.view.ContextThemeWrapper;
+@@ -648,6 +650,79 @@ public class AutocompleteMediatorUnitTest {
+         mMediator.onSuggestionsReceived(AutocompleteResult.fromCache(mSuggestionsList, null), true);
+     }
+ 
++    @Test
++    @SmallTest
++    public void kiwiClipboardCandidate_shownOnNewTabEvenWhenNativeReturnsEmpty() {
++        ClipboardManager clipboard =
++                (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
++        clipboard.setPrimaryClip(ClipData.newPlainText("link", "https://example.com/first"));
++        try {
++            mMediator.beginInput(
++                    createSession(
++                            JUnitTestGURLs.NTP_URL,
++                            "New Tab Page",
++                            PageClassification.INSTANT_NTP_WITH_OMNIBOX_AS_STARTING_FOCUS));
++            assertEquals(1, mMediator.getSuggestionCount());
++            assertTrue(mMediator.getSuggestionAt(0).isKiwiClipboardCandidate());
++
++            mMediator.onSuggestionsReceived(AutocompleteResult.fromCache(null, null), true);
++            assertEquals(1, mMediator.getSuggestionCount());
++            assertTrue(mMediator.getSuggestionAt(0).isKiwiClipboardCandidate());
++
++            // Selection reads the current clipboard, not the content present on focus.
++            clipboard.setPrimaryClip(ClipData.newPlainText("link", "https://example.com/second"));
++            GURL destination = new GURL("https://example.com/second");
++            when(mAutocompleteController.classify("https://example.com/second"))
++                    .thenReturn(createExactUrlMatch(destination));
++            mMediator.onSuggestionClicked(
++                    mMediator.getSuggestionAt(0), 0, GURL.emptyGURL(), /* modifiers= */ 0);
++            verifyLoadUrl(destination);
++        } finally {
++            clipboard.clearPrimaryClip();
++        }
++    }
++
++    @Test
++    @SmallTest
++    public void kiwiClipboardCandidate_copiedWordsAreClassifiedAsSearch() {
++        ClipboardManager clipboard =
++                (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
++        clipboard.setPrimaryClip(ClipData.newPlainText("words", "copied words"));
++        try {
++            mMediator.beginInput(
++                    createSession(
++                            JUnitTestGURLs.NTP_URL,
++                            "New Tab Page",
++                            PageClassification.NTP));
++            when(mAutocompleteController.classify("copied words"))
++                    .thenReturn(createSearchSuggestMatch());
++            mMediator.onSuggestionClicked(
++                    mMediator.getSuggestionAt(0), 0, GURL.emptyGURL(), /* modifiers= */ 0);
++            verifyLoadUrl(JUnitTestGURLs.SEARCH_URL);
++        } finally {
++            clipboard.clearPrimaryClip();
++        }
++    }
++
++    @Test
++    @SmallTest
++    public void kiwiClipboardCandidate_noClipboardHidesNewTabHistory_butTypingRestoresResults() {
++        ClipboardManager clipboard =
++                (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
++        clipboard.clearPrimaryClip();
++        var session =
++                createSession(JUnitTestGURLs.NTP_URL, "New Tab Page", PageClassification.NTP);
++        mMediator.beginInput(session);
++        mMediator.onSuggestionsReceived(
++                AutocompleteResult.fromCache(mSuggestionsList, null), true);
++        assertEquals(0, mMediator.getSuggestionCount());
++
++        session.getAutocompleteInput().setUserText("example");
++        mMediator.onSuggestionsReceived(
++                AutocompleteResult.fromCache(mSuggestionsList, null), true);
++        assertEquals(mSuggestionsList.size(), mMediator.getSuggestionCount());
++    }
++
+     @Test
+     public void setSessionState_mobileMode_emptyOmnibox() {
+         // In Mobile mode, if LocationBar clears the Page URL on focus, Autocomplete requests
+diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/clipboard/ClipboardSuggestionProcessor.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/clipboard/ClipboardSuggestionProcessor.java
+index 79511773f5d091db3268b8d6cb50092305f16242..10f9b73a5eff7830f224f0c1dc65ec3d24bc200f 100644
+--- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/clipboard/ClipboardSuggestionProcessor.java
++++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/clipboard/ClipboardSuggestionProcessor.java
+@@ -101,7 +101,11 @@ public class ClipboardSuggestionProcessor extends BaseSuggestionViewProcessor {
+         model.set(SuggestionViewProperties.TEXT_LINE_2_TEXT, textLine2);
+ 
+         updateSuggestionIcon(suggestion, model, showContent);
+-        updateActionButton(suggestion, model, showContent);
++        // The local row has no native match from which the reveal action could read content.
++        // Its main click reads the current clipboard and opens/searches it instead.
++        if (!suggestion.isKiwiClipboardCandidate()) {
++            updateActionButton(suggestion, model, showContent);
++        }
+     }
+ 
+     /**
+@@ -198,6 +202,10 @@ public class ClipboardSuggestionProcessor extends BaseSuggestionViewProcessor {
+ 
+     @Override
+     protected void onSuggestionClicked(AutocompleteMatch suggestion, int position, int modifiers) {
++        if (suggestion.isKiwiClipboardCandidate()) {
++            super.onSuggestionClicked(suggestion, position, modifiers);
++            return;
++        }
+         if (!suggestion.getUrl().isEmpty()) {
+             super.onSuggestionClicked(suggestion, position, modifiers);
+             return;
+diff --git a/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java b/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
+index 15f8c3f58480b229918465722c6eaae8303d5d26..8437610fc433ea43fb96779d5d4daee7b2533ec9 100644
+--- a/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
++++ b/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
+@@ -73,6 +73,8 @@ public class AutocompleteMatch {
+     }
+ 
+     private final int mType;
++    // UI-only new-tab row. It has no native match and is never serialized.
++    private boolean mKiwiClipboardCandidate;
+     private final Set<Integer> mSubtypes;
+     private final boolean mIsSearchType;
+     private final @OmniboxSuggestionKind int mSuggestionKind;
+@@ -208,6 +210,57 @@ public class AutocompleteMatch {
+         updatePostContentType(postContentType);
+     }
+ 
++    /**
++     * Creates a display-only clipboard row for a new tab when the native clipboard provider does
++     * not return a match. The mediator reads the clipboard on selection and classifies its current
++     * text. This match never has a native counterpart.
++     */
++    public static AutocompleteMatch createKiwiClipboardCandidate(String description) {
++        AutocompleteMatch match =
++                new AutocompleteMatch(
++                        OmniboxSuggestionType.CLIPBOARD_URL,
++                        Collections.emptySet(),
++                        false,
++                        OmniboxSuggestionKind.NAVIGATION,
++                        0,
++                        0,
++                        "",
++                        Collections.emptyList(),
++                        description,
++                        List.of(new MatchClassification(0, MatchClassificationStyle.NONE)),
++                        null,
++                        0,
++                        "",
++                        GURL.emptyGURL(),
++                        GURL.emptyGURL(),
++                        null,
++                        false,
++                        StarterPackId.NONE,
++                        null,
++                        null,
++                        GroupId.GROUP_MOBILE_CLIPBOARD_VALUE,
++                        false,
++                        null,
++                        false,
++                        0,
++                        null,
++                        null,
++                        false,
++                        "",
++                        "",
++                        null,
++                        null,
++                        null,
++                        DocumentType.NONE);
++        match.mKiwiClipboardCandidate = true;
++        return match;
++    }
++
++    /** Whether this row is generated by the Android UI rather than the native provider. */
++    public boolean isKiwiClipboardCandidate() {
++        return mKiwiClipboardCandidate;
++    }
++
+     private void updatePostContentType(@Nullable String postContentType) {
+         if (TextUtils.isEmpty(postContentType)) {
+             mExtraHeaders.remove("Content-Type");
