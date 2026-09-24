@@ -35,7 +35,7 @@
       "after_sha256": "ab7463bf4ffc8441c830906da8436435d2044cf6955b2b59374323f14e7e2686"
     },
     "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java": {
-      "before_sha256": "75035fb3d3c7a845397b42169b990360911720168b8039a650e9001983593b9f",
+      "before_sha256": "b87a62a477b8cd4634759c3217e7d5c7adc24f2030433c2b6e5aca29575f542d",
       "after_sha256": "8119a0ca9108c5d986ae651e5545ae8570dc67c64caf87c8d9309ad85d196021"
     },
     "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinator.java": {

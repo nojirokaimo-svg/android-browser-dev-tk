@@ -1,21 +1,28 @@
 # Titanium Browser for Android
 
-## Pending: tab-search setting and browser dark surfaces
+## Tab-search setting and browser dark surfaces (Build #157)
 
-The next staged build adds **Search tabs** under Settings > Tabs and tab groups.
+Build #157 adds **Search tabs** under Settings > Tabs and tab groups.
 It defaults to off, hiding the search field in the tab switcher; enabling the
 setting restores the search field. Settings > Appearance also offers an optional
 dark surface color: default palette, black, two dark gray presets, and a custom
 `#RRGGBB` value. A custom color is applied to browser-owned settings surfaces,
 history, menus and submenus, dialogs and sheets in dark mode. The default
-palette and light mode retain their current behavior. These changes require a
-signed APK and device inspection before their visual coverage can be claimed.
+palette and light mode retain their current behavior. Build #157 completed a signed APK; their exact visual coverage requires device
+inspection, including any externally hosted password-manager surfaces.
 
 Build #156 (2026-09-24, commit `fe51b864d2987e96a7a691f68ad6b4df94420330`,
 run `35990362979`) succeeded and saved the exact completed incremental cache
 `kiwi-incremental-153-fe51b864d2987e96a7a691f68ad6b4df94420330-stage-11`.
-The next build must restore that literal key, fail on cache miss, and preserve
-Ninja's logs, dependencies, objects and generated outputs. The user confirmed
+Build #157 restored that literal key, preserved Ninja's logs, dependencies,
+objects and generated outputs, and saved completed checkpoint
+`kiwi-incremental-153-7c2a317e5db05e1b647eeba4e5010081906f0615-stage-11`.
+Its Android v2 signed APK SHA-256 is
+`1c912b4f381ce43a69638777102a24a9fc81438774870d6c4972e045883611d4`.
+The ZIP artifact SHA-256 is
+`58f9ecaedfa6bc9c7b381af1326d2acd36b178d1f5c376496c68d8c784dabdcd`.
+All 11 changed post-Titanium UI source files matched the manifest after hashes;
+the measured pre-Titanium Kiwi patch hash for `AppMenu.java` is also recorded. The user confirmed
 on a device that #156 **displays** the copied-link row. Tapping the row to
 navigate/search has not yet been explicitly confirmed.
 
