@@ -123,6 +123,20 @@ def restore(source, cache_key, manifest, legacy, identity, bootstrap_current=Fal
         | set(previous or {})
         | patch_owned_files()
     )
+    # A checkpoint from a prior same-upstream continuation may contain sources
+    # changed after the original upstream transition. Older versions stamped
+    # these changes with the transition's *old* epoch, so Ninja could compile
+    # dependent Java code while reusing stale classes and Android resources.
+    # Retry only those recorded inputs once, without touching cached outputs.
+    retry_sources = set()
+    prior_plan_path = out / PLAN
+    if source_epoch_ns is not None and not upstream_transition and prior_plan_path.is_file():
+        prior_plan = json.loads(prior_plan_path.read_text())
+        if prior_plan.get("identity") == identity and not prior_plan.get("upstream_transition"):
+            retry_sources = {
+                name for name in prior_plan.get("changed_sources", [])
+                if name in names and previous.get(name, {}).get("mtime_ns") == source_epoch_ns
+            }
     paths = {name: checked_path(source, name) for name in names}
     current = {name: digest(p) for name, p in paths.items()}
 
@@ -161,11 +175,12 @@ def restore(source, cache_key, manifest, legacy, identity, bootstrap_current=Fal
     for name, p in paths.items():
         old = previous.get(name)
         different = old is None or old["sha256"] != current[name]
-        if source_epoch_ns is not None:
+        needs_rebuild = different or name in retry_sources
+        if upstream_transition:
             stamp = source_epoch_ns
         else:
-            stamp = now if different else old["mtime_ns"]
-        if different:
+            stamp = now if needs_rebuild else old["mtime_ns"]
+        if needs_rebuild:
             changed.append(name)
         if p.is_file():
             os.utime(p, ns=(stamp, stamp))

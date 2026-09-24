@@ -41,10 +41,17 @@ Build #152 saved checkpoint
 `kiwi-incremental-153-92becf4647069d88aa8e59491282422c3ec70d62-stage-11`.
 Build #153 saved the newer completed checkpoint
 `kiwi-incremental-153-6891fb00adc2c3adfacf23e893c8827d8f89502d-stage-11`.
-The Java fallback build restores this exact literal #153 key and keeps
-`.ninja_log`, `.ninja_deps`, object files, and generated outputs. A cache miss
-stops before source preparation. The upstream-update workflow separately
-requires `incremental_cache_key` and matching `transition_from_identity`.
+Build #154 restored that key but failed while compiling the new Java fallback:
+the persisted upstream-transition source epoch predated the compiled objects,
+so the edited `AutocompleteMatch.java` and resource XML were treated as old.
+The missing method and `R.string.kiwi_clipboard_link` errors reflect stale
+compiled dependencies. The job saved its 16 GB partial `out/Default` at
+`kiwi-153-295f56e0c1b01000326e3f86a7fde470b767b965-stage-11`.
+The next build restores this **exact literal key**. Source timestamp recovery
+requeues the six changed inputs recorded by #154 while retaining `.ninja_log`,
+`.ninja_deps`, object files, and generated outputs. A cache miss stops before
+source preparation. The upstream-update workflow separately requires
+`incremental_cache_key` and matching `transition_from_identity`.
 
 Build #150 produced a 324,184,408-byte APK, verified with Android APK Signature
 Scheme v2. APK SHA-256:
@@ -52,7 +59,9 @@ Scheme v2. APK SHA-256:
 The artifact ZIP SHA-256 is
 `1ade241813369addd8cf4cc0abccb339851ecc7d2f0c43c15de56c5049fe7219`.
 Build #150 compiled the earlier candidate, but the user confirmed it did not
-appear on the device. Build #153 also needs a device-visible correction; the Java fallback above is awaiting a new APK and device confirmation.
+appear on the device. Build #153 also failed the device-visible requirement;
+#154 did not produce an APK. The Java fallback is awaiting a new signed APK
+and device confirmation.
 
 On Android, returning after a long pause retains the selected tab instead of
 creating/selecting an NTP. The NTP itself can still be opened intentionally.
@@ -166,4 +175,3 @@ To build these releases yourself via CI (e.g. GitHub Actions), fork this reposit
 ## Credits
 
 This project would not have been possible without the huge community contributions from [Vanadium](https://github.com/GrapheneOS/Vanadium), and without the privacy-focused, open-source approach shared by various other Chromium projects. All credit goes to the original authors and contributors. This project started around the same time as [Helium Browser for Linux](https://github.com/imputnet/helium-linux) but it is not affiliated with the desktop Helium project.
-

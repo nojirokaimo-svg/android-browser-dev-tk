@@ -25,12 +25,11 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Resume is deliberately exact: never fall back to an older/empty
-          # checkpoint and never start another cold multi-hour compile.
-          restore-key: kiwi-incremental-153-6891fb00adc2c3adfacf23e893c8827d8f89502d-stage-11
+          # Build #154 saved this 16 GB checkpoint after the Java compile error.
+          # Resume it exactly; corrected source mtimes rebuild the missed edges.
+          restore-key: kiwi-153-295f56e0c1b01000326e3f86a7fde470b767b965-stage-11
           require-restore: "true"
-          # Build #153 saved the signed APK and immutable stage-11 output.
-          # Recompile the Android clipboard UI fallback while retaining Ninja outputs.
+          # Retain .ninja_log, .ninja_deps, generated files and all object files.
           bootstrap-revision: ""
           transition-from-identity: ""
           save-key: kiwi-153-${{ github.sha }}-stage-11

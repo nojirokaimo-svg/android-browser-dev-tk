@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import shutil
 import tempfile
+import time
 import unittest
 
 import incremental_sources
@@ -12,6 +13,70 @@ from incremental_sources import AGE_NS, PLAN, STATE, digest, restore
 
 
 class IncrementalTest(unittest.TestCase):
+    def test_retries_source_stamped_before_failed_checkpoint_output(self):
+        original_patch_owned_files = incremental_sources.patch_owned_files
+        self.addCleanup(
+            setattr, incremental_sources, 'patch_owned_files', original_patch_owned_files)
+        incremental_sources.patch_owned_files = lambda: set()
+
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp)
+            out = source/'out/Default'
+            out.mkdir(parents=True)
+            (out/'args.gn').write_text(
+                'target_cpu = "arm64"\n'
+                'chrome_public_manifest_package = "io.github.nojirokaimo.titaniumkiwi"\n'
+                'is_debug = false\n'
+                'is_official_build = true\n'
+                'symbol_level = 0\n'
+                'generate_linker_map = false\n'
+                'blink_symbol_level = 0\n'
+                'v8_symbol_level = 0\n'
+                'treat_warnings_as_errors = false\n'
+            )
+            prior_epoch = time.time_ns() - 60 * 10**9
+            for name in ('changed.java', 'unchanged.java'):
+                (source/name).write_text(name)
+            (out/STATE).write_text(json.dumps({
+                'identity': 'same-upstream',
+                'source_epoch_ns': prior_epoch,
+                'files': {
+                    name: {'sha256': digest(source/name), 'mtime_ns': prior_epoch}
+                    for name in ('changed.java', 'unchanged.java')
+                },
+            }))
+            (out/PLAN).write_text(json.dumps({
+                'identity': 'same-upstream',
+                'upstream_transition': False,
+                'changed_sources': ['changed.java'],
+            }))
+            prior_output = out/'java.jar'
+            prior_output.write_text('old compiled classes')
+            os.utime(prior_output, ns=(prior_epoch + 1, prior_epoch + 1))
+            manifest = {'files': dict.fromkeys(('changed.java', 'unchanged.java'))}
+
+            with contextlib.redirect_stdout(io.StringIO()):
+                changed = restore(
+                    source, 'failed-stage-11', manifest,
+                    {'cache_key': '', 'files': {}}, 'same-upstream')
+
+            self.assertEqual(changed, ['changed.java'])
+            self.assertGreater((source/'changed.java').stat().st_mtime_ns,
+                               prior_output.stat().st_mtime_ns)
+            self.assertEqual((source/'unchanged.java').stat().st_mtime_ns, prior_epoch)
+            self.assertEqual(prior_output.read_text(), 'old compiled classes')
+
+            # The first continuation schedules the missing edge; subsequent
+            # checkpoints must not rebuild it again after it completes.
+            compiled_stamp = (source/'changed.java').stat().st_mtime_ns + 1
+            os.utime(prior_output, ns=(compiled_stamp, compiled_stamp))
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(restore(
+                    source, 'next-stage', manifest,
+                    {'cache_key': '', 'files': {}}, 'same-upstream'), [])
+            self.assertLess((source/'changed.java').stat().st_mtime_ns,
+                            prior_output.stat().st_mtime_ns)
+
     def test_upstream_transition_preserves_cache_and_keeps_unrebuilt_edges_dirty(self):
         original_patch_owned_files = incremental_sources.patch_owned_files
         self.addCleanup(

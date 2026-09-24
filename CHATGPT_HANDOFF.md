@@ -1,3 +1,24 @@
+## 2026-09-24: Build #154 stopped at stale Java/resources checkpoint
+
+Build #154, commit `295f56e0c1b01000326e3f86a7fde470b767b965`, run
+`35982630596`, restored the exact completed #153 cache and applied all 22
+feature patches. It failed during `//chrome/browser/ui/android/omnibox:java`
+compilation: `R.string.kiwi_clipboard_link` and
+`AutocompleteMatch.isKiwiClipboardCandidate()` were absent from old generated
+outputs. The repository source files had the new XML/method. The recorded
+upstream-transition `source_epoch_ns` dated to 2026-09-23, before #153's
+cached outputs, and `incremental_sources.py` stamped later source changes
+with that old epoch, so Ninja missed their respective resource/class rebuilds.
+
+The failed job **saved** the 16 GB partial cache at 2026-09-24 10:12:44 UTC:
+`kiwi-153-295f56e0c1b01000326e3f86a7fde470b767b965-stage-11`.
+The next workflow restores this literal key, fails on cache miss, and changes
+timestamps of the six inputs recorded by the previous plan to the current
+time. A regression test demonstrates the old missed dependency and the
+one-time retry. Retain `.ninja_log`, `.ninja_deps`, objects and generated
+outputs. No APK was produced by #154, and the copied-link row still requires
+device verification after a signed build.
+
 ## 2026-09-24: Build #153 still did not display copied link
 
 The user installed Build #153 and reports that the copied-link suggestion never
@@ -21,8 +42,9 @@ Build #153 / commit `6891fb00adc2c3adfacf23e893c8827d8f89502d`
 completed at 2026-09-24 02:27:36 UTC (run 35944736196). Its immutable
 `out/Default` key is
 `kiwi-incremental-153-6891fb00adc2c3adfacf23e893c8827d8f89502d-stage-11`,
-confirmed in the stage-11 job log. Restore that exact literal key for the next
-build. Cache miss must stop without cold build, deletion, or older fallback.
+confirmed in the stage-11 job log. #154 already restored this completed key;
+the failed #154 key above is the next exact continuation. Cache miss must stop
+without cold build, deletion, or older fallback.
 Preserve Ninja logs, deps, object files, and generated outputs. Do not claim
 this Java-side change fixed the UI until the user sees the row and tapping it
 on the installed APK.
@@ -506,4 +528,3 @@ Preserve the exact M153 build cache and do not clean `out/Default`.
 User reported that normal backup works but **Create migration backup** crashes. Root cause in `185-portable-full-backup.patch`: the standalone `KiwiFullBackupActivity` export path called `ProfileManager.getLastUsedRegularProfile()`, `PasswordStoreBridge`, and cookie JNI before Chromium native/profile startup. The restore path already performed synchronous startup, but export did not.
 
 Fix: `createPortableBackup()` now calls `ChromeBrowserInitializer.getInstance().handleSynchronousStartup()` before obtaining the regular profile. No cache/build workflow changes; preserve the exact M153 `out/Default` cache and never clean/fall back.
-
