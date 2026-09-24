@@ -48,7 +48,7 @@
     },
     {
       "id": "night-mode-presets",
-      "name": "Six Kiwi Night mode presets on the Chromium renderer path",
+      "name": "Six Kiwi Night mode presets plus low-CPU startup switches",
       "patch": "050-night-mode-presets.patch",
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java",
@@ -65,7 +65,7 @@
         "third_party/blink/renderer/platform/graphics/dark_mode_settings_builder.h",
         "third_party/blink/renderer/platform/graphics/dark_mode_filter_test.cc"
       ],
-      "sha256": "46389b6ee7ebf4e59527108bbbd9933d8e1b140c520b7eabed377a1c66ace1d7"
+      "sha256": "a72d695802b4029ba35ae39ec88b63f8f3f95a9be87727a162162013a18130a5"
     },
     {
       "id": "runtime-night-mode",
@@ -284,7 +284,7 @@
     },
     {
       "id": "tab-search-setting",
-      "name": "Hide Hub tab search by default and expose an opt-in setting",
+      "name": "Tab search visibility and ultra-low-CPU preference",
       "patch": "205-tab-search-preference.patch",
       "files": [
         "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java",
@@ -294,7 +294,7 @@
         "chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java",
         "chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java"
       ],
-      "sha256": "32d6e319f110566781ccaa309521853f7a67bd2fb9874881db9672ae19ce7a73"
+      "sha256": "8360ee753ee532eeb01f2211220d00eca816c7ecc2c850e27e5bf6d6b59c3a7c"
     },
     {
       "id": "dark-ui-surface-color",

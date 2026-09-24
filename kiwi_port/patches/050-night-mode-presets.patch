@@ -10,7 +10,7 @@ index 6efddf6f939ded1d209165e17575667585668f1f..214231b85f72c15885e8f7620611fd50
  import org.chromium.base.task.AsyncTask;
  import org.chromium.base.task.ChainedTasks;
  import org.chromium.base.task.PostTask;
-@@ -277,6 +278,10 @@ public class ProcessInitializationHandler {
+@@ -277,6 +278,21 @@ public class ProcessInitializationHandler {
          if (BuildConfig.ENABLE_ASSERTS) {
              AllPreferenceKeyRegistries.initializeKnownRegistries();
          }
@@ -18,6 +18,17 @@ index 6efddf6f939ded1d209165e17575667585668f1f..214231b85f72c15885e8f7620611fd50
 +                .appendSwitchWithValue(
 +                        "dark-mode-settings",
 +                        SharedPrefsUtils.getNightModeSettingsSwitchValue());
++        // Keep GPU acceleration enabled. Chromium's generic low-end-device mode disables
++        // hardware acceleration on Android, which can move rendering work back onto the CPU.
++        if (ContextUtils.getApplicationContext()
++                .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
++                .getBoolean("low_cpu_mode", false)) {
++            CommandLine.getInstance().appendSwitch("force-prefers-reduced-motion");
++            CommandLine.getInstance()
++                    .appendSwitchWithValue("animation-duration-scale", "0");
++            CommandLine.getInstance()
++                    .appendSwitchWithValue("renderer-process-limit", "2");
++        }
          // Time this call takes in background from test devices:
          // - Pixel 2: ~10 ms
          // - Nokia 1 (Android Go): 20-200 ms
