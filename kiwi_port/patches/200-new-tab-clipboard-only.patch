@@ -360,7 +360,7 @@ index ebb0164a2bdc405816002b89f36c675729cb93a3..83dc89016bf8256986ffc49b7af1a7ca
 +        if (mKiwiClipboardCandidate == null) {
 +            mKiwiClipboardCandidate =
 +                    AutocompleteMatch.createKiwiClipboardCandidate(
-+                            mContext.getString(org.chromium.chrome.R.string.kiwi_clipboard_link));
++                            mContext.getString(R.string.kiwi_clipboard_link));
 +        }
 +        return mKiwiClipboardCandidate;
 +    }
@@ -641,3 +641,42 @@ index 15f8c3f58480b229918465722c6eaae8303d5d26..8437610fc433ea43fb96779d5d4daee7
      private void updatePostContentType(@Nullable String postContentType) {
          if (TextUtils.isEmpty(postContentType)) {
              mExtraHeaders.remove("Content-Type");
+diff --git a/chrome/browser/ui/android/omnibox/BUILD.gn b/chrome/browser/ui/android/omnibox/BUILD.gn
+--- a/chrome/browser/ui/android/omnibox/BUILD.gn
++++ b/chrome/browser/ui/android/omnibox/BUILD.gn
+@@ -445,6 +445,7 @@
+     "java/res/layout/suggestions_tile_vertical_divider.xml",
+     "java/res/layout/suggestions_tile_view.xml",
+     "java/res/layout/url_action_container.xml",
++    "java/res/values-ja/kiwi_clipboard.xml",
+     "java/res/values-ldrtl/drawables.xml",
+     "java/res/values-night/drawables.xml",
+     "java/res/values-sw600dp-w600dp/dimens.xml",
+@@ -453,6 +454,7 @@
+     "java/res/values/dimens.xml",
+     "java/res/values/drawables.xml",
+     "java/res/values/ids.xml",
++    "java/res/values/kiwi_clipboard.xml",
+     "java/res/values/styles.xml",
+   ]
+ 
+diff --git a/chrome/browser/ui/android/omnibox/java/res/values/kiwi_clipboard.xml b/chrome/browser/ui/android/omnibox/java/res/values/kiwi_clipboard.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..af7886bd35f72338b7af24c45086ee7a48ef30cc
+--- /dev/null
++++ b/chrome/browser/ui/android/omnibox/java/res/values/kiwi_clipboard.xml
+@@ -0,0 +1,4 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <string name="kiwi_clipboard_link">Link you copied</string>
++</resources>
+diff --git a/chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml b/chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..d442231d31df908ea2fb3b55247ecfb12aefba20
+--- /dev/null
++++ b/chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml
+@@ -0,0 +1,4 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <string name="kiwi_clipboard_link">コピーしたリンク</string>
++</resources>

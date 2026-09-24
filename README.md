@@ -44,11 +44,17 @@ Build #153 saved the newer completed checkpoint
 Build #154 restored that key but failed while compiling the new Java fallback:
 the persisted upstream-transition source epoch predated the compiled objects,
 so the edited `AutocompleteMatch.java` and resource XML were treated as old.
-The missing method and `R.string.kiwi_clipboard_link` errors reflect stale
-compiled dependencies. The job saved its 16 GB partial `out/Default` at
+The missing method reflected stale compiled dependencies. The job saved its
+16 GB partial `out/Default` at
 `kiwi-153-295f56e0c1b01000326e3f86a7fde470b767b965-stage-11`.
-The next build restores this **exact literal key**. Source timestamp recovery
-requeues the six changed inputs recorded by #154 while retaining `.ninja_log`,
+Build #155 restored that key, recovered the source timestamps, and rebuilt the
+missing `AutocompleteMatch` method. Its only remaining Java error was
+`org.chromium.chrome.R.string.kiwi_clipboard_link` in the omnibox library. The
+new label now lives in `//chrome/browser/ui/android/omnibox:java_resources`,
+registered in that module's `BUILD.gn` and referenced through its local `R`.
+#155 saved the 16 GB partial checkpoint
+`kiwi-153-366b77e8e43375fb846dfcaf5e22b9de5cf853e2-stage-11`.
+The next build restores this **exact literal key**, keeping `.ninja_log`,
 `.ninja_deps`, object files, and generated outputs. A cache miss stops before
 source preparation. The upstream-update workflow separately requires
 `incremental_cache_key` and matching `transition_from_identity`.
@@ -60,7 +66,7 @@ The artifact ZIP SHA-256 is
 `1ade241813369addd8cf4cc0abccb339851ecc7d2f0c43c15de56c5049fe7219`.
 Build #150 compiled the earlier candidate, but the user confirmed it did not
 appear on the device. Build #153 also failed the device-visible requirement;
-#154 did not produce an APK. The Java fallback is awaiting a new signed APK
+#154 and #155 did not produce an APK. The Java fallback is awaiting a new signed APK
 and device confirmation.
 
 On Android, returning after a long pause retains the selected tab instead of

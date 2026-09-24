@@ -1,3 +1,22 @@
+## 2026-09-24: Build #155 stopped at omnibox-local resource lookup
+
+Build #155, commit `366b77e8e43375fb846dfcaf5e22b9de5cf853e2`, run
+`35986674172`, restored the exact #154 partial cache and rebuilt the previously
+stale `AutocompleteMatch.java` dependency. The missing-method errors vanished.
+Its sole remaining Java compiler error at `AutocompleteMediator.java:508` was
+`org.chromium.chrome.R.string.kiwi_clipboard_link`: the omnibox Java target
+uses package `org.chromium.chrome.browser.omnibox` for its own `R` class, and
+the new string lived in `chrome/android/java/res`. The feature patch now
+registers English and Japanese strings in `omnibox/BUILD.gn` under that
+module's own `java_resources` target and refers to `R.string.kiwi_clipboard_link`.
+The app-level Kiwi Night mode strings remain in patch 010. Tests and patch
+metadata include the new omnibox resource files. Build #155 saved its exact
+16 GB `out/Default` continuation cache at 2026-09-24 10:48:15 UTC:
+`kiwi-153-366b77e8e43375fb846dfcaf5e22b9de5cf853e2-stage-11`.
+The next build must restore precisely this key and keep Ninja's logs, deps,
+objects, and generated outputs. A cache miss must fail without a cold build.
+No APK came from #155. Device-visible behavior remains unverified.
+
 ## 2026-09-24: Build #154 stopped at stale Java/resources checkpoint
 
 Build #154, commit `295f56e0c1b01000326e3f86a7fde470b767b965`, run
@@ -12,7 +31,7 @@ with that old epoch, so Ninja missed their respective resource/class rebuilds.
 
 The failed job **saved** the 16 GB partial cache at 2026-09-24 10:12:44 UTC:
 `kiwi-153-295f56e0c1b01000326e3f86a7fde470b767b965-stage-11`.
-The next workflow restores this literal key, fails on cache miss, and changes
+Build #155 restored this literal key, failed on cache miss, and changed
 timestamps of the six inputs recorded by the previous plan to the current
 time. A regression test demonstrates the old missed dependency and the
 one-time retry. Retain `.ninja_log`, `.ninja_deps`, objects and generated
@@ -35,7 +54,7 @@ reading clipboard contents; it shows the row immediately and retains it across
 empty native result callbacks. Tapping reads the current clipboard text and
 calls AutocompleteMediator.loadPastedText() to classify URL versus search.
 Typing returns to ordinary suggestions. The copied-link label is in English
-and Japanese via feature patch 010. The user must test the next signed APK on
+and Japanese via feature patch 200. The user must test the next signed APK on
 the actual device; Java test additions by themselves do not prove UI behavior.
 
 Build #153 / commit `6891fb00adc2c3adfacf23e893c8827d8f89502d`

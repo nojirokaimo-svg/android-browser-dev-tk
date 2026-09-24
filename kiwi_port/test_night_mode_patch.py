@@ -121,6 +121,22 @@ class NightModePatchTest(unittest.TestCase):
         for path in feature["files"]:
             self.assertIn(path, manifest["files"])
 
+    def test_clipboard_label_is_owned_by_the_omnibox_java_resources(self):
+        patch = (ROOT / "patches/200-new-tab-clipboard-only.patch").read_text()
+        feature = next(
+            item for item in json.loads((ROOT / "patches/series.json").read_text())["features"]
+            if item["id"] == "new-tab-clipboard-only"
+        )
+        for path in (
+            "chrome/browser/ui/android/omnibox/BUILD.gn",
+            "chrome/browser/ui/android/omnibox/java/res/values/kiwi_clipboard.xml",
+            "chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml",
+        ):
+            self.assertIn(path, feature["files"])
+            self.assertIn(path, patch)
+        self.assertIn("mContext.getString(R.string.kiwi_clipboard_link)", patch)
+        self.assertNotIn("mContext.getString(org.chromium.chrome.R.string.kiwi_clipboard_link)", patch)
+
 
 if __name__ == "__main__":
     unittest.main()

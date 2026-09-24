@@ -12,11 +12,11 @@
     },
     "chrome/android/java/res/values-ja/kiwi_ui.xml": {
       "before_sha256": null,
-      "after_sha256": "54e9cd1b2547cac54549e428223dade90c0273f0d94a58f5fbd3d30b40051920"
+      "after_sha256": "66c2785bc1b0cb8143a74354b8740e72f5deac22bda8f3f8341581de33dd5f14"
     },
     "chrome/android/java/res/values/kiwi_ui.xml": {
       "before_sha256": null,
-      "after_sha256": "749be76e52dfa7d4ecbbb133182947cc2a52835de753584e8cbda040927359d9"
+      "after_sha256": "584e17ca31623b8e7d129f805ff372e350996fd01d4dfda5a6dfa0acae1105d9"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java": {
       "before_sha256": "5bc49448b90cd757443a488677cddf5ecc9655a8496fe60e9f946c238ed9952e",
@@ -140,7 +140,7 @@
     },
     "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java": {
       "before_sha256": "0867e4645b07636fb55e4cba3884160370f84662eb156ab0c954dd6afa30025e",
-      "after_sha256": "3a80da728e38f5ebfff1f86d3fff03cad293591c84b46331888d6e2b96f7ee18"
+      "after_sha256": "b7493b0073cdd9d76ad00f1da2289393380b077f4c54edb99f33f86476716a8b"
     },
     "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java": {
       "before_sha256": "f5066905ea389a32274179e5baea3461321032ad7048e1d277a19fc275c7444b",
@@ -153,6 +153,18 @@
     "components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java": {
       "before_sha256": "111b755e4d0fd12f1f1795ea2a3c9c95ae9f45bbd7a627daddfc4c70d2ef13e1",
       "after_sha256": "2cad89d674dab40d12c28970ac6679084152256d7c8c29d3462e9fd8414c4b10"
+    },
+    "chrome/browser/ui/android/omnibox/BUILD.gn": {
+      "before_sha256": "4a6d9b57cf5ee9a6710ccaae678caaf91def45f4fe8227d3a89d6913c81ac7b4",
+      "after_sha256": "ba2f64532bc804a5ed465084c50dfa542f1c1e152e3c3c53c17c9584201b7635"
+    },
+    "chrome/browser/ui/android/omnibox/java/res/values/kiwi_clipboard.xml": {
+      "before_sha256": null,
+      "after_sha256": "27fa01c5ff389d4fc75a537b753d2337b64004ff119997c6a26cd7912978bee9"
+    },
+    "chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml": {
+      "before_sha256": null,
+      "after_sha256": "f1cf73328f71fd06e6eaff1c5cf19b339b6de911f83fea88bbd00d0c508627b0"
     }
   }
 }
