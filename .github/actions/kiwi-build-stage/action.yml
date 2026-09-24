@@ -127,6 +127,26 @@ runs:
         CHROMIUM_VERSION: ${{ inputs.chromium-version }}
       run: ./build_kiwi_ui_arm64.sh
 
+    - name: Preserve the prepared UI source for exact manifest verification
+      if: always() && hashFiles('work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java') != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: kiwi-ui-source-audit-${{ inputs.save-key }}
+        path: |
+          work/titanium/chromium/src/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
+          work/titanium/chromium/src/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
+          work/titanium/chromium/src/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
+          work/titanium/chromium/src/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java
+          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
+          work/titanium/chromium/src/chrome/android/java/res/xml/tabswitcher_preferences.xml
+          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
+          work/titanium/chromium/src/chrome/android/java/res/xml/appearance_preferences.xml
+          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
+          work/titanium/chromium/src/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
+          work/titanium/chromium/src/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
+        if-no-files-found: error
+        retention-days: 7
+
     - name: Restore untouched checkpoint after source preparation
       if: always() && inputs.restore-key != ''
       shell: bash
@@ -264,6 +284,11 @@ runs:
           output/SHA256SUMS.txt
         if-no-files-found: error
         retention-days: 14
+
+    - name: Print APK SHA-256 for verification
+      if: steps.result.outputs.done == 'true'
+      shell: bash
+      run: sha256sum output/Titanium-Kiwi-core-*-arm64-v8a.apk
 
     - name: Upload failure diagnostics
       if: failure()

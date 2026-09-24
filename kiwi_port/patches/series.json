@@ -281,6 +281,33 @@
         "chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml"
       ],
       "sha256": "fb51f584b48f3c9497933d654adf07a97d398d346479caa2f22dfb838e676b2b"
+    },
+    {
+      "id": "tab-search-setting",
+      "name": "Hide Hub tab search by default and expose an opt-in setting",
+      "patch": "205-tab-search-preference.patch",
+      "files": [
+        "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java",
+        "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java",
+        "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java",
+        "chrome/android/java/res/xml/tabswitcher_preferences.xml",
+        "chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java",
+        "chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java"
+      ],
+      "sha256": "32d6e319f110566781ccaa309521853f7a67bd2fb9874881db9672ae19ce7a73"
+    },
+    {
+      "id": "dark-ui-surface-color",
+      "name": "Configurable dark settings, history, menus, flyouts and browser surface palette",
+      "patch": "210-configurable-dark-surfaces.patch",
+      "files": [
+        "chrome/android/java/res/xml/appearance_preferences.xml",
+        "chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java",
+        "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
+        "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
+      ],
+      "sha256": "2ef307ca1210cebd5bb033ed7df91f86c211b4f8cde5d8c035cdd325057d21ac"
     }
   ]
 }

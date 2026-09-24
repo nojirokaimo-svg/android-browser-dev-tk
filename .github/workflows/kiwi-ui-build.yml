@@ -25,9 +25,9 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Build #155 saved this 16 GB checkpoint after the remaining R error.
-          # Resume exactly; omnibox now owns its clipboard string resource.
-          restore-key: kiwi-153-366b77e8e43375fb846dfcaf5e22b9de5cf853e2-stage-11
+          # Build #156 completed and saved this exact immutable out/Default checkpoint.
+          # Keep Ninja history and object files; a cache miss stops the build.
+          restore-key: kiwi-incremental-153-fe51b864d2987e96a7a691f68ad6b4df94420330-stage-11
           require-restore: "true"
           # Retain .ninja_log, .ninja_deps, generated files and all object files.
           bootstrap-revision: ""

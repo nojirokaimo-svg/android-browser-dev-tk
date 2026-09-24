@@ -1,9 +1,28 @@
 # Titanium Browser for Android
 
+## Pending: tab-search setting and browser dark surfaces
+
+The next staged build adds **Search tabs** under Settings > Tabs and tab groups.
+It defaults to off, hiding the search field in the tab switcher; enabling the
+setting restores the search field. Settings > Appearance also offers an optional
+dark surface color: default palette, black, two dark gray presets, and a custom
+`#RRGGBB` value. A custom color is applied to browser-owned settings surfaces,
+history, menus and submenus, dialogs and sheets in dark mode. The default
+palette and light mode retain their current behavior. These changes require a
+signed APK and device inspection before their visual coverage can be claimed.
+
+Build #156 (2026-09-24, commit `fe51b864d2987e96a7a691f68ad6b4df94420330`,
+run `35990362979`) succeeded and saved the exact completed incremental cache
+`kiwi-incremental-153-fe51b864d2987e96a7a691f68ad6b4df94420330-stage-11`.
+The next build must restore that literal key, fail on cache miss, and preserve
+Ninja's logs, dependencies, objects and generated outputs. The user confirmed
+on a device that #156 **displays** the copied-link row. Tapping the row to
+navigate/search has not yet been explicitly confirmed.
+
 ## New-tab clipboard candidate
 
 Build #153 compiled and signed an APK, but the user confirmed on 2026-09-24
-that the copied-link row still never appears on the device. The C++ candidate
+that its copied-link row never appeared on the device. The C++ candidate
 was gated by Android clipboard format reporting and native suggestion delivery.
 The new feature patch adds a Java UI fallback at omnibox focus: for an empty
 new tab with a primary clipboard item, display one localized "Copied link"
@@ -18,8 +37,8 @@ clipboard text before the user's tap.
 Three Android mediator unit tests cover focus/empty native results, updated
 clipboard URL navigation, copied-text search, and hiding new-tab history.
 The repository's patch checks and Python unit tests do not execute these Android
-unit tests. A successful CI APK proves only that the feature compiled; its
-appearance on a device remains unverified until a user installs and tests it.
+unit tests. The row's appearance was confirmed by the user after #156; navigation
+on tap remains to be verified on the device.
 
 ## Titanium-Kiwi incremental upstream updates
 
@@ -54,7 +73,8 @@ new label now lives in `//chrome/browser/ui/android/omnibox:java_resources`,
 registered in that module's `BUILD.gn` and referenced through its local `R`.
 #155 saved the 16 GB partial checkpoint
 `kiwi-153-366b77e8e43375fb846dfcaf5e22b9de5cf853e2-stage-11`.
-The next build restores this **exact literal key**, keeping `.ninja_log`,
+Build #156 completed and superseded this partial checkpoint. The next build
+restores the #156 completed key above, keeping `.ninja_log`,
 `.ninja_deps`, object files, and generated outputs. A cache miss stops before
 source preparation. The upstream-update workflow separately requires
 `incremental_cache_key` and matching `transition_from_identity`.
@@ -66,8 +86,8 @@ The artifact ZIP SHA-256 is
 `1ade241813369addd8cf4cc0abccb339851ecc7d2f0c43c15de56c5049fe7219`.
 Build #150 compiled the earlier candidate, but the user confirmed it did not
 appear on the device. Build #153 also failed the device-visible requirement;
-#154 and #155 did not produce an APK. The Java fallback is awaiting a new signed APK
-and device confirmation.
+#154 and #155 did not produce an APK. The #156 Java fallback displayed the row
+on the user's device; its navigation on selection has not been confirmed.
 
 On Android, returning after a long pause retains the selected tab instead of
 creating/selecting an NTP. The NTP itself can still be opened intentionally.

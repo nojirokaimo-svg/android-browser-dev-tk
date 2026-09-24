@@ -1,0 +1,180 @@
+diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
+index 01f547a..243b566 100644
+--- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
++++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
+@@ -90,6 +90,13 @@ public abstract class TabSwitcherPaneBase extends PaneBase
+     private static final String TAG = "TabSwitcherPaneBase";
+     private static final int ON_SHOWN_IPH_DELAY = 700;
+ 
++    /** Keep the Chromium tab search available, but hide its Hub entrypoint by default. */
++    static boolean isHubSearchBoxAllowed(Context context) {
++        return context.getApplicationContext()
++                .getSharedPreferences("kiwi_tab_ui", Context.MODE_PRIVATE)
++                .getBoolean("show_tab_search", false);
++    }
++
+     private static boolean sShowIphForTesting;
+ 
+     private final MonotonicObservableSupplier<FullButtonData> mEmptyActionButtonDataSupplier =
+@@ -180,6 +187,7 @@ public abstract class TabSwitcherPaneBase extends PaneBase
+             NonNullObservableSupplier<Boolean> xrSpaceModeObservableSupplier,
+             OnClickListener newTabButtonClickListener) {
+         super(paneId, context, onToolbarAlphaChange);
++        mHubSearchBoxVisibilitySupplier.set(isHubSearchBoxAllowed(context));
+         mMenuButtonVisible = shouldShowMenuButton(context);
+         mFactory = factory;
+         mIsIncognito = isIncognito;
+@@ -248,13 +256,22 @@ public abstract class TabSwitcherPaneBase extends PaneBase
+         if (isFocused()) {
+             int screenWidthDp =
+                     mRootView.getContext().getResources().getConfiguration().screenWidthDp;
+-            mHubSearchBoxVisibilitySupplier.set(!HubUtils.isScreenWidthTablet(screenWidthDp));
++            mHubSearchBoxVisibilitySupplier.set(
++                    !HubUtils.isScreenWidthTablet(screenWidthDp)
++                            && isHubSearchBoxAllowed(mRootView.getContext()));
+         }
+     }
+ 
+     @Override
+     public void notifyLoadHint(@LoadHint int loadHint) {
+         boolean isVisible = loadHint == LoadHint.HOT;
++        if (isVisible) {
++            int screenWidthDp =
++                    mRootView.getContext().getResources().getConfiguration().screenWidthDp;
++            mHubSearchBoxVisibilitySupplier.set(
++                    !HubUtils.isScreenWidthTablet(screenWidthDp)
++                            && isHubSearchBoxAllowed(mRootView.getContext()));
++        }
+         mIsVisibleSupplier.set(isVisible);
+         removeDelayedCallbacks();
+ 
+diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
+index 7d8080c..f604268 100644
+--- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
++++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
+@@ -1262,7 +1262,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
+     private void maybeMakeSpaceForSearchBar() {
+         Configuration config = mActivity.getResources().getConfiguration();
+         boolean isTabletOrLandscape = HubUtils.isScreenWidthTablet(config.screenWidthDp);
+-        mMediator.setIsTabletOrLandscape(isTabletOrLandscape);
++        // A hidden search box must not leave its reserved gap above the tab cards.
++        mMediator.setIsTabletOrLandscape(
++                isTabletOrLandscape || !TabSwitcherPaneBase.isHubSearchBoxAllowed(mActivity));
+         if (isTabletOrLandscape) {
+             if (mPinnedTabsCoordinator != null) {
+                 mMediator.maybeTranslatePinnedStrip(
+diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
+index 45fda22..eb04c4b 100644
+--- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
++++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
+@@ -420,14 +420,18 @@ public class TabSwitcherPaneMediator
+ 
+     /** Sets the visibility of the Hub search box. */
+     void setHubSearchBoxVisibility(boolean isVisible) {
+-        mHubSearchBoxVisibilitySupplier.set(isVisible);
++        mHubSearchBoxVisibilitySupplier.set(
++                isVisible && TabSwitcherPaneBase.isHubSearchBoxAllowed(mContext));
+     }
+ 
+     /** Translates the pinned strip to make space for the search box. */
+     void maybeTranslatePinnedStrip(boolean shouldShowSearchBox, boolean forced) {
+         Configuration config = mContext.getResources().getConfiguration();
+         boolean isTabletOrLandscape = HubUtils.isScreenWidthTablet(config.screenWidthDp);
+-        boolean shouldShow = shouldShowSearchBox && !isTabletOrLandscape;
++        boolean shouldShow =
++                shouldShowSearchBox
++                        && !isTabletOrLandscape
++                        && TabSwitcherPaneBase.isHubSearchBoxAllowed(mContext);
+ 
+         mContainerViewModel.set(
+                 ANIMATE_SUPPLEMENTARY_CONTAINER,
+diff --git a/chrome/android/java/res/xml/tabswitcher_preferences.xml b/chrome/android/java/res/xml/tabswitcher_preferences.xml
+index a11482c..141f969 100644
+--- a/chrome/android/java/res/xml/tabswitcher_preferences.xml
++++ b/chrome/android/java/res/xml/tabswitcher_preferences.xml
+@@ -3,4 +3,7 @@
+     <org.chromium.chrome.browser.settings.RadioButtonGroupTabSwitcherPreference
+         android:key="tabswitcher_radio_group"
+         android:persistent="false" />
++    <org.chromium.components.browser_ui.settings.ChromeSwitchPreference
++        android:key="show_tab_search"
++        android:persistent="false" />
+ </PreferenceScreen>
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
+index 22bded8..a9ce1f9 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
+@@ -4,8 +4,11 @@
+ 
+ package org.chromium.chrome.browser.settings;
+ 
++import android.content.Context;
+ import android.os.Bundle;
+ 
++import androidx.preference.Preference;
++
+ import org.chromium.base.supplier.MonotonicObservableSupplier;
+ import org.chromium.base.supplier.ObservableSuppliers;
+ import org.chromium.base.supplier.SettableMonotonicObservableSupplier;
+@@ -13,6 +16,7 @@ import org.chromium.build.annotations.NullMarked;
+ import org.chromium.build.annotations.Nullable;
+ import org.chromium.chrome.R;
+ import org.chromium.components.browser_ui.settings.CustomDividerFragment;
++import org.chromium.components.browser_ui.settings.ChromeSwitchPreference;
+ import org.chromium.components.browser_ui.settings.SettingsFragment;
+ import org.chromium.components.browser_ui.settings.SettingsUtils;
+ 
+@@ -35,6 +39,27 @@ public final class TabSwitcherSettings extends ChromeBaseSettingsFragment
+                         findPreference("tabswitcher_radio_group");
+         assert preference != null;
+         preference.setActivity(requireActivity());
++
++        ChromeSwitchPreference search = findPreference("show_tab_search");
++        assert search != null;
++        search.setTitle(ja ? "タブを検索" : "Search tabs");
++        search.setSummary(
++                ja ? "タブ一覧に検索欄を表示" : "Show the search box in the tab switcher");
++        search.setChecked(
++                requireContext()
++                        .getApplicationContext()
++                        .getSharedPreferences("kiwi_tab_ui", Context.MODE_PRIVATE)
++                        .getBoolean("show_tab_search", false));
++        search.setOnPreferenceChangeListener(
++                (Preference changed, Object newValue) -> {
++                    requireContext()
++                            .getApplicationContext()
++                            .getSharedPreferences("kiwi_tab_ui", Context.MODE_PRIVATE)
++                            .edit()
++                            .putBoolean("show_tab_search", (Boolean) newValue)
++                            .apply();
++                    return true;
++                });
+     }
+ 
+     @Override
+diff --git a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java
+index 7b1f83a..dce484c 100644
+--- a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java
++++ b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java
+@@ -105,8 +105,19 @@ public class HubToolbarMediator {
+                         mPropertyModel.set(SEARCH_LOUPE_VISIBLE, false);
+                     } else {
+                         mPropertyModel.set(APPLY_DELAY_FOR_SEARCH_BOX_ANIMATION, false);
+-                        mPropertyModel.set(SEARCH_BOX_VISIBLE, !isTablet);
+-                        mPropertyModel.set(SEARCH_LOUPE_VISIBLE, isTablet);
++                        boolean tabSearchAllowed =
++                                (focusedPaneId != PaneId.TAB_SWITCHER
++                                                && focusedPaneId != PaneId.INCOGNITO_TAB_SWITCHER)
++                                        || mContext.getApplicationContext()
++                                                .getSharedPreferences("kiwi_tab_ui", Context.MODE_PRIVATE)
++                                                .getBoolean("show_tab_search", false);
++                        mPropertyModel.set(
++                                SEARCH_BOX_VISIBLE,
++                                !isTablet
++                                        && tabSearchAllowed
++                                        && Boolean.TRUE.equals(
++                                                pane.getHubSearchBoxVisibilitySupplier().get()));
++                        mPropertyModel.set(SEARCH_LOUPE_VISIBLE, isTablet && tabSearchAllowed);
+                     }
+                 }
+ 

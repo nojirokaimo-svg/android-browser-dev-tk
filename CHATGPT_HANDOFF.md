@@ -1,3 +1,28 @@
+## 2026-09-24: Build #156 succeeded; new tab and dark-color settings pending
+
+Build #156, commit `fe51b864d2987e96a7a691f68ad6b4df94420330`, run
+`35990362979`, completed the signed APK and immutable `out/Default` checkpoint
+`kiwi-incremental-153-fe51b864d2987e96a7a691f68ad6b4df94420330-stage-11`.
+The user installed it and confirmed that the copied-link suggestion is visible;
+its URL/text navigation on tap was not explicitly confirmed. Prior #153-#155
+notes below record the historical failures, not the current status.
+
+The next changes add feature patches 205 (hide the tab switcher search box by
+default, with Settings > Tabs and tab groups switch) and 210 (optional browser
+dark-surface color under Settings > Appearance). The default color retains the
+existing palette; black, two dark-gray presets and custom readable `#RRGGBB`
+colors target settings, history, primary and secondary app menus, dialogs and
+sheets. Browser-owned sources in the patches are covered; device screenshots
+must verify the actual reach, especially separately hosted password manager
+surfaces. Do not describe this as verified on-device before testing.
+
+Restore the exact #156 stage-11 key above in the next job, stop on a miss, and
+retain `.ninja_log`, `.ninja_deps`, object files and generated outputs. The
+source audit artifact introduced with these changes records actual post-Titanium
+sources so new manifest before/after hashes can be measured and corrected if
+the pinned Chromium fixture differs from prepared Titanium. Do not replace an
+existing immutable cache with a same-key save or start a cold build.
+
 ## 2026-09-24: Build #155 stopped at omnibox-local resource lookup
 
 Build #155, commit `366b77e8e43375fb846dfcaf5e22b9de5cf853e2`, run

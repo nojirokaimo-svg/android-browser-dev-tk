@@ -130,6 +130,15 @@ version_lt() {
 source "$TITANIUM_DIR/patch.sh"
 for kiwi_hash_file in \
   chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java \
+  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java \
+  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java \
+  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java \
+  chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java \
+  chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java \
+  chrome/android/java/res/xml/appearance_preferences.xml \
+  chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java \
+  chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java \
+  components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java \
   components/omnibox/browser/clipboard_provider.cc \
   components/open_from_clipboard/clipboard_recent_content.cc; do
   printf "KIWI_SOURCE_SHA256 before %s " "$kiwi_hash_file"
@@ -145,6 +154,15 @@ fi
 python3 "$KIT_ROOT/kiwi_port/apply.py" "$PWD" "${PATCH_ARGS[@]}"
 for kiwi_hash_file in \
   chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java \
+  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java \
+  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java \
+  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java \
+  chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java \
+  chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java \
+  chrome/android/java/res/xml/appearance_preferences.xml \
+  chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java \
+  chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java \
+  components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java \
   components/omnibox/browser/clipboard_provider.cc \
   components/open_from_clipboard/clipboard_recent_content.cc; do
   printf "KIWI_SOURCE_SHA256 after %s " "$kiwi_hash_file"

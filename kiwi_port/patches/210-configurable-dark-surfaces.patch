@@ -1,0 +1,353 @@
+diff --git a/chrome/android/java/res/xml/appearance_preferences.xml b/chrome/android/java/res/xml/appearance_preferences.xml
+index d5b5533..08b8bd9 100644
+--- a/chrome/android/java/res/xml/appearance_preferences.xml
++++ b/chrome/android/java/res/xml/appearance_preferences.xml
+@@ -35,4 +35,8 @@ exclusive options. -->
+         android:title="@string/bookmark_bar_setting"
+         android:summary="@string/bookmark_bar_setting_subtitle" />
+ 
++    <Preference
++        android:key="kiwi_dark_surface_color"
++        android:order="3" />
++
+ </PreferenceScreen>
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
+index 427570b..506cd29 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
+@@ -4,9 +4,12 @@
+ 
+ package org.chromium.chrome.browser.appearance.settings;
+ 
++import android.app.AlertDialog;
+ import android.content.Context;
+ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
++import android.graphics.Color;
+ import android.os.Bundle;
++import android.widget.EditText;
+ 
+ import androidx.preference.Preference;
+ 
+@@ -39,6 +42,8 @@ import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
+ import org.chromium.components.prefs.PrefChangeRegistrar;
+ import org.chromium.components.prefs.PrefChangeRegistrar.PrefObserver;
+ 
++import java.util.Locale;
++
+ /** Fragment to manage appearance settings. */
+ @NullMarked
+ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -68,6 +73,105 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+         initBookmarkBarPref();
+         initToolbarShortcutPref();
+         initUiThemePref();
++        initDarkSurfaceColorPref();
++    }
++
++    private void initDarkSurfaceColorPref() {
++        Preference preference = findPreference("kiwi_dark_surface_color");
++        assert preference != null;
++        boolean ja = Locale.getDefault().getLanguage().equals("ja");
++        preference.setTitle(ja ? "暗色画面の背景色" : "Dark interface surface color");
++        String chosen =
++                requireContext()
++                        .getApplicationContext()
++                        .getSharedPreferences("kiwi_ui_color", Context.MODE_PRIVATE)
++                        .getString("dark_surface_hex", null);
++        preference.setSummary(
++                chosen == null
++                        ? (ja ? "標準（設定・履歴・メニュー）" : "Default (settings, history, menus)")
++                        : chosen);
++        preference.setOnPreferenceClickListener(
++                ignored -> {
++                    String[] options =
++                            ja
++                                    ? new String[] {
++                                        "標準に戻す", "黒 #000000", "濃いグレー #16171B", "グレー #202124"
++                                    }
++                                    : new String[] {
++                                        "Use default", "Black #000000", "Dark gray #16171B", "Gray #202124"
++                                    };
++                    new AlertDialog.Builder(requireContext())
++                            .setTitle(preference.getTitle())
++                            .setItems(
++                                    options,
++                                    (dialog, which) -> {
++                                        @Nullable String chosenColor =
++                                                which == 0
++                                                        ? null
++                                                        : new String[] {"#000000", "#16171B", "#202124"}[
++                                                                which - 1];
++                                        saveDarkSurfaceColor(chosenColor);
++                                    })
++                            .setNeutralButton(
++                                    ja ? "HEXで指定" : "Custom HEX",
++                                    (dialog, which) -> showCustomDarkSurfaceColorDialog(ja))
++                            .setNegativeButton(ja ? "キャンセル" : "Cancel", null)
++                            .show();
++                    return true;
++                });
++    }
++
++    private void saveDarkSurfaceColor(@Nullable String hex) {
++        var editor =
++                requireContext()
++                        .getApplicationContext()
++                        .getSharedPreferences("kiwi_ui_color", Context.MODE_PRIVATE)
++                        .edit();
++        if (hex == null) {
++            editor.remove("dark_surface_hex");
++        } else {
++            editor.putString("dark_surface_hex", hex);
++        }
++        editor.apply();
++        requireActivity().recreate();
++    }
++
++    private void showCustomDarkSurfaceColorDialog(boolean ja) {
++        EditText input = new EditText(requireContext());
++        input.setSingleLine(true);
++        String previous =
++                requireContext()
++                        .getApplicationContext()
++                        .getSharedPreferences("kiwi_ui_color", Context.MODE_PRIVATE)
++                        .getString("dark_surface_hex", "#202124");
++        input.setText(previous);
++        input.selectAll();
++        AlertDialog dialog =
++                new AlertDialog.Builder(requireContext())
++                        .setTitle(ja ? "暗色画面の背景色 (#RRGGBB)" : "Dark surface color (#RRGGBB)")
++                        .setView(input)
++                        .setPositiveButton(ja ? "適用" : "Apply", null)
++                        .setNegativeButton(ja ? "キャンセル" : "Cancel", null)
++                        .create();
++        dialog.setOnShowListener(
++                ignored ->
++                        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
++                                .setOnClickListener(
++                                        button -> {
++                                            String hex =
++                                                    input.getText().toString().trim().toUpperCase(Locale.ROOT);
++                                            if (!hex.matches("#[0-9A-F]{6}")
++                                                    || Color.luminance(Color.parseColor(hex)) > 0.18) {
++                                                input.setError(
++                                                        ja
++                                                                ? "暗い色を #RRGGBB で入力してください"
++                                                                : "Enter a dark #RRGGBB color");
++                                                return;
++                                            }
++                                            saveDarkSurfaceColor(hex);
++                                            dialog.dismiss();
++                                        }));
++        dialog.show();
+     }
+ 
+     @Override
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
+index b230ef0..f9e4c03 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
+@@ -44,6 +44,7 @@ import org.chromium.chrome.browser.ui.messages.snackbar.Snackbar;
+ import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
+ import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager.SnackbarController;
+ import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
++import org.chromium.components.browser_ui.styles.SemanticColorUtils;
+ import org.chromium.components.browser_ui.settings.SettingsNavigation;
+ import org.chromium.components.browser_ui.widget.DateDividedAdapter.ItemViewType;
+ import org.chromium.components.browser_ui.widget.gesture.BackPressHandler;
+@@ -187,6 +188,9 @@ public class HistoryManager
+         }
+ 
+         mRootView = new FrameLayout(mActivity);
++        @Nullable Integer customDarkSurface =
++                SemanticColorUtils.getCustomDarkSurfaceColor(mActivity);
++        if (customDarkSurface != null) mRootView.setBackgroundColor(customDarkSurface);
+ 
+         // 1. Create selectable components.
+         mSelectableListLayout =
+@@ -227,6 +231,10 @@ public class HistoryManager
+                 mContentManager.getAdapter(),
+                 mContentManager.getRecyclerView(),
+                 edgeToEdgePadAdjusterGenerator);
++        if (customDarkSurface != null) {
++            mSelectableListLayout.setBackgroundColor(customDarkSurface);
++            mContentManager.getRecyclerView().setBackgroundColor(customDarkSurface);
++        }
+ 
+         mIsLargeFormFactorDevice = DeviceFormFactor.isNonMultiDisplayContextOnTablet(mActivity);
+         if (mContentManager.showAppFilter() || mIsLargeFormFactorDevice) {
+@@ -254,6 +262,7 @@ public class HistoryManager
+                                         ? R.menu.app_specific_history_manager_menu
+                                         : R.menu.history_manager_menu,
+                                 launchedForApp);
++        if (customDarkSurface != null) mToolbar.setBackgroundColor(customDarkSurface);
+         mToolbar.setManager(this);
+         mToolbar.setMenuDelegate(
+                 new HistoryManagerToolbar.HistoryManagerMenuDelegate() {
+diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
+index da35533..eb999cd 100644
+--- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
++++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
+@@ -979,6 +979,8 @@ class AppMenu implements OnKeyListener {
+     }
+ 
+     private static int getKiwiMenuBackgroundColor(Context context) {
++        Integer custom = SemanticColorUtils.getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         int menuBgColor = SemanticColorUtils.getMenuBgColor(context);
+         boolean isDark =
+                 Color.red(menuBgColor) * 299
+diff --git a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
+index 9265792..087864d 100644
+--- a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
++++ b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
+@@ -27,6 +27,19 @@ import org.chromium.ui.util.ColorUtils;
+ public class SemanticColorUtils {
+     private static final String TAG = "SemanticColorUtils";
+ 
++    /** Optional color for browser-owned dark surfaces; light mode keeps the normal palette. */
++    public static @Nullable Integer getCustomDarkSurfaceColor(Context context) {
++        if (!ColorUtils.inNightMode(context)) return null;
++        String hex =
++                context.getApplicationContext()
++                        .getSharedPreferences("kiwi_ui_color", Context.MODE_PRIVATE)
++                        .getString("dark_surface_hex", null);
++        if (hex == null || !hex.matches("#[0-9a-fA-F]{6}")) return null;
++        int color = Color.parseColor(hex);
++        // White icons and labels must remain legible even after an external preference edit.
++        return Color.luminance(color) <= 0.18 ? color : null;
++    }
++
+     private static @ColorInt @Nullable Integer sDefaultIconColorSecondaryForTesting;
+     private static @ColorInt @Nullable Integer sDefaultBgColorForTesting;
+     private static @ColorInt @Nullable Integer sDividerLineBgColorForTesting;
+@@ -43,6 +56,8 @@ public class SemanticColorUtils {
+         if (sDefaultBgColorForTesting != null) {
+             return sDefaultBgColorForTesting;
+         }
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurface, context);
+     }
+ 
+@@ -154,6 +169,8 @@ public class SemanticColorUtils {
+ 
+     /** Returns the semantic color value that corresponds to settings_bg_color. */
+     public static @ColorInt int getSettingsBackgroundColor(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         // Match Kiwi's near-black settings surface without changing light mode.
+         if (ColorUtils.inNightMode(context)) {
+             return Color.rgb(16, 17, 20);
+@@ -163,6 +180,8 @@ public class SemanticColorUtils {
+ 
+     /** Returns the semantic color value that corresponds to settings_container_background_color. */
+     public static @ColorInt int getSettingsContainerBackgroundColor(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         if (ColorUtils.inNightMode(context)) {
+             return Color.rgb(27, 28, 33);
+         }
+@@ -186,6 +205,8 @@ public class SemanticColorUtils {
+ 
+     /** Returns the surface color value of the conceptual dialog_bg_color. */
+     public static @ColorInt int getDialogBgColor(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return ContextCompat.getColor(context, R.color.dialog_bg_color);
+     }
+ 
+@@ -196,6 +217,8 @@ public class SemanticColorUtils {
+      */
+     @Deprecated
+     public static @ColorInt int getSheetBgColor(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurface, context);
+     }
+ 
+@@ -207,6 +230,8 @@ public class SemanticColorUtils {
+ 
+     /** Returns the semantic color value that corresponds to menu_bg_color. */
+     public static @ColorInt int getMenuBgColor(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurfaceBright, context);
+     }
+ 
+@@ -259,11 +284,15 @@ public class SemanticColorUtils {
+ 
+     /** Returns the semantic color values that correspond to colorSurface. */
+     public static @ColorInt int getColorSurface(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurface, context);
+     }
+ 
+     /** Returns the semantic color values that correspond to colorSurfaceBright. */
+     public static @ColorInt int getColorSurfaceBright(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurfaceBright, context);
+     }
+ 
+@@ -274,36 +303,50 @@ public class SemanticColorUtils {
+ 
+     /** Returns the semantic color values that correspond to colorSurfaceContainerLow. */
+     public static @ColorInt int getColorSurfaceContainerLow(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurfaceContainerLow, context);
+     }
+ 
+     /** Returns the semantic color values that correspond to colorSurfaceContainerLowest. */
+     public static @ColorInt int getColorSurfaceContainerLowest(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurfaceContainerLowest, context);
+     }
+ 
+     /** Returns the semantic color values that correspond to colorSurfaceContainer. */
+     public static @ColorInt int getColorSurfaceContainer(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurfaceContainer, context);
+     }
+ 
+     /** Returns a color state list for the surface container color. */
+     public static ColorStateList getColorSurfaceContainerTintList(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return ColorStateList.valueOf(custom);
+         return context.getColorStateList(R.color.color_surface_container_tint_list);
+     }
+ 
+     /** Returns the semantic color values that correspond to colorSurfaceContainerHigh. */
+     public static @ColorInt int getColorSurfaceContainerHigh(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurfaceContainerHigh, context);
+     }
+ 
+     /** Returns the semantic color values that correspond to colorSurfaceContainerHighest. */
+     public static @ColorInt int getColorSurfaceContainerHighest(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurfaceContainerHighest, context);
+     }
+ 
+     /** Returns the semantic color values that correspond to colorSurfaceDim. */
+     public static @ColorInt int getColorSurfaceDim(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurfaceDim, context);
+     }
+ 
+@@ -314,6 +357,8 @@ public class SemanticColorUtils {
+ 
+     /** Returns the surface color value of the conceptual floating snackbar background color. */
+     public static @ColorInt int getFloatingSnackbarBackgroundColor(Context context) {
++        @Nullable Integer custom = getCustomDarkSurfaceColor(context);
++        if (custom != null) return custom;
+         return resolve(R.attr.colorSurfaceContainerHigh, context);
+     }
+ 
