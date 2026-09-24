@@ -2,15 +2,27 @@
 
 ## New-tab clipboard candidate
 
-The empty Android new-tab omnibox restricts zero-prefix suggestions to the
-clipboard provider. Android Chromium ordinarily expires that provider's copied
-link after three minutes; the new-tab path now accepts an item up to 24 hours
-old when Android still retains it. Other pages keep short-lived clipboard
-suggestions. The user confirmed that Build #150 still showed no clipboard row.
-The follow-up patch routes the candidate to Android's dedicated clipboard
-suggestion group, which has its own slot even when the recent-search group is
-suppressed. Selecting it uses Chromium's existing URL navigation or text-search
-handling. The follow-up APK still needs a device check.
+Build #152 also fails to show the copied-link row on the user's device.
+The previous changes only extended the default clipboard age and changed its
+suggestion group. Neither guarantees that a match is created: the generic
+clipboard provider rejects an unknown native modification time (and field
+trials may override its default age) before checking clipboard formats.
+The current feature patch instead queries Android clipboard *formats* on an
+empty new-tab omnibox, without reading the value or depending on its age or
+URL classification. If plain text or URL is present, it creates one
+"Copied link" placeholder in the dedicated clipboard group. Tapping it reads
+the current clipboard text: Chromium's existing paste handling opens valid
+URLs and searches other text. Other pages retain the existing age guard.
+The new Android provider regression tests cover a missing timestamp, URL
+navigation, and text search. A successful build alone cannot verify that the
+row is rendered on the user's device; check the signed APK there.
+
+Build #150 extended the default age to 24 hours, but the user confirmed
+the row did not appear. Build #152 routed the candidate to Android's
+dedicated clipboard group; the user confirmed that did not appear either.
+Those earlier attempts remain in the patch history for traceability. The
+new-tab path now depends on Android's current clipboard formats and reads
+the actual contents only after the user taps the row.
 
 ## Titanium-Kiwi incremental upstream updates
 
@@ -28,7 +40,9 @@ build. Its immutable checkpoint is
 `kiwi-incremental-153-9099484be06bb034d1efd4d120e9bd8aa1262dd0-stage-11`.
 Build #151 subsequently saved immutable checkpoint
 `kiwi-incremental-153-addbe54fe875cd72e8c0c1543930ea0549fef857-stage-11`.
-The workflow restores this latest literal key for the follow-up and keeps
+Build #152 saved a newer completed immutable checkpoint,
+`kiwi-incremental-153-92becf4647069d88aa8e59491282422c3ec70d62-stage-11`.
+The workflow restores this exact literal key for the next fix and keeps
 `.ninja_log`, `.ninja_deps`, object files, and generated outputs. A cache miss
 stops before source preparation. The upstream-update workflow separately
 requires `incremental_cache_key` and matching `transition_from_identity`.

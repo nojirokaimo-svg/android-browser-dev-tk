@@ -264,14 +264,16 @@
     },
     {
       "id": "new-tab-clipboard-only",
-      "name": "Show clipboard instead of history on empty Android new-tab omnibox",
+      "name": "Show a live clipboard link instead of history on empty Android new-tab omnibox",
       "patch": "200-new-tab-clipboard-only.patch",
       "files": [
         "components/omnibox/browser/autocomplete_controller.cc",
         "components/omnibox/browser/clipboard_provider.cc",
+        "components/omnibox/browser/clipboard_provider.h",
+        "components/omnibox/browser/clipboard_provider_unittest.cc",
         "components/open_from_clipboard/clipboard_recent_content.cc"
       ],
-      "sha256": "2600b0aa42cd489c72aad450bcd9424c1ffc4734687defb13e0cc5b5bde71a6e"
+      "sha256": "04f3ab83a56dbfb6a37e529bdf4e46fd5bff146ab5557445d2ec32228cf1f13c"
     }
   ]
 }

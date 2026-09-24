@@ -3,7 +3,7 @@
   "chromium_commit": "78e5e45d4bb41035e17ea4da2cc257f496416ac9",
   "vanadium_commit": "2aaf9dfc919e620564409f94beedaedca5301e81",
   "chromium_version": "153.0.8010.52",
-  "scope": "Build 146 Kiwi UI, extensions, migration, backups, credentials and six Night mode presets on Chromium 153.0.8010.52; preserve active tab after inactivity and show clipboard only on new-tab empty omnibox",
+  "scope": "Build 146 Kiwi UI, extensions, migration, backups, credentials and six Night mode presets on Chromium 153.0.8010.52; preserve active tab after inactivity; create an empty new-tab copied-link candidate from Android clipboard formats without relying on its native timestamp and read its current content on selection",
   "complete_kiwi_ui_port": false,
   "files": {
     "chrome/android/chrome_java_resources.gni": {
@@ -124,11 +124,19 @@
     },
     "components/omnibox/browser/clipboard_provider.cc": {
       "before_sha256": "b3df287914e67863f616adbd8bd16b893fe4938ca21da54083e17ddd7e77525d",
-      "after_sha256": "bdc27067594c66af18757674cbea183852f8f532794bf38a5b94a67fbd0ebc42"
+      "after_sha256": "ec1f16dc8f2e12dccc1623fc1a26ee55f50a012132ad4853995861ffc7e22712"
     },
     "components/open_from_clipboard/clipboard_recent_content.cc": {
       "before_sha256": "baaca5b46c8d0e945f7002d21ed4ded02ec983d7f0637929abeb5ce652902920",
       "after_sha256": "0411ad4cdd1345f6b4a24e04a533f92a4552962b242e077f8923e2dab309987b"
+    },
+    "components/omnibox/browser/clipboard_provider.h": {
+      "before_sha256": "639b1c0e5b4fd7046235e83eaa9054ffbbb0b951aa59f8814507531f7bf506b8",
+      "after_sha256": "593eca3fb2771fa60a92e2dff83bd582f622d6048628b8478c6f00453ea3da14"
+    },
+    "components/omnibox/browser/clipboard_provider_unittest.cc": {
+      "before_sha256": "36f406c27309bac2734739a876f6773062139cf6754daaf23800583fe740d88b",
+      "after_sha256": "3cc10fe3e7c5f5640e01d18edcc3718639425a926af144d464272262c65b3cda"
     }
   }
 }

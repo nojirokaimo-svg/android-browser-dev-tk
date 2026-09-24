@@ -1,3 +1,32 @@
+## 2026-09-24: Build #152 also did not show the clipboard row
+
+The user tested Build #152 on a device and reports that the new-tab omnibox
+never shows the "Copied link" row, even briefly. Build success and the
+dedicated suggestion group did not address candidate creation. Do not claim
+the feature is fixed until the user confirms it on a new installed APK.
+
+The pinned Chromium implementation checks clipboard age in
+`ClipboardRecentContentGeneric::HasRecentContentFromClipboard()` *before*
+checking formats. A missing native timestamp yields an extremely old age;
+the feature flag can also override the changed default 24-hour age.
+Android may report copied links as plain text while its URL classifier is
+pending. The new feature patch handles the empty new-tab case in
+`ClipboardProvider`: query `UrlType` and `PlainTextType` formats without
+reading clipboard contents, create one `CLIPBOARD_URL` placeholder in
+`GROUP_MOBILE_CLIPBOARD`, then read the clipboard text upon user selection.
+The existing `UpdateClipboardTextContent` routes valid URLs to navigation
+and other text to search. Other omnibox contexts retain age checks. Added
+Android C++ regression tests for absent timestamps, URL navigation and text
+search. This is a source-level fix with pending compile and device testing.
+
+The immediately previous completed immutable output is
+`kiwi-incremental-153-92becf4647069d88aa8e59491282422c3ec70d62-stage-11`
+from successful Build #152, run 35935016846. The stage-11 log says
+"Cache saved with key" at 2026-09-24 00:19:43 UTC. Restore exactly this
+literal key on the next run; preserve `.ninja_log`, `.ninja_deps`, objects and
+generated outputs. Stop on a cache miss. No clean or fallback. The APK from
+Build #152 is known to fail this user-visible feature.
+
 ## 2026-09-24: Build #150 did not show the clipboard row
 
 The user installed Build #150 and confirmed that the copied-link row still does

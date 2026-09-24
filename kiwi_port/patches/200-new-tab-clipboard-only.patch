@@ -20,10 +20,41 @@ diff --git a/components/omnibox/browser/autocomplete_controller.cc b/components/
 diff --git a/components/omnibox/browser/clipboard_provider.cc b/components/omnibox/browser/clipboard_provider.cc
 --- a/components/omnibox/browser/clipboard_provider.cc
 +++ b/components/omnibox/browser/clipboard_provider.cc
-@@ -156,6 +156,15 @@
+@@ -10,6 +10,7 @@
+ #include <utility>
+ #include <vector>
+ 
++#include "base/containers/flat_set.h"
+ #include "base/feature_list.h"
+ #include "base/functional/bind.h"
+ #include "base/memory/ref_counted_memory.h"
+@@ -46,6 +47,9 @@
+ #if !BUILDFLAG(IS_IOS)
+ #include "ui/base/clipboard/clipboard.h"  // nogncheck
+ #endif                                    // !BUILDFLAG(IS_IOS)
++#if BUILDFLAG(IS_ANDROID)
++#include "ui/base/data_transfer_policy/data_transfer_endpoint.h"
++#endif
+ 
+ namespace {
+ constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+@@ -144,6 +148,11 @@
+   using OEP = ::metrics::OmniboxEventProto;
+ 
+   matches_.clear();
++#if BUILDFLAG(IS_ANDROID)
++  ntp_clipboard_mode_ =
++      input.IsZeroSuggest() &&
++      omnibox::IsNTPPage(input.current_page_classification());
++#endif
+ 
+   // If the user started typing, do not offer clipboard based match.
+   if (!input.IsZeroSuggest()) {
+@@ -155,6 +164,15 @@
+       page_class == OEP::SEARCH_RESULT_PAGE_ON_CCT) {
      return;
    }
- 
++
 +#if BUILDFLAG(IS_ANDROID)
 +  // Keep clipboard suggestions short-lived outside the new-tab omnibox. On a
 +  // new tab, offer the link while Android retains the clipboard item.
@@ -32,11 +63,10 @@ diff --git a/components/omnibox/browser/clipboard_provider.cc b/components/omnib
 +    return;
 +  }
 +#endif
-+
+ 
    done_ = true;
  
-   // On iOS and Android, accessing the clipboard contents shows a notification
-@@ -217,14 +226,9 @@
+@@ -217,14 +235,9 @@
                                             matches_.empty(), match.type,
                                             clipboard_contents_age);
  
@@ -54,6 +84,164 @@ diff --git a/components/omnibox/browser/clipboard_provider.cc b/components/omnib
  
    matches_.push_back(match);
  }
+@@ -249,6 +262,41 @@
+ }
+ 
+ void ClipboardProvider::CheckClipboardContent(const AutocompleteInput& input) {
++#if BUILDFLAG(IS_ANDROID)
++  if (ntp_clipboard_mode_) {
++    // Android may not have delivered the clipboard timestamp to native code
++    // yet, and a field trial may impose a shorter maximum age. Neither should
++    // hide a link that is still present when the user focuses a new tab.
++    // Query formats only: reading the value here would trigger Android's
++    // clipboard access notification before the user selects the suggestion.
++    done_ = false;
++    ui::DataTransferEndpoint data_dst(
++        ui::EndpointType::kDefault, {.notify_if_restricted = false});
++    ui::Clipboard::GetForCurrentThread()->GetAvailableFormats(
++        ui::ClipboardBuffer::kCopyPaste,
++        {ui::ClipboardFormatType::UrlType(),
++         ui::ClipboardFormatType::PlainTextType()},
++        data_dst,
++        base::BindOnce(
++            [](base::WeakPtr<ClipboardProvider> provider,
++               AutocompleteInput input,
++               base::flat_set<ui::ClipboardFormatType> formats) {
++              if (!provider) return;
++              std::set<ClipboardContentType> types;
++              if (formats.contains(ui::ClipboardFormatType::UrlType()) ||
++                  formats.contains(ui::ClipboardFormatType::PlainTextType())) {
++                // Android often labels copied URLs as plain text until its
++                // classifier finishes. Read the text only after selection.
++                types.insert(ClipboardContentType::URL);
++              }
++              provider->OnReceiveClipboardContent(
++                  input, provider->clipboard_content_->GetClipboardContentAge(),
++                  types);
++            },
++            callback_weak_ptr_factory_.GetWeakPtr(), input));
++    return;
++  }
++#endif
+   std::set<ClipboardContentType> desired_types;
+   desired_types.insert(ClipboardContentType::URL);
+ 
+@@ -402,6 +450,30 @@
+     base::WeakPtr<AutocompleteMatch> match,
+     ClipboardMatchCallback callback) {
+   DCHECK(match);
++#if BUILDFLAG(IS_ANDROID)
++  if (ntp_clipboard_mode_ && match->type == AutocompleteMatchType::CLIPBOARD_URL) {
++    // The placeholder stands for either a link or text. Reading the current
++    // value at selection time also respects changes to the clipboard while
++    // the omnibox is open. UpdateClipboardTextContent handles both URLs and
++    // search terms without trusting Android's asynchronous URL classifier.
++    ui::DataTransferEndpoint data_dst(
++        ui::EndpointType::kDefault, {.notify_if_restricted = false});
++    ui::Clipboard::GetForCurrentThread()->ReadText(
++        ui::ClipboardBuffer::kCopyPaste, data_dst,
++        base::BindOnce(
++            [](base::WeakPtr<ClipboardProvider> provider,
++               base::WeakPtr<AutocompleteMatch> match,
++               ClipboardMatchCallback callback, std::u16string text) {
++              if (provider && match && !text.empty()) {
++                provider->UpdateClipboardTextContent(text, match.get());
++              }
++              std::move(callback).Run();
++            },
++            callback_weak_ptr_factory_.GetWeakPtr(), std::move(match),
++            std::move(callback)));
++    return;
++  }
++#endif
+   if (match->type == AutocompleteMatchType::CLIPBOARD_URL) {
+     clipboard_content_->GetRecentURLFromClipboard(
+         base::BindOnce(&ClipboardProvider::OnReceiveURLForMatchWithContent,
+diff --git a/components/omnibox/browser/clipboard_provider.h b/components/omnibox/browser/clipboard_provider.h
+--- a/components/omnibox/browser/clipboard_provider.h
++++ b/components/omnibox/browser/clipboard_provider.h
+@@ -6,6 +6,7 @@
+ #define COMPONENTS_OMNIBOX_BROWSER_CLIPBOARD_PROVIDER_H_
+ 
+ #include "base/gtest_prod_util.h"
++#include "build/build_config.h"
+ #include "base/memory/raw_ptr.h"
+ #include "components/omnibox/browser/autocomplete_enums.h"
+ #include "components/omnibox/browser/autocomplete_provider.h"
+@@ -151,6 +152,11 @@
+   raw_ptr<AutocompleteProviderClient> client_;
+   raw_ptr<ClipboardRecentContent> clipboard_content_;
+ 
++#if BUILDFLAG(IS_ANDROID)
++  // Set for the zero-prefix new-tab input whose clipboard match was created.
++  bool ntp_clipboard_mode_ = false;
++#endif
++
+   // The current URL suggested and the number of times it has been offered.
+   // Used for recording metrics.
+   GURL current_url_suggested_;
+diff --git a/components/omnibox/browser/clipboard_provider_unittest.cc b/components/omnibox/browser/clipboard_provider_unittest.cc
+--- a/components/omnibox/browser/clipboard_provider_unittest.cc
++++ b/components/omnibox/browser/clipboard_provider_unittest.cc
+@@ -405,8 +405,12 @@
+ }
+ 
+ #if BUILDFLAG(IS_ANDROID)
+-TEST_F(ClipboardProviderTest, Android_MergedWithPZPSGroupOnNTP) {
+-  SetClipboardText(kClipboardText);
++TEST_F(ClipboardProviderTest, Android_NTPClipboardLinkWithUnknownTimestamp) {
++  // Reproduces a cold-start clipboard: Android has the item but has not yet
++  // delivered its last-modified timestamp to the native clipboard.
++  auto* system_clipboard = ui::TestClipboard::CreateForCurrentThread();
++  system_clipboard->WriteText(kClipboardURL);
++  system_clipboard->SetLastModifiedTime(base::Time());
+   client_->set_template_url_service(
+       search_engines_test_environment_.template_url_service());
+ 
+@@ -416,14 +420,37 @@
+ 
+   provider_->Start(input, false);
+ 
+-  // Expect the clipboard entry, but not the content. Content is not directly
+-  // available on mobile devices - the user needs to explicitly ask to reveal
+-  // the content.
+   ASSERT_EQ(provider_->matches().size(), 1U);
+-  const auto& match = provider_->matches().back();
++  auto& match = provider_->matches().back();
++  EXPECT_EQ(AutocompleteMatchType::CLIPBOARD_URL, match.type);
++  EXPECT_EQ(omnibox::GROUP_MOBILE_CLIPBOARD, match.suggestion_group_id);
++  EXPECT_TRUE(match.destination_url.is_empty());
++
++  system_clipboard->WriteText("https://example.org/latest");
++  CreateMatchWithContentCallbackWaiter waiter(provider_, &match);
++  waiter.WaitForMatchUpdated();
++  EXPECT_EQ(GURL("https://example.org/latest"), match.destination_url);
++  ui::Clipboard::DestroyClipboardForCurrentThread();
++}
++
++TEST_F(ClipboardProviderTest, Android_NTPClipboardTextSearchesWhenSelected) {
++  auto* system_clipboard = ui::TestClipboard::CreateForCurrentThread();
++  system_clipboard->WriteText("Search for me");
++  system_clipboard->SetLastModifiedTime(base::Time());
++  client_->set_template_url_service(
++      search_engines_test_environment_.template_url_service());
++
++  AutocompleteInput input(std::u16string(), metrics::OmniboxEventProto::NTP,
++                          classifier_);
++  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
++  provider_->Start(input, false);
++  ASSERT_EQ(provider_->matches().size(), 1U);
++  auto& match = provider_->matches().back();
++  CreateMatchWithContentCallbackWaiter waiter(provider_, &match);
++  waiter.WaitForMatchUpdated();
+   EXPECT_EQ(AutocompleteMatchType::CLIPBOARD_TEXT, match.type);
+-  EXPECT_EQ(omnibox::GROUP_PERSONALIZED_ZERO_SUGGEST,
+-            match.suggestion_group_id);
++  EXPECT_TRUE(match.destination_url.is_valid());
++  ui::Clipboard::DestroyClipboardForCurrentThread();
+ }
+ 
+ TEST_F(ClipboardProviderTest, Android_StandaloneSuggestionOnSearchActivity) {
 diff --git a/components/open_from_clipboard/clipboard_recent_content.cc b/components/open_from_clipboard/clipboard_recent_content.cc
 --- a/components/open_from_clipboard/clipboard_recent_content.cc
 +++ b/components/open_from_clipboard/clipboard_recent_content.cc

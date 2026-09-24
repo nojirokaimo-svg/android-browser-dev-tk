@@ -27,10 +27,10 @@ jobs:
         with:
           # Resume is deliberately exact: never fall back to an older/empty
           # checkpoint and never start another cold multi-hour compile.
-          restore-key: kiwi-incremental-153-addbe54fe875cd72e8c0c1543930ea0549fef857-stage-11
+          restore-key: kiwi-incremental-153-92becf4647069d88aa8e59491282422c3ec70d62-stage-11
           require-restore: "true"
-          # Build #151 saved the signed APK and the immutable stage-11 output.
-          # Revalidate metadata-only changes while retaining all Ninja outputs.
+          # Build #152 saved the signed APK and immutable stage-11 output.
+          # Recompile the clipboard-provider changes while retaining Ninja outputs.
           bootstrap-revision: ""
           transition-from-identity: ""
           save-key: kiwi-153-${{ github.sha }}-stage-11
