@@ -20,11 +20,11 @@
     },
     "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java": {
       "before_sha256": "5bc49448b90cd757443a488677cddf5ecc9655a8496fe60e9f946c238ed9952e",
-      "after_sha256": null
+      "after_sha256": "76cfd6dbbb3805915ec2b2d05331e5e03ac4165f3681be2bf681280dae3724d4"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java": {
       "before_sha256": "e37d1f6a8fb3e92cbd8f5fb2763ebcc7ebafc9b0b81f9d8dd90b6e93d563155b",
-      "after_sha256": null
+      "after_sha256": "254bff5ad4ceeca06473cce4234afd4e97153baac70590c6f70ad3b7e6e8a63b"
     },
     "chrome/browser/chrome_browser_field_trials.cc": {
       "before_sha256": "9f25498cc42de7762960a76d5c8434eaa455bceecf2f92d1b599e85cf7604e51",
@@ -64,7 +64,7 @@
     },
     "chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java": {
       "before_sha256": "0c8ad0b606e9d119743b85e238fe997d09458c951a0504863b2ccac97da4057d",
-      "after_sha256": null
+      "after_sha256": "23e275fe0a74e2862c2e9a2290f0421f8fc38910c4f2332e5e7922fffb039ffa"
     },
     "chrome/browser/ui/android/night_mode/BUILD.gn": {
       "before_sha256": "fea7203de919361f05ee363f2a3b82817ef0e26c5f45bff2560f01fbab26e03b",

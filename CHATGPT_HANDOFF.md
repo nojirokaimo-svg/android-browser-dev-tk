@@ -228,9 +228,8 @@ log before claiming any resumed work or APK success.
   checkpoint. Inspect current Actions run before further changes.
 - `manifest.json` records the verified raw .52 omnibox hashes. The
   ChromeTabbedActivity hash after Titanium's upstream patch and features
-  `020`/`195` must be populated after a prepared .52 checkout; it remains
-  unknown until that checkpoint is available. Do not claim full manifest
-  verification or APK completion before checking those generated hashes.
+  `020`/`195` required a prepared .52 checkout. This historical gap was
+  resolved by the Build #160 source audit described below.
 
 ## 2026-09-23: v153.0.8010.47 transition from Build #146
 
@@ -573,7 +572,7 @@ User reported that normal backup works but **Create migration backup** crashes. 
 
 Fix: `createPortableBackup()` now calls `ChromeBrowserInitializer.getInstance().handleSynchronousStartup()` before obtaining the regular profile. No cache/build workflow changes; preserve the exact M153 `out/Default` cache and never clean/fall back.
 
-## 2026-09-25: Return to Build #157 source; preparation-only manifest audit
+## 2026-09-25: Build #160 and exact post-Titanium manifest audit
 
 Build #158 (commit `29c99d3dd1b822a85022f4678f99d9595fe9ae83`)
 was canceled at the user's request. The user's new base is the successful Build
@@ -589,14 +588,21 @@ settings independently request reduced web animations, limit renderers to two,
 and disable Prerender2 only when the master toggle is on. CPU/battery benefits
 are unmeasured and active JavaScript, extensions, and videos still run.
 
-The Build #157 source-audit artifact confirmed the exact base for the six
-existing color and settings files. Eight modified post-hashes are measured
-locally against those verified files. The final post-hashes of
-`ChromeTabbedActivity.java`, `ProcessInitializationHandler.java`, and
-`TabbedAppMenuPropertiesDelegate.java` are deliberately `null` until measuring
-the actual prepared source. An audit-only CI pass restores the exact #157 cache,
-prepares the pinned Titanium source, uploads those three source files, and
-**skips compilation and all checkpoint saves**. Once all three SHA-256 hashes
-are measured, replace `null`, disable `audit-only`, restore stage continuation
-conditions and the `require-apk` gate, then push the complete build change.
-The present audit pass alone does not produce an APK.
+Build #160 (commit `e5b7f2f3c17d4066478dd07a23fe4a0a3c32bac9`, run
+`36078045905`) restored that exact #157 key, applied 26 patches, compiled an
+arm64 APK, verified Android v2 signing, and saved the immutable completed key
+`kiwi-incremental-153-e5b7f2f3c17d4066478dd07a23fe4a0a3c32bac9-stage-11`.
+Its APK SHA-256 is `b364caef95756437a01610615e366599391a7dfca16273fa17f7d60f52c10d29`.
+The source audit artifact supplied the three previously unknown exact
+post-Titanium hashes in `manifest.json`; the other 11 audited files matched.
+The final build must restore #160's completed key exactly and run with
+`KIWI_MANIFEST_AUDIT_ONLY=false`; it must not invalidate or overwrite it.
+
+Reapplication safety was tightened for future Chromium major versions:
+`NewTabPage.java`'s known context drift is repaired only when its original
+method body matches exactly. The `chrome_java_resources.gni` two-anchor repair
+is atomic. If upstream changes either pattern, the feature and affected file
+remain visible as a conflict while independent features can still apply.
+Continue updating manifest hashes against actual post-Titanium source after
+any upstream version bump; a clean compile alone cannot establish UI behavior
+or measured battery savings.

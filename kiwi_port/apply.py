@@ -99,12 +99,19 @@ def repair_known_context_drift(
                         '  "java/res/xml/tabswitcher_preferences.xml",\n',
                     ),
                 )
+                original = target.read_text(encoding="utf-8")
+                updated = original
                 repaired = True
                 for anchor, insertion in additions:
-                    if not _insert_after_unique(target, anchor, insertion):
+                    if insertion in updated:
+                        continue
+                    if updated.count(anchor) != 1:
                         repaired = False
                         break
+                    updated = updated.replace(anchor, anchor + insertion, 1)
                 if repaired:
+                    if updated != original:
+                        target.write_text(updated, encoding="utf-8")
                     (source / f"{relative}.rej").unlink(missing_ok=True)
                     remaining.remove(relative)
 
@@ -114,10 +121,12 @@ def repair_known_context_drift(
             target = source / relative
             if target.is_file():
                 text = target.read_text(encoding="utf-8")
-                method_start = "        public boolean isLocationBarShownInNtp() {\n"
-                next_override = "\n        @Override\n"
-                start = text.find(method_start)
-                end = text.find(next_override, start + len(method_start)) if start >= 0 else -1
+                original = (
+                    "        public boolean isLocationBarShownInNtp() {\n"
+                    "            if (mIsDestroyed) return false;\n"
+                    "            return isInSingleUrlBarMode() && !mNewTabPageCoordinator.urlFocusAnimationsDisabled();\n"
+                    "        }\n"
+                )
                 desired = (
                     "        public boolean isLocationBarShownInNtp() {\n"
                     "            if (mIsDestroyed) return false;\n"
@@ -128,8 +137,8 @@ def repair_known_context_drift(
                 )
                 if desired in text:
                     repaired = True
-                elif start >= 0 and end >= 0:
-                    target.write_text(text[:start] + desired + text[end:], encoding="utf-8")
+                elif text.count(original) == 1:
+                    target.write_text(text.replace(original, desired, 1), encoding="utf-8")
                     repaired = True
                 else:
                     repaired = False

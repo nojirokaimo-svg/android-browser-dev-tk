@@ -1,8 +1,8 @@
 # Titanium Browser for Android
 
-## Separate dark colors and extra power saving (prepared; no new APK)
+## Separate dark colors and extra power saving (Build #160)
 
-The next source patches expose three independent dark interface colors under
+The source patches expose three independent dark interface colors under
 Settings > Appearance: page background, raised cards/search fields, and
 menus/popups. Each has standard colors and a custom dark `#RRGGBB` entry.
 When unset, the original layered palette remains. Existing custom
@@ -17,11 +17,13 @@ not guarantee a particular CPU or battery reduction while an active page is
 running scripts, video, or extensions. GPU acceleration, security updates,
 extensions, and backups are left enabled.
 
-The two additional feature patches and ordered reapplication checks are
-prepared locally. **No new APK has been built or signed for these changes.**
-The actual prepared Titanium source hashes for three Android files remain
-to be measured before publishing a build. The existing completed Build #157
-checksum below refers only to Build #157.
+Build #160 completed on 2026-09-25 from Build #157's exact cache. Its
+Android v2 signed arm64 APK has SHA-256
+`b364caef95756437a01610615e366599391a7dfca16273fa17f7d60f52c10d29`.
+The prepared Titanium source artifact supplies all three previously unknown
+Android file hashes. The next build uses Build #160's immutable completed
+`out/Default` checkpoint and verifies the full post-apply manifest. Battery
+savings and the appearance of every theme surface remain unmeasured on a device.
 
 ## Tab-search setting and browser dark surfaces (Build #157)
 

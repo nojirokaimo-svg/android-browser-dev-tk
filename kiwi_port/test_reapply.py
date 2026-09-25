@@ -1,5 +1,6 @@
 """Exercise conflict handling on disposable git trees, never build outputs."""
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -55,6 +56,74 @@ class ReapplyTest(unittest.TestCase):
         import sys
         return subprocess.run([sys.executable, str(self.port / 'apply.py'),
                                str(self.src), *args], capture_output=True, text=True)
+
+    def repair(self, feature_id, files):
+        spec = importlib.util.spec_from_file_location('reapply_under_test', self.port / 'apply.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.repair_known_context_drift(self.src, feature_id, files)
+
+    def test_omnibox_repair_never_overwrites_changed_upstream_method(self):
+        relative = 'chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java'
+        target = self.src / relative
+        target.parent.mkdir(parents=True)
+        original = (
+            '        public boolean isLocationBarShownInNtp() {\n'
+            '            if (mIsDestroyed) return false;\n'
+            '            return upstreamNewRule();\n'
+            '        }\n\n'
+            '        @Override\n'
+        )
+        target.write_text(original)
+        reject = Path(str(target) + '.rej')
+        reject.write_text('unresolved')
+        self.assertEqual(self.repair('kiwi-omnibox-history', [relative]), [relative])
+        self.assertEqual(target.read_text(), original)
+        self.assertTrue(reject.is_file())
+
+    def test_multi_anchor_repair_is_atomic_on_unknown_upstream(self):
+        relative = 'chrome/android/chrome_java_resources.gni'
+        target = self.src / relative
+        target.parent.mkdir(parents=True)
+        original = '  "java/res/layout/radio_button_group_homepage_preference.xml",\n'
+        target.write_text(original)
+        reject = Path(str(target) + '.rej')
+        reject.write_text('unresolved')
+        self.assertEqual(self.repair('kiwi-tab-switcher', [relative]), [relative])
+        self.assertEqual(target.read_text(), original)
+        self.assertTrue(reject.is_file())
+
+    def test_known_omnibox_context_drift_is_still_repaired(self):
+        relative = 'chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java'
+        target = self.src / relative
+        target.parent.mkdir(parents=True)
+        target.write_text(
+            '        public boolean isLocationBarShownInNtp() {\n'
+            '            if (mIsDestroyed) return false;\n'
+            '            return isInSingleUrlBarMode() && !mNewTabPageCoordinator.urlFocusAnimationsDisabled();\n'
+            '        }\n\n'
+            '        @Override\n'
+        )
+        reject = Path(str(target) + '.rej')
+        reject.write_text('context drift')
+        self.assertEqual(self.repair('kiwi-omnibox-history', [relative]), [])
+        self.assertIn('return false;\n        }', target.read_text())
+        self.assertFalse(reject.exists())
+
+    def test_known_two_anchor_context_drift_is_still_repaired(self):
+        relative = 'chrome/android/chrome_java_resources.gni'
+        target = self.src / relative
+        target.parent.mkdir(parents=True)
+        target.write_text(
+            '  "java/res/layout/radio_button_group_homepage_preference.xml",\n'
+            '  "java/res/xml/main_preferences.xml",\n'
+        )
+        reject = Path(str(target) + '.rej')
+        reject.write_text('context drift')
+        self.assertEqual(self.repair('kiwi-tab-switcher', [relative]), [])
+        self.assertIn('radio_button_group_tabswitcher_preference.xml', target.read_text())
+        self.assertIn('tabswitcher_preferences.xml', target.read_text())
+        self.assertFalse(reject.exists())
 
     def test_apply_and_idempotence(self):
         self.assertEqual(self.apply().returncode, 0)
