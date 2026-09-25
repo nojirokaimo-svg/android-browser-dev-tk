@@ -48,7 +48,7 @@
     },
     {
       "id": "night-mode-presets",
-      "name": "Six Kiwi Night mode presets plus low-CPU startup switches",
+      "name": "Six Kiwi Night mode presets on the Chromium renderer path",
       "patch": "050-night-mode-presets.patch",
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java",
@@ -65,7 +65,7 @@
         "third_party/blink/renderer/platform/graphics/dark_mode_settings_builder.h",
         "third_party/blink/renderer/platform/graphics/dark_mode_filter_test.cc"
       ],
-      "sha256": "a72d695802b4029ba35ae39ec88b63f8f3f95a9be87727a162162013a18130a5"
+      "sha256": "46389b6ee7ebf4e59527108bbbd9933d8e1b140c520b7eabed377a1c66ace1d7"
     },
     {
       "id": "runtime-night-mode",
@@ -284,7 +284,7 @@
     },
     {
       "id": "tab-search-setting",
-      "name": "Tab search visibility and ultra-low-CPU preference",
+      "name": "Hide Hub tab search by default and expose an opt-in setting",
       "patch": "205-tab-search-preference.patch",
       "files": [
         "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java",
@@ -294,7 +294,7 @@
         "chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java",
         "chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java"
       ],
-      "sha256": "8360ee753ee532eeb01f2211220d00eca816c7ecc2c850e27e5bf6d6b59c3a7c"
+      "sha256": "32d6e319f110566781ccaa309521853f7a67bd2fb9874881db9672ae19ce7a73"
     },
     {
       "id": "dark-ui-surface-color",
@@ -308,6 +308,33 @@
         "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
       ],
       "sha256": "2ef307ca1210cebd5bb033ed7df91f86c211b4f8cde5d8c035cdd325057d21ac"
+    },
+    {
+      "id": "independent-dark-ui-colors",
+      "name": "Separate dark page, card and menu colors",
+      "patch": "215-separate-dark-colors.patch",
+      "files": [
+        "chrome/android/java/res/xml/appearance_preferences.xml",
+        "chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java",
+        "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
+        "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
+      ],
+      "sha256": "4db697d65e3c8d3096fc3bf4da3bf0172d1b51f87c507e73f8e0996b33d8e66e"
+    },
+    {
+      "id": "power-saving-controls",
+      "name": "Menu toggle and adjustable CPU-saving options",
+      "patch": "220-power-saving-controls.patch",
+      "files": [
+        "chrome/android/java/res/values-ja/kiwi_ui.xml",
+        "chrome/android/java/res/values/kiwi_ui.xml",
+        "chrome/android/java/res/xml/tabswitcher_preferences.xml",
+        "chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java"
+      ],
+      "sha256": "d9471462b32029e0d78cfefa142f5826534e48f3b497dac03510077f062b0bf1"
     }
   ]
 }

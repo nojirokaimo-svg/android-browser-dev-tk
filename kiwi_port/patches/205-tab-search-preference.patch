@@ -92,15 +92,12 @@ diff --git a/chrome/android/java/res/xml/tabswitcher_preferences.xml b/chrome/an
 index a11482c..141f969 100644
 --- a/chrome/android/java/res/xml/tabswitcher_preferences.xml
 +++ b/chrome/android/java/res/xml/tabswitcher_preferences.xml
-@@ -3,4 +3,10 @@
+@@ -3,4 +3,7 @@
      <org.chromium.chrome.browser.settings.RadioButtonGroupTabSwitcherPreference
          android:key="tabswitcher_radio_group"
          android:persistent="false" />
 +    <org.chromium.components.browser_ui.settings.ChromeSwitchPreference
 +        android:key="show_tab_search"
-+        android:persistent="false" />
-+    <org.chromium.components.browser_ui.settings.ChromeSwitchPreference
-+        android:key="kiwi_low_cpu_mode"
 +        android:persistent="false" />
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
@@ -127,7 +124,7 @@ index 22bded8..a9ce1f9 100644
  import org.chromium.components.browser_ui.settings.SettingsFragment;
  import org.chromium.components.browser_ui.settings.SettingsUtils;
  
-@@ -35,6 +39,50 @@ public final class TabSwitcherSettings extends ChromeBaseSettingsFragment
+@@ -35,6 +39,27 @@ public final class TabSwitcherSettings extends ChromeBaseSettingsFragment
                          findPreference("tabswitcher_radio_group");
          assert preference != null;
          preference.setActivity(requireActivity());
@@ -149,29 +146,6 @@ index 22bded8..a9ce1f9 100644
 +                            .getSharedPreferences("kiwi_tab_ui", Context.MODE_PRIVATE)
 +                            .edit()
 +                            .putBoolean("show_tab_search", (Boolean) newValue)
-+                            .apply();
-+                    return true;
-+                });
-+
-+        ChromeSwitchPreference lowCpu = findPreference("kiwi_low_cpu_mode");
-+        assert lowCpu != null;
-+        lowCpu.setTitle(ja ? "超低CPUモード" : "Ultra low CPU mode");
-+        lowCpu.setSummary(
-+                ja
-+                        ? "CPU負荷を優先して抑える。アニメーション停止・レンダラ並列数を制限。次回起動から有効"
-+                        : "Reduce CPU load by disabling animations and limiting renderer concurrency. Applies after restart.");
-+        lowCpu.setChecked(
-+                requireContext()
-+                        .getApplicationContext()
-+                        .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
-+                        .getBoolean("low_cpu_mode", false));
-+        lowCpu.setOnPreferenceChangeListener(
-+                (Preference changed, Object newValue) -> {
-+                    requireContext()
-+                            .getApplicationContext()
-+                            .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
-+                            .edit()
-+                            .putBoolean("low_cpu_mode", (Boolean) newValue)
 +                            .apply();
 +                    return true;
 +                });

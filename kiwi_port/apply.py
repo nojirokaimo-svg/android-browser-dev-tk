@@ -6,9 +6,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
+import shutil
+import tempfile
 
 HERE = Path(__file__).resolve().parent
 MANIFEST = json.loads((HERE / "manifest.json").read_text(encoding="utf-8"))
@@ -226,19 +229,34 @@ def main() -> int:
 
     pinned_before = all(state == "before" for state in states.values())
     if not args.best_effort:
-        # Preflight the complete series before changing any file. Feature
-        # patches own disjoint files, so every contextual check can be done
-        # against the same untouched tree.
+        # Check the complete ordered series against a disposable copy of only
+        # patch-owned sources. Later features can build on earlier ones without
+        # changing the real source tree if a subsequent patch conflicts.
         failures: list[tuple[dict[str, object], str, str]] = []
-        for feature in SERIES["features"]:
-            patch = HERE / "patches" / safe_relative(feature["patch"])
-            if digest(patch) != feature["sha256"]:
-                raise RuntimeError(f"patch checksum mismatch: {patch.name}")
-            patch_to_apply = effective_patch(source, feature, patch)
-            forward = git(source, "apply", "--check", str(patch_to_apply))
-            reverse = git(source, "apply", "--reverse", "--check", str(patch_to_apply))
-            if forward.returncode != 0 and reverse.returncode != 0:
-                failures.append((feature, command_detail(forward), command_detail(reverse)))
+        with tempfile.TemporaryDirectory(prefix="kiwi-preflight-") as temporary:
+            probe = Path(temporary)
+            git(probe, "init", "-q", check=True)
+            for feature in SERIES["features"]:
+                for relative in feature["files"]:
+                    path = safe_relative(relative)
+                    original = source / path
+                    copy = probe / path
+                    if original.is_file() and not copy.exists():
+                        copy.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(original, copy)
+            for feature in SERIES["features"]:
+                patch = HERE / "patches" / safe_relative(feature["patch"])
+                if digest(patch) != feature["sha256"]:
+                    raise RuntimeError(f"patch checksum mismatch: {patch.name}")
+                patch_to_apply = effective_patch(probe, feature, patch)
+                forward = git(probe, "apply", "--check", str(patch_to_apply))
+                if forward.returncode == 0:
+                    git(probe, "apply", "--whitespace=nowarn", str(patch_to_apply), check=True)
+                    continue
+                reverse = git(probe, "apply", "--reverse", "--check", str(patch_to_apply))
+                if reverse.returncode != 0:
+                    failures.append(
+                        (feature, command_detail(forward), command_detail(reverse)))
         if failures:
             details = "\n".join(
                 f"  {feature['id']} ({feature['name']}):\n"
@@ -291,7 +309,12 @@ def main() -> int:
         return 2
     if pinned_before:
         after = file_states(source)
-        bad = [path for path, state in after.items() if state != "after"]
+        audit_only = os.environ.get("KIWI_MANIFEST_AUDIT_ONLY") == "true"
+        bad = [
+            path for path, state in after.items()
+            if state != "after"
+            and not (audit_only and MANIFEST["files"][path]["after_sha256"] is None)
+        ]
         if bad:
             raise RuntimeError("pinned post-apply verification failed: " + ", ".join(bad))
     print(f"Applied/verified {len(results)} Kiwi UI feature patches.")

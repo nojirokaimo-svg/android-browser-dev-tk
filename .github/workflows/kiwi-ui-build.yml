@@ -25,10 +25,12 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Build #156 completed and saved this exact immutable out/Default checkpoint.
+          # Build #157 completed and saved this exact immutable out/Default checkpoint.
           # Keep Ninja history and object files; a cache miss stops the build.
-          restore-key: kiwi-incremental-153-fe51b864d2987e96a7a691f68ad6b4df94420330-stage-11
+          restore-key: kiwi-incremental-153-7c2a317e5db05e1b647eeba4e5010081906f0615-stage-11
           require-restore: "true"
+          # One preparation-only run measures the three post-Titanium files absent from #157's audit.
+          audit-only: "true"
           # Retain .ninja_log, .ninja_deps, generated files and all object files.
           bootstrap-revision: ""
           transition-from-identity: ""
@@ -43,7 +45,7 @@ jobs:
 
   stage-12:
     needs: stage-11
-    if: needs.stage-11.outputs.done != 'true'
+    if: false # Preparation-only run. Re-enable after verifying final manifest hashes.
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -66,7 +68,7 @@ jobs:
 
   stage-13:
     needs: stage-12
-    if: needs.stage-12.outputs.done != 'true'
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -89,7 +91,7 @@ jobs:
 
   stage-14:
     needs: stage-13
-    if: needs.stage-13.outputs.done != 'true'
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -112,7 +114,7 @@ jobs:
 
   stage-15:
     needs: stage-14
-    if: needs.stage-14.outputs.done != 'true'
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -135,7 +137,7 @@ jobs:
 
   require-apk:
     needs: [stage-11, stage-12, stage-13, stage-14, stage-15]
-    if: always()
+    if: false # No APK is expected in a source audit run.
     runs-on: ubuntu-latest
     steps:
       - name: Require one stage to finish the APK

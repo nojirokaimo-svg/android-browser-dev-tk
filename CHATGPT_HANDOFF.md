@@ -1,28 +1,3 @@
-## 2026-09-24: Build #157 signed and source-audited
-
-Commit `7c2a317e5db05e1b647eeba4e5010081906f0615` completed in run
-`35999796308` on 2026-09-24 13:21 UTC. All 24 Kiwi feature patches applied,
-and the exact completed #156 out/Default checkpoint was restored without a
-clean build. Android APK Signature Scheme v2 verification succeeded. The signed
-arm64 APK SHA-256 is
-`1c912b4f381ce43a69638777102a24a9fc81438774870d6c4972e045883611d4`,
-and the ZIP artifact SHA-256 is
-`58f9ecaedfa6bc9c7b381af1326d2acd36b178d1f5c376496c68d8c784dabdcd`.
-The new immutable completed checkpoint is
-`kiwi-incremental-153-7c2a317e5db05e1b647eeba4e5010081906f0615-stage-11`.
-The source-audit artifact verified all 11 changed files against their manifest
-after hashes. Runner logs showed an incorrect prior `AppMenu.java` before hash:
-`75035fb3...` was replaced with the actual post-Titanium pre-Kiwi value
-`b87a62a477b8cd4634759c3217e7d5c7adc24f2030433c2b6e5aca29575f542d`.
-This manifest/documentation correction changes no compiled source; its commit
-uses `[skip ci]` to avoid rebuilding an unchanged APK or touching the cache.
-
-The user has not yet tested Build #157 on the device. Tab-search default-off,
-its Settings toggle and dark-surface customization remain visually unverified.
-The copied-link row was confirmed visible on the preceding #156 build; tapping
-it to navigate/search remains unconfirmed. Do not claim that Google-owned
-password manager activity surfaces can be colored by Chromium's UI setting.
-
 ## 2026-09-24: Build #156 succeeded; new tab and dark-color settings pending
 
 Build #156, commit `fe51b864d2987e96a7a691f68ad6b4df94420330`, run
@@ -597,3 +572,31 @@ Preserve the exact M153 build cache and do not clean `out/Default`.
 User reported that normal backup works but **Create migration backup** crashes. Root cause in `185-portable-full-backup.patch`: the standalone `KiwiFullBackupActivity` export path called `ProfileManager.getLastUsedRegularProfile()`, `PasswordStoreBridge`, and cookie JNI before Chromium native/profile startup. The restore path already performed synchronous startup, but export did not.
 
 Fix: `createPortableBackup()` now calls `ChromeBrowserInitializer.getInstance().handleSynchronousStartup()` before obtaining the regular profile. No cache/build workflow changes; preserve the exact M153 `out/Default` cache and never clean/fall back.
+
+## 2026-09-25: Return to Build #157 source; preparation-only manifest audit
+
+Build #158 (commit `29c99d3dd1b822a85022f4678f99d9595fe9ae83`)
+was canceled at the user's request. The user's new base is the successful Build
+#157 source commit `7c2a317e5db05e1b647eeba4e5010081906f0615`; the #158
+startup switches and modified patches 050/205 are not used. Build #157's logs
+show Android v2 signing and an exact completed out/Default checkpoint saved at
+`kiwi-incremental-153-7c2a317e5db05e1b647eeba4e5010081906f0615-stage-11`.
+Do not remove/overwrite that cache or fall back to a different key.
+
+Two new feature patches 215 and 220 add independent page/card/popup dark colors
+and a default-off extra power saving menu toggle below Night mode. Its three
+settings independently request reduced web animations, limit renderers to two,
+and disable Prerender2 only when the master toggle is on. CPU/battery benefits
+are unmeasured and active JavaScript, extensions, and videos still run.
+
+The Build #157 source-audit artifact confirmed the exact base for the six
+existing color and settings files. Eight modified post-hashes are measured
+locally against those verified files. The final post-hashes of
+`ChromeTabbedActivity.java`, `ProcessInitializationHandler.java`, and
+`TabbedAppMenuPropertiesDelegate.java` are deliberately `null` until measuring
+the actual prepared source. An audit-only CI pass restores the exact #157 cache,
+prepares the pinned Titanium source, uploads those three source files, and
+**skips compilation and all checkpoint saves**. Once all three SHA-256 hashes
+are measured, replace `null`, disable `audit-only`, restore stage continuation
+conditions and the `require-apk` gate, then push the complete build change.
+The present audit pass alone does not produce an APK.

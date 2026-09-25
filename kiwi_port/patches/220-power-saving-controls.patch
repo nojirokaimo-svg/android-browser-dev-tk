@@ -1,0 +1,217 @@
+diff --git a/chrome/android/java/res/values-ja/kiwi_ui.xml b/chrome/android/java/res/values-ja/kiwi_ui.xml
+index f86b54e..c058898 100644
+--- a/chrome/android/java/res/values-ja/kiwi_ui.xml
++++ b/chrome/android/java/res/values-ja/kiwi_ui.xml
+@@ -2,4 +2,7 @@
+ <resources>
+     <string name="kiwi_night_mode_on">Nightモードをオン</string>
+     <string name="kiwi_night_mode_off">Nightモードをオフ</string>
++    <string name="kiwi_low_cpu_on">超省電力モードをオン</string>
++    <string name="kiwi_low_cpu_off">超省電力モードをオフ</string>
++    <string name="kiwi_low_cpu_restart">省電力の変更はブラウザの再起動後に適用されます</string>
+ </resources>
+diff --git a/chrome/android/java/res/values/kiwi_ui.xml b/chrome/android/java/res/values/kiwi_ui.xml
+index 6173e1d..630358c 100644
+--- a/chrome/android/java/res/values/kiwi_ui.xml
++++ b/chrome/android/java/res/values/kiwi_ui.xml
+@@ -2,6 +2,10 @@
+ <resources>
+     <item name="kiwi_extension_action_menu_id" type="id" />
+     <item name="kiwi_night_mode_menu_id" type="id" />
++    <item name="kiwi_low_cpu_menu_id" type="id" />
+     <string name="kiwi_night_mode_on">Turn on Night mode</string>
+     <string name="kiwi_night_mode_off">Turn off Night mode</string>
++    <string name="kiwi_low_cpu_on">Turn on extra power saving</string>
++    <string name="kiwi_low_cpu_off">Turn off extra power saving</string>
++    <string name="kiwi_low_cpu_restart">Power saving changes apply after restarting the browser</string>
+ </resources>
+diff --git a/chrome/android/java/res/xml/tabswitcher_preferences.xml b/chrome/android/java/res/xml/tabswitcher_preferences.xml
+index 141f969..df777af 100644
+--- a/chrome/android/java/res/xml/tabswitcher_preferences.xml
++++ b/chrome/android/java/res/xml/tabswitcher_preferences.xml
+@@ -6,4 +6,16 @@
+     <org.chromium.components.browser_ui.settings.ChromeSwitchPreference
+         android:key="show_tab_search"
+         android:persistent="false" />
++    <org.chromium.components.browser_ui.settings.ChromeSwitchPreference
++        android:key="kiwi_low_cpu_mode"
++        android:persistent="false" />
++    <org.chromium.components.browser_ui.settings.ChromeSwitchPreference
++        android:key="kiwi_low_cpu_reduce_motion"
++        android:persistent="false" />
++    <org.chromium.components.browser_ui.settings.ChromeSwitchPreference
++        android:key="kiwi_low_cpu_limit_renderers"
++        android:persistent="false" />
++    <org.chromium.components.browser_ui.settings.ChromeSwitchPreference
++        android:key="kiwi_low_cpu_disable_prerender"
++        android:persistent="false" />
+ </PreferenceScreen>
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
+index a9ce1f9..dab5d74 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
+@@ -60,6 +60,69 @@ public final class TabSwitcherSettings extends ChromeBaseSettingsFragment
+                             .apply();
+                     return true;
+                 });
++
++        ChromeSwitchPreference lowCpu = findPreference("kiwi_low_cpu_mode");
++        assert lowCpu != null;
++        lowCpu.setTitle(ja ? "超省電力モード" : "Extra power saving mode");
++        lowCpu.setSummary(
++                ja
++                        ? "選んだ節電項目をまとめて有効化。変更は再起動後に適用"
++                        : "Apply selected power-saving options after restarting the browser.");
++        lowCpu.setChecked(
++                requireContext()
++                        .getApplicationContext()
++                        .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
++                        .getBoolean("low_cpu_mode", false));
++        lowCpu.setOnPreferenceChangeListener(
++                (Preference changed, Object newValue) -> {
++                    requireContext()
++                            .getApplicationContext()
++                            .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
++                            .edit()
++                            .putBoolean("low_cpu_mode", (Boolean) newValue)
++                            .apply();
++                    return true;
++                });
++
++        initPowerSavingOption(
++                "kiwi_low_cpu_reduce_motion", "reduce_motion", true,
++                ja ? "Webページの動きを抑える" : "Request reduced web animations",
++                ja ? "対応サイトに動きを減らすよう通知。再起動後に適用" :
++                     "Ask supported sites to reduce motion. Applies after restart.");
++        initPowerSavingOption(
++                "kiwi_low_cpu_limit_renderers", "limit_renderers", true,
++                ja ? "同時レンダラ数を制限" : "Limit concurrent renderers",
++                ja ? "上限を2にする。複数サイト・拡張機能の応答に影響する場合あり。再起動後に適用" :
++                     "Cap renderers at two; some sites and extensions may respond more slowly. Applies after restart.");
++        initPowerSavingOption(
++                "kiwi_low_cpu_disable_prerender", "disable_prerender", true,
++                ja ? "ページの先読み描画を止める" : "Disable prerendering",
++                ja ? "先読みのCPU・通信を抑える。移動先の表示が遅くなる場合あり。再起動後に適用" :
++                     "Avoid background prerender CPU and network work; navigation may feel slower. Applies after restart.");
++    }
++
++    private void initPowerSavingOption(
++            String preferenceKey, String optionKey, boolean defaultValue,
++            String title, String summary) {
++        ChromeSwitchPreference option = findPreference(preferenceKey);
++        assert option != null;
++        option.setTitle(title);
++        option.setSummary(summary);
++        option.setChecked(
++                requireContext()
++                        .getApplicationContext()
++                        .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
++                        .getBoolean(optionKey, defaultValue));
++        option.setOnPreferenceChangeListener(
++                (Preference changed, Object newValue) -> {
++                    requireContext()
++                            .getApplicationContext()
++                            .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
++                            .edit()
++                            .putBoolean(optionKey, (Boolean) newValue)
++                            .apply();
++                    return true;
++                });
+     }
+ 
+     @Override
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
+index fdc222d..c4b8178 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
+@@ -4258,6 +4258,14 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+             }
+             return true;
+         }
++        if (id == R.id.kiwi_low_cpu_menu_id) {
++            var prefs =
++                    getApplicationContext()
++                            .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE);
++            prefs.edit().putBoolean("low_cpu_mode", !prefs.getBoolean("low_cpu_mode", false)).apply();
++            Toast.makeText(this, R.string.kiwi_low_cpu_restart, Toast.LENGTH_SHORT).show();
++            return true;
++        }
+         boolean currentTabIsNtp = isTabNtp(currentTab);
+         if (id == R.id.new_tab_menu_id) {
+             if (!mTabModelSelector.isTabStateInitialized()) {
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java b/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
+index 7aa145e..2ce8b5e 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
+@@ -278,6 +278,32 @@ public class ProcessInitializationHandler {
+                 .appendSwitchWithValue(
+                         "dark-mode-settings",
+                         SharedPrefsUtils.getNightModeSettingsSwitchValue());
++        // Keep GPU acceleration enabled. Chromium's generic low-end-device mode disables
++        // hardware acceleration on Android, which can move rendering work back onto the CPU.
++        if (ContextUtils.getApplicationContext()
++                .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
++                .getBoolean("low_cpu_mode", false)) {
++            var powerPreferences =
++                    ContextUtils.getApplicationContext()
++                            .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE);
++            if (powerPreferences.getBoolean("reduce_motion", true)) {
++                CommandLine.getInstance().appendSwitch("force-prefers-reduced-motion");
++            }
++            if (powerPreferences.getBoolean("limit_renderers", true)) {
++                CommandLine.getInstance().appendSwitchWithValue("renderer-process-limit", "2");
++            }
++            if (powerPreferences.getBoolean("disable_prerender", true)) {
++                String existing = CommandLine.getInstance().getSwitchValue("disable-features");
++                if (existing == null || !("," + existing + ",").contains(",Prerender2,")) {
++                    CommandLine.getInstance()
++                            .appendSwitchWithValue(
++                                    "disable-features",
++                                    existing == null || existing.isEmpty()
++                                            ? "Prerender2"
++                                            : existing + ",Prerender2");
++                }
++            }
++        }
+         // Time this call takes in background from test devices:
+         // - Pixel 2: ~10 ms
+         // - Nokia 1 (Android Go): 20-200 ms
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
+index 4f25aa8..3bdca73 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
+@@ -352,6 +352,18 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+                         R.drawable.ic_brightness_medium_24dp, isMenuIconAtStart()), true);
+     }
+ 
++    private ListItem buildKiwiPowerSavingItem() {
++        boolean enabled =
++                mContext.getApplicationContext()
++                        .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
++                        .getBoolean("low_cpu_mode", false);
++        return AppMenuItemUtils.createStandardListItem(
++                AppMenuItemUtils.buildModelForStandardMenuItem(
++                        mContext, getAppMenuItemTheme(), R.id.kiwi_low_cpu_menu_id,
++                        enabled ? R.string.kiwi_low_cpu_off : R.string.kiwi_low_cpu_on,
++                        R.drawable.ic_brightness_medium_24dp, isMenuIconAtStart()), true);
++    }
++
+     @Override
+     public MVCListAdapter.ModelList buildMenuModelList() {
+         // Do not clear this in onMenuDismissed: the click bundle is read AFTER dismiss.
+@@ -614,6 +626,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+ 
+         // Kiwi global Night Mode
+         modelList.add(buildKiwiNightModeItem());
++        modelList.add(buildKiwiPowerSavingItem());
+ 
+         // Settings
+         modelList.add(buildSettingsItem());
+@@ -812,6 +825,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+ 
+         // Kiwi global Night Mode
+         modelList.add(buildKiwiNightModeItem());
++        modelList.add(buildKiwiPowerSavingItem());
+ 
+         // Settings
+         modelList.add(buildSettingsItem());

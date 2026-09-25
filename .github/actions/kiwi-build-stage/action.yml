@@ -17,6 +17,10 @@ inputs:
     description: Refuse a cold build when this stage is intended to resume a checkpoint.
     required: false
     default: "false"
+  audit-only:
+    description: Prepare and upload exact post-Titanium sources without compiling or saving a checkpoint.
+    required: false
+    default: "false"
   bootstrap-revision:
     description: Repository revision that created a checkpoint lacking provenance. Empty disables one-time bootstrap.
     required: false
@@ -120,6 +124,7 @@ runs:
       env:
         KIWI_BUILD_PHASE: prepare
         KIWI_PATCH_MODE: ${{ inputs.patch-mode }}
+        KIWI_MANIFEST_AUDIT_ONLY: ${{ inputs.audit-only }}
         KIWI_PATCH_REPORT: ${{ github.workspace }}/output/kiwi-patch-report.md
         TITANIUM_COMMIT: ${{ inputs.titanium-commit }}
         VANADIUM_COMMIT: ${{ inputs.vanadium-commit }}
@@ -133,6 +138,8 @@ runs:
       with:
         name: kiwi-ui-source-audit-${{ inputs.save-key }}
         path: |
+          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
+          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
           work/titanium/chromium/src/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
           work/titanium/chromium/src/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
           work/titanium/chromium/src/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
@@ -191,7 +198,7 @@ runs:
         echo "Source-producing inputs match checkpoint revision $base exactly."
 
     - name: Preserve Ninja history without rewriting restored output
-      if: inputs.restore-key != ''
+      if: inputs.restore-key != '' && inputs.audit-only != 'true'
       shell: bash
       run: |
         bootstrap_args=()
@@ -217,6 +224,7 @@ runs:
 
     - name: Continue arm64 APK compilation within the stage budget
       id: compile
+      if: inputs.audit-only != 'true'
       shell: bash
       env:
         KIWI_BUILD_PHASE: compile

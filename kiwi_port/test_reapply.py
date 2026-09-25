@@ -1,9 +1,11 @@
 """Exercise conflict handling on disposable git trees, never build outputs."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -68,6 +70,45 @@ class ReapplyTest(unittest.TestCase):
         self.assertIn('feature-0', result.stderr)
         self.assertIn('a.txt', result.stderr)
         self.assertEqual(self.git('diff').stdout, before)
+
+    def test_strict_preflight_applies_dependent_features_in_order(self):
+        (self.src / 'a.txt').write_text('after\n')
+        self.git('add', 'a.txt')
+        self.git('commit', '-qm', 'first feature baseline')
+        (self.src / 'a.txt').write_text('final\n')
+        second = self.git('diff', '--', 'a.txt').stdout
+        (self.port / 'patches/2.patch').write_text(second)
+        self.git('reset', '--hard', 'HEAD~1')
+        series_path = self.port / 'patches/series.json'
+        series = json.loads(series_path.read_text())
+        series['features'].append(dict(id='feature-2', name='Dependent feature',
+                                       patch='2.patch', files=['a.txt'],
+                                       sha256=hashlib.sha256(second.encode()).hexdigest()))
+        series_path.write_text(json.dumps(series))
+        manifest_path = self.port / 'manifest.json'
+        manifest = json.loads(manifest_path.read_text())
+        manifest['files']['a.txt']['after_sha256'] = hashlib.sha256(b'final\n').hexdigest()
+        manifest_path.write_text(json.dumps(manifest))
+
+        result = self.apply()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.src / 'a.txt').read_text(), 'final\n')
+
+    def test_audit_only_tolerates_only_omitted_post_hashes(self):
+        manifest_path = self.port / 'manifest.json'
+        manifest = json.loads(manifest_path.read_text())
+        manifest['files']['a.txt']['after_sha256'] = None
+        manifest_path.write_text(json.dumps(manifest))
+        self.assertEqual(self.apply().returncode, 1)
+        # Create a fresh test tree so the first failing call cannot influence the audit run.
+        for name in ('a.txt', 'b.txt'):
+            (self.src / name).write_text('before\n')
+        result = subprocess.run(
+            [sys.executable, str(self.port / 'apply.py'), str(self.src)],
+            capture_output=True, text=True,
+            env={**os.environ, 'KIWI_MANIFEST_AUDIT_ONLY': 'true'})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.src / 'a.txt').read_text(), 'after\n')
 
     def test_conflict_keeps_independent_feature(self):
         (self.src / 'a.txt').write_text('upstream change\n')
