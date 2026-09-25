@@ -29,8 +29,8 @@ jobs:
           # Keep Ninja history and object files; a cache miss stops the build.
           restore-key: kiwi-incremental-153-7c2a317e5db05e1b647eeba4e5010081906f0615-stage-11
           require-restore: "true"
-          # One preparation-only run measures the three post-Titanium files absent from #157's audit.
-          audit-only: "true"
+          # Compile from the exact #157 cache while preserving the source audit artifact.
+          audit-only: "false"
           # Retain .ninja_log, .ninja_deps, generated files and all object files.
           bootstrap-revision: ""
           transition-from-identity: ""
@@ -45,7 +45,7 @@ jobs:
 
   stage-12:
     needs: stage-11
-    if: false # Preparation-only run. Re-enable after verifying final manifest hashes.
+    if: needs.stage-11.outputs.done != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -68,7 +68,7 @@ jobs:
 
   stage-13:
     needs: stage-12
-    if: false
+    if: needs.stage-12.outputs.done != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -91,7 +91,7 @@ jobs:
 
   stage-14:
     needs: stage-13
-    if: false
+    if: needs.stage-13.outputs.done != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -114,7 +114,7 @@ jobs:
 
   stage-15:
     needs: stage-14
-    if: false
+    if: needs.stage-14.outputs.done != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 350
     outputs:
@@ -137,7 +137,7 @@ jobs:
 
   require-apk:
     needs: [stage-11, stage-12, stage-13, stage-14, stage-15]
-    if: false # No APK is expected in a source audit run.
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Require one stage to finish the APK

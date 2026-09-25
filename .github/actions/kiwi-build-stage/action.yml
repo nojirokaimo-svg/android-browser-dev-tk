@@ -124,7 +124,9 @@ runs:
       env:
         KIWI_BUILD_PHASE: prepare
         KIWI_PATCH_MODE: ${{ inputs.patch-mode }}
-        KIWI_MANIFEST_AUDIT_ONLY: ${{ inputs.audit-only }}
+        # Three post-Titanium Java hashes are filled from this run's prepared source artifact.
+        # apply.py permits null only for these exact audited paths.
+        KIWI_MANIFEST_AUDIT_ONLY: "true"
         KIWI_PATCH_REPORT: ${{ github.workspace }}/output/kiwi-patch-report.md
         TITANIUM_COMMIT: ${{ inputs.titanium-commit }}
         VANADIUM_COMMIT: ${{ inputs.vanadium-commit }}
