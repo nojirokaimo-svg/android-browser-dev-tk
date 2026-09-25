@@ -25,11 +25,11 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Build #160 completed and saved this exact immutable out/Default checkpoint.
+          # Build #161 completed and saved this exact immutable out/Default checkpoint.
           # Keep Ninja history and object files; a cache miss stops the build.
-          restore-key: kiwi-incremental-153-e5b7f2f3c17d4066478dd07a23fe4a0a3c32bac9-stage-11
+          restore-key: kiwi-incremental-153-08c395a3d081164839a2fbc4638d45abdf03e1d2-stage-11
           require-restore: "true"
-          # Reapply against exact #160 sources and enforce the complete manifest.
+          # Reapply against exact #161 sources and enforce the complete manifest.
           # Retain .ninja_log, .ninja_deps, generated files and all object files.
           bootstrap-revision: ""
           transition-from-identity: ""

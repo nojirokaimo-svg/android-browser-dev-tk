@@ -619,3 +619,18 @@ The completed immutable checkpoint is
 `kiwi-incremental-153-08c395a3d081164839a2fbc4638d45abdf03e1d2-stage-11`.
 Battery reduction and device-wide visual coverage are not measured; neither
 an APK build nor a source hash proves either user-facing behavior.
+
+## 2026-09-25: Hameln site background follow-up
+
+`225-novel-dark-background.patch` adds a tab load observer that sets the
+background on syosetu.org pages to the selected `dark_surface_hex` color,
+defaulting to black, only when the browser's WebContents Night mode is enabled
+for that site. The website's text and link colors remain controlled by its
+own styles and Chromium. The new patch applies to the archived exact #161
+post-Titanium `ChromeTabbedActivity.java` and its updated manifest hash matches
+the resulting bytes. This work is **not** part of Build #161. Before building,
+restore only #161's immutable checkpoint above; a miss must stop, without a
+cold build or cache fallback. Validate the new APK and the website on an actual
+device before claiming the original symptom is resolved. The website could not
+be inspected directly here because its security check prevented opening the
+site body in the available browser.

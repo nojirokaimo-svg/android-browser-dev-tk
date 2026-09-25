@@ -1,5 +1,16 @@
 # Titanium Browser for Android
 
+## Hameln site backgrounds (pending APK verification)
+
+An Android tab observer now applies the selected Settings > Appearance > Page
+background color to `https://syosetu.org` and its subdomains after each
+page load and when returning from settings while Night mode is enabled for
+that site. The override is removed when Night mode is turned off. With no custom color it
+uses `#000000`. The override targets page backgrounds; text and links remain
+under the site's and Chromium's existing Night mode handling. Other websites
+keep their existing colors. Build #161 does not include this patch. The
+Chromium source build and on-device display still need verification.
+
 ## Separate dark colors and extra power saving (Build #160)
 
 The source patches expose three independent dark interface colors under

@@ -1,0 +1,70 @@
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
+@@ -1729,10 +1729,13 @@
+             // onStart() when the next time onStart() is called, since it is no longer a cold start.
+             mFromResumption = true;
+         }
+ 
+         super.onResumeWithNative();
++        // Appearance settings reopen this activity without reloading the tab.
++        Tab visibleTab = getActivityTab();
++        if (visibleTab != null) applyKiwiHamelnDarkBackground(visibleTab, visibleTab.getUrl());
+ 
+         DefaultBrowserPromoUtils.getInstance().maybeRecordDeepLinkOutcome();
+ 
+         if (!isColdStart() && isMainIntentLaunchPostOnResume()) {
+             StartupLatencyInjector startupLatencyInjector = new StartupLatencyInjector();
+@@ -3825,12 +3828,52 @@
+                         try (TraceEvent e =
+                                 TraceEvent.scoped("CheckSyncErrorOnDidFinishNavigation")) {
+                             SyncErrorMessage.maybeShowMessageUi(getWindowAndroid(), profile);
+                         }
+                     }
++
++                    @Override
++                    public void onPageLoadFinished(Tab tab, GURL url) {
++                        applyKiwiHamelnDarkBackground(tab, url);
++                    }
+                 };
+         if (startIncognito) mTabModelSelector.selectModel(true);
++    }
++
++    // The appearance preference normally colors browser UI. Hameln
++    // renders its own page backgrounds, so apply the same color after page load.
++    private void applyKiwiHamelnDarkBackground(Tab tab, GURL url) {
++        if (tab == null || url == null || !"https".equals(url.getScheme())) return;
++        String host = url.getHost();
++        if (!("syosetu.org".equals(host) || host.endsWith(".syosetu.org"))) return;
++        WebContents contents = tab.getWebContents();
++        if (contents == null) return;
++        Profile profile = Profile.fromWebContents(contents);
++        if (profile == null) return;
++        if (!WebContentsDarkModeController.isGlobalUserSettingsEnabled(profile)
++                || !WebContentsDarkModeController.isEnabledForUrl(profile, url)) {
++            contents.evaluateJavaScript(
++                    "(function(){let style=document.getElementById('kiwi-novel-dark-page');"
++                            + "if(style)style.remove()})();", null);
++            return;
++        }
++        String color = getApplicationContext()
++                .getSharedPreferences("kiwi_ui_color", Context.MODE_PRIVATE)
++                .getString("dark_surface_hex", "#000000");
++        if (color == null || !color.matches("#[0-9a-fA-F]{6}")) color = "#000000";
++        // The validated hex value is the only dynamic script input. Restrict
++        // injection to syosetu.org pages and respect per-site Night mode.
++        contents.evaluateJavaScript(
++                "(function(){const color='" + color + "';"
++                        + "const css='html,body,body>div,main,article,#main,#contents,"
++                        + "#novel,#honbun,.contents,.novel{background-color:'"
++                        + "+color+'!important}';"
++                        + "let style=document.getElementById('kiwi-novel-dark-page');"
++                        + "if(!style){style=document.createElement('style');"
++                        + "style.id='kiwi-novel-dark-page';"
++                        + "(document.head||document.documentElement).appendChild(style)}"
++                        + "style.textContent=css})();", null);
+     }
+ 
+     public TabModelSelectorObserver getTabModelSelectorObserverForTesting() {
+         return mTabModelSelectorObserver;
+     }

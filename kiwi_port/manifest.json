@@ -3,7 +3,7 @@
   "chromium_commit": "78e5e45d4bb41035e17ea4da2cc257f496416ac9",
   "vanadium_commit": "2aaf9dfc919e620564409f94beedaedca5301e81",
   "chromium_version": "153.0.8010.52",
-  "scope": "Build 146 Kiwi UI, extensions, migration, backups, credentials and six Night mode presets on Chromium 153.0.8010.52; preserve active tab after inactivity; show an Android UI-owned copied-link row on empty new tabs if native clipboard formats return no match; classify current clipboard text as URL/search when tapped; tab search hidden by default with Settings opt-in; configurable browser-owned dark settings, history, menu and surface color; separate dark page/card/menu colors and adjustable extra power saving controls with a menu toggle",
+  "scope": "Build 146 Kiwi UI, extensions, migration, backups, credentials and six Night mode presets on Chromium 153.0.8010.52; preserve active tab after inactivity; show an Android UI-owned copied-link row on empty new tabs if native clipboard formats return no match; classify current clipboard text as URL/search when tapped; tab search hidden by default with Settings opt-in; configurable browser-owned dark settings, history, menu and surface color; separate dark page/card/menu colors and adjustable extra power saving controls with a menu toggle; apply selected dark page color (or pure black by default) to syosetu.org site backgrounds in Night mode",
   "complete_kiwi_ui_port": false,
   "files": {
     "chrome/android/chrome_java_resources.gni": {
@@ -20,7 +20,7 @@
     },
     "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java": {
       "before_sha256": "5bc49448b90cd757443a488677cddf5ecc9655a8496fe60e9f946c238ed9952e",
-      "after_sha256": "76cfd6dbbb3805915ec2b2d05331e5e03ac4165f3681be2bf681280dae3724d4"
+      "after_sha256": "a7dfd29df823991c50c23dd67721a0dcac0b10108c380f77365ed18017f370e8"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java": {
       "before_sha256": "e37d1f6a8fb3e92cbd8f5fb2763ebcc7ebafc9b0b81f9d8dd90b6e93d563155b",
