@@ -66,7 +66,7 @@ index a9ce1f9..dab5d74 100644
 +                requireContext()
 +                        .getApplicationContext()
 +                        .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
-+                        .getBoolean("low_cpu_mode", false));
++                        .getBoolean("low_cpu_mode", true));
 +        lowCpu.setOnPreferenceChangeListener(
 +                (Preference changed, Object newValue) -> {
 +                    requireContext()
@@ -132,7 +132,7 @@ index fdc222d..c4b8178 100644
 +            var prefs =
 +                    getApplicationContext()
 +                            .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE);
-+            prefs.edit().putBoolean("low_cpu_mode", !prefs.getBoolean("low_cpu_mode", false)).apply();
++            prefs.edit().putBoolean("low_cpu_mode", !prefs.getBoolean("low_cpu_mode", true)).apply();
 +            Toast.makeText(this, R.string.kiwi_low_cpu_restart, Toast.LENGTH_SHORT).show();
 +            return true;
 +        }
@@ -151,7 +151,7 @@ index 7aa145e..2ce8b5e 100644
 +        // hardware acceleration on Android, which can move rendering work back onto the CPU.
 +        if (ContextUtils.getApplicationContext()
 +                .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
-+                .getBoolean("low_cpu_mode", false)) {
++                .getBoolean("low_cpu_mode", true)) {
 +            var powerPreferences =
 +                    ContextUtils.getApplicationContext()
 +                            .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE);
@@ -188,7 +188,7 @@ index 4f25aa8..3bdca73 100644
 +        boolean enabled =
 +                mContext.getApplicationContext()
 +                        .getSharedPreferences("kiwi_performance", Context.MODE_PRIVATE)
-+                        .getBoolean("low_cpu_mode", false);
++                        .getBoolean("low_cpu_mode", true);
 +        return AppMenuItemUtils.createStandardListItem(
 +                AppMenuItemUtils.buildModelForStandardMenuItem(
 +                        mContext, getAppMenuItemTheme(), R.id.kiwi_low_cpu_menu_id,

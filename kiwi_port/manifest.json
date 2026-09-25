@@ -3,7 +3,7 @@
   "chromium_commit": "78e5e45d4bb41035e17ea4da2cc257f496416ac9",
   "vanadium_commit": "2aaf9dfc919e620564409f94beedaedca5301e81",
   "chromium_version": "153.0.8010.52",
-  "scope": "Build 146 Kiwi UI, extensions, migration, backups, credentials and six Night mode presets on Chromium 153.0.8010.52; preserve active tab after inactivity; show an Android UI-owned copied-link row on empty new tabs if native clipboard formats return no match; classify current clipboard text as URL/search when tapped; tab search hidden by default with Settings opt-in; configurable browser-owned dark settings, history, menu and surface color; separate dark page/card/menu colors and adjustable extra power saving controls with a menu toggle; apply selected dark page color (or pure black by default) to syosetu.org site backgrounds in Night mode",
+  "scope": "Build 146 Kiwi UI, extensions, migration, backups, credentials and six Night mode presets on Chromium 153.0.8010.52; preserve active tab after inactivity; show an Android UI-owned copied-link row on empty new tabs if native clipboard formats return no match; classify current clipboard text as URL/search when tapped; tab search hidden by default with Settings opt-in; configurable browser-owned dark settings, history, menu and surface color; separate dark page/card/menu colors and adjustable extra power saving controls with a menu toggle",
   "complete_kiwi_ui_port": false,
   "files": {
     "chrome/android/chrome_java_resources.gni": {
@@ -20,11 +20,11 @@
     },
     "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java": {
       "before_sha256": "5bc49448b90cd757443a488677cddf5ecc9655a8496fe60e9f946c238ed9952e",
-      "after_sha256": "a7dfd29df823991c50c23dd67721a0dcac0b10108c380f77365ed18017f370e8"
+      "after_sha256": "85419ed24a6bc71f698ffbbd62deaf65a07dcec0c3170f9d55b524eea4cb3d9b"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java": {
       "before_sha256": "e37d1f6a8fb3e92cbd8f5fb2763ebcc7ebafc9b0b81f9d8dd90b6e93d563155b",
-      "after_sha256": "254bff5ad4ceeca06473cce4234afd4e97153baac70590c6f70ad3b7e6e8a63b"
+      "after_sha256": "638f79a99f3308597f4b687034d16e9631072ea38787b2a2da6ecb6a283a955a"
     },
     "chrome/browser/chrome_browser_field_trials.cc": {
       "before_sha256": "9f25498cc42de7762960a76d5c8434eaa455bceecf2f92d1b599e85cf7604e51",
@@ -64,7 +64,7 @@
     },
     "chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java": {
       "before_sha256": "0c8ad0b606e9d119743b85e238fe997d09458c951a0504863b2ccac97da4057d",
-      "after_sha256": "23e275fe0a74e2862c2e9a2290f0421f8fc38910c4f2332e5e7922fffb039ffa"
+      "after_sha256": "84229e4f79094f32d7491d30c8332d452c85b122da5df1083be2419f97c1b13c"
     },
     "chrome/browser/ui/android/night_mode/BUILD.gn": {
       "before_sha256": "fea7203de919361f05ee363f2a3b82817ef0e26c5f45bff2560f01fbab26e03b",
@@ -184,7 +184,7 @@
     },
     "chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java": {
       "before_sha256": null,
-      "after_sha256": "b74a7a1bbcbaed7a6785a9af206ba3ea6ea826dead2424a73792080b942925bd"
+      "after_sha256": "0aaae13c3ca398821af8e4e4291b41fd282b335c4e99d7338994cbb0d9dcf255"
     },
     "chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java": {
       "before_sha256": "dcdd57d900d198f9f83316467e357cdbdcb01b6183c3e30d5c42058a1e5deed8",

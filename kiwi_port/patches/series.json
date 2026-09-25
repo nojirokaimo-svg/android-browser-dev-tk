@@ -334,16 +334,7 @@
         "chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java",
         "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java"
       ],
-      "sha256": "d9471462b32029e0d78cfefa142f5826534e48f3b497dac03510077f062b0bf1"
-    },
-    {
-      "id": "novel-dark-background",
-      "name": "Use the selected dark page color on Hameln pages in Night mode",
-      "patch": "225-novel-dark-background.patch",
-      "files": [
-        "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java"
-      ],
-      "sha256": "6dd60c52b75b303e985ea795095f82a226e3716b897805ae31bad5e225811c64"
+      "sha256": "6490b3166a22d05babe0773b0bd3dfc28e28da5a6e2a5196348c8e532e4e014e"
     }
   ]
 }

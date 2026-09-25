@@ -1,15 +1,19 @@
 # Titanium Browser for Android
 
-## Hameln site backgrounds (pending APK verification)
+## Hameln rollback and default power saving
 
-An Android tab observer now applies the selected Settings > Appearance > Page
-background color to `https://syosetu.org` and its subdomains after each
-page load and when returning from settings while Night mode is enabled for
-that site. The override is removed when Night mode is turned off. With no custom color it
-uses `#000000`. The override targets page backgrounds; text and links remain
-under the site's and Chromium's existing Night mode handling. Other websites
-keep their existing colors. Build #161 does not include this patch. The
-Chromium source build and on-device display still need verification.
+The Hameln-only page background injection was withdrawn after a device report
+that opening syosetu.org crashed the browser in Build #162. The last verified
+APK without this feature is Build #161; the exact cause of the crash is not yet
+known. No website-specific script is installed by the current patch series.
+
+Extra power saving now defaults to **on for installations without a saved
+preference**. An existing explicit on/off choice is preserved. Settings > Tabs
+and tab groups exposes the master switch and three independent options:
+reduced web motion, two concurrent renderers, and disabling Prerender2. The
+three options default to on when the master switch is on. Changes require a
+browser restart. Heavy foreground applications still run at their normal CPU
+and GPU speed; battery savings have not been measured on a device.
 
 ## Separate dark colors and extra power saving (Build #160)
 

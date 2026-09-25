@@ -106,19 +106,6 @@ class NightModePatchTest(unittest.TestCase):
         )
         self.assertGreaterEqual(patch.count("modelList.add(buildKiwiNightModeItem());"), 2)
 
-    def test_novel_dark_background_uses_night_mode_and_selected_page_color(self):
-        patch = (ROOT / "patches/225-novel-dark-background.patch").read_text()
-        self.assertIn('"syosetu.org".equals(host)', patch)
-        self.assertIn('host.endsWith(".syosetu.org")', patch)
-        self.assertIn("onPageLoadFinished(Tab tab, GURL url)", patch)
-        self.assertIn("applyKiwiHamelnDarkBackground(visibleTab, visibleTab.getUrl())", patch)
-        self.assertIn("WebContentsDarkModeController.isGlobalUserSettingsEnabled(profile)", patch)
-        self.assertIn("if(style)style.remove()", patch)
-        self.assertIn('getString("dark_surface_hex", "#000000")', patch)
-        self.assertIn('"#[0-9a-fA-F]{6}"', patch)
-        self.assertIn("evaluateJavaScript", patch)
-        self.assertIn("!important", patch)
-
     def test_settings_dark_surfaces_match_kiwi_palette(self):
         patch = (ROOT / "patches/150-kiwi-settings-dark.patch").read_text()
         self.assertIn("ColorUtils.inNightMode(context)", patch)

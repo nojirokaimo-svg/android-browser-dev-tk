@@ -620,17 +620,23 @@ The completed immutable checkpoint is
 Battery reduction and device-wide visual coverage are not measured; neither
 an APK build nor a source hash proves either user-facing behavior.
 
-## 2026-09-25: Hameln site background follow-up
+## 2026-09-25: Roll back Hameln crash and default-enable extra power saving
 
-`225-novel-dark-background.patch` adds a tab load observer that sets the
-background on syosetu.org pages to the selected `dark_surface_hex` color,
-defaulting to black, only when the browser's WebContents Night mode is enabled
-for that site. The website's text and link colors remain controlled by its
-own styles and Chromium. The new patch applies to the archived exact #161
-post-Titanium `ChromeTabbedActivity.java` and its updated manifest hash matches
-the resulting bytes. This work is **not** part of Build #161. Before building,
-restore only #161's immutable checkpoint above; a miss must stop, without a
-cold build or cache fallback. Validate the new APK and the website on an actual
-device before claiming the original symptom is resolved. The website could not
-be inspected directly here because its security check prevented opening the
-site body in the available browser.
+The user reports that the site-specific Hameln behavior in Build #162 causes
+the browser to crash when syosetu.org opens. The crash has no captured device
+stack trace; do not assert the precise faulting Java method. Remove feature
+`225-novel-dark-background.patch` entirely and restore Build #161's patch
+series and pre-site ChromeTabbedActivity bytes. Build #161 remains the
+previous signed APK the user can reinstall immediately.
+
+The master extra power saving mode defaults to on only when no preference is
+stored. Respect users' existing explicit on/off selections. Three individual
+switches under Settings > Tabs and tab groups default to on: reduce motion,
+renderer count of two, and no Prerender2. The menu, settings screen and startup
+must use the same default. A restart applies changed flags. This does not cap
+the active Photopea tab's CPU or GPU usage or establish measured battery saving.
+
+The #161 source audit archive permits recomputing hashes after the four Java
+default changes by reversing the old `220` patch and applying the new patch.
+Restore the exact completed #161 cache literal shown above; do not clean,
+delete, overwrite, or fall back from `out/Default` when making a new APK.
