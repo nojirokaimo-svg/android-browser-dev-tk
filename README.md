@@ -17,13 +17,16 @@ not guarantee a particular CPU or battery reduction while an active page is
 running scripts, video, or extensions. GPU acceleration, security updates,
 extensions, and backups are left enabled.
 
-Build #160 completed on 2026-09-25 from Build #157's exact cache. Its
-Android v2 signed arm64 APK has SHA-256
-`b364caef95756437a01610615e366599391a7dfca16273fa17f7d60f52c10d29`.
-The prepared Titanium source artifact supplies all three previously unknown
-Android file hashes. The next build uses Build #160's immutable completed
-`out/Default` checkpoint and verifies the full post-apply manifest. Battery
-savings and the appearance of every theme surface remain unmeasured on a device.
+Build #160 completed on 2026-09-25 from Build #157's exact cache and supplied
+all three previously unknown post-Titanium Android file hashes. Final
+[Build #161](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/36093793201)
+restored #160's immutable completed `out/Default` key
+`kiwi-incremental-153-e5b7f2f3c17d4066478dd07a23fe4a0a3c32bac9-stage-11`,
+verified all 14 archived source files against the now-complete manifest, passed
+27 relevant tests, applied 26 patches, and signed the arm64 APK with Android v2.
+APK SHA-256: `10ac551e86e57381a2fc15f10d6b5c89337855d6ff6aca99e4bdc6c78003965a`.
+Download artifact ZIP SHA-256: `3c46fd9a0747edfaf9a78adf91ae66a9f25e6cb156e016ab28b42a9590f69783`.
+Battery savings and the appearance of every theme surface remain unmeasured on a device.
 
 ## Tab-search setting and browser dark surfaces (Build #157)
 

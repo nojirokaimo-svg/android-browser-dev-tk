@@ -606,3 +606,16 @@ remain visible as a conflict while independent features can still apply.
 Continue updating manifest hashes against actual post-Titanium source after
 any upstream version bump; a clean compile alone cannot establish UI behavior
 or measured battery savings.
+
+## 2026-09-25: Final Build #161
+
+Build #161 (commit `08c395a3d081164839a2fbc4638d45abdf03e1d2`, run
+`36093793201`) restored the exact completed Build #160 checkpoint, verified
+26 feature patches and 27 tests, matched all 14 archived prepared-source files
+against `manifest.json`, and produced an Android v2 signed arm64 APK. APK
+SHA-256: `10ac551e86e57381a2fc15f10d6b5c89337855d6ff6aca99e4bdc6c78003965a`.
+Artifact ZIP SHA-256: `3c46fd9a0747edfaf9a78adf91ae66a9f25e6cb156e016ab28b42a9590f69783`.
+The completed immutable checkpoint is
+`kiwi-incremental-153-08c395a3d081164839a2fbc4638d45abdf03e1d2-stage-11`.
+Battery reduction and device-wide visual coverage are not measured; neither
+an APK build nor a source hash proves either user-facing behavior.
