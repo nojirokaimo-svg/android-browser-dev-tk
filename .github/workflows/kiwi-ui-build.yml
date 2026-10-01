@@ -1,154 +1,53 @@
 name: Build Titanium-Kiwi core
-
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - codex/kiwi-ui-port
-
+    branches: [codex/kiwi-ui-port]
 permissions:
   contents: read
-  actions: write
-
 concurrency:
   group: titanium-kiwi-core-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
-  build:
+  checkpoint-diagnostics:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
-    outputs:
-      done: ${{ steps.build.outputs.done }}
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
-      - id: build
-        uses: ./.github/actions/kiwi-build-stage
+      - uses: actions/cache/restore@v4
         with:
-          # Build #166 saved this exact M154 partial checkpoint after source preparation.
-          # Keep Ninja history and object files; a cache miss stops the build.
-          restore-key: kiwi-154-6df5931ce5664d898c599acac4bcb0ae005381a4-build
-          require-restore: "true"
-          # The source identity is already M154. Invalidate only the obsolete M153
-          # auxiliary_search turbine dependency that was retained in .ninja_deps.
-          bootstrap-revision: ""
-          transition-from-identity: ""
-          invalidate-m153-auxiliary-search-deps: "true"
-          save-key: kiwi-154-${{ github.sha }}-build
-          final-cache-key: kiwi-incremental-154-${{ github.sha }}-build
-          titanium-commit: dd8d8a969fb6af762a3c2445ff455f7e48626993
-          vanadium-commit: 826316da0994ebd78601a86ba5c0cb34b46ba32d
-          chromium-commit: 334b65d254ccc35df4fca82706d1753227b01039
-          chromium-version: 154.0.8037.92
-          patch-mode: strict
-          build-budget-minutes: "270"
-
-  continue-1:
-    needs: build
-    if: needs.build.outputs.done != 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 350
-    outputs:
-      done: ${{ steps.build.outputs.done }}
-    steps:
-      - uses: actions/checkout@v5
-      - id: build
-        uses: ./.github/actions/kiwi-build-stage
-        with:
-          restore-key: kiwi-154-${{ github.sha }}-build
-          require-restore: "true"
-          save-key: kiwi-154-${{ github.sha }}-continue-1
-          final-cache-key: kiwi-incremental-154-${{ github.sha }}-continue-1
-          titanium-commit: dd8d8a969fb6af762a3c2445ff455f7e48626993
-          vanadium-commit: 826316da0994ebd78601a86ba5c0cb34b46ba32d
-          chromium-commit: 334b65d254ccc35df4fca82706d1753227b01039
-          chromium-version: 154.0.8037.92
-          patch-mode: strict
-          build-budget-minutes: "270"
-
-  continue-2:
-    needs: continue-1
-    if: needs.continue-1.outputs.done != 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 350
-    outputs:
-      done: ${{ steps.build.outputs.done }}
-    steps:
-      - uses: actions/checkout@v5
-      - id: build
-        uses: ./.github/actions/kiwi-build-stage
-        with:
-          restore-key: kiwi-154-${{ github.sha }}-continue-1
-          require-restore: "true"
-          save-key: kiwi-154-${{ github.sha }}-continue-2
-          final-cache-key: kiwi-incremental-154-${{ github.sha }}-continue-2
-          titanium-commit: dd8d8a969fb6af762a3c2445ff455f7e48626993
-          vanadium-commit: 826316da0994ebd78601a86ba5c0cb34b46ba32d
-          chromium-commit: 334b65d254ccc35df4fca82706d1753227b01039
-          chromium-version: 154.0.8037.92
-          patch-mode: strict
-          build-budget-minutes: "270"
-
-  continue-3:
-    needs: continue-2
-    if: needs.continue-2.outputs.done != 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 350
-    outputs:
-      done: ${{ steps.build.outputs.done }}
-    steps:
-      - uses: actions/checkout@v5
-      - id: build
-        uses: ./.github/actions/kiwi-build-stage
-        with:
-          restore-key: kiwi-154-${{ github.sha }}-continue-2
-          require-restore: "true"
-          save-key: kiwi-154-${{ github.sha }}-continue-3
-          final-cache-key: kiwi-incremental-154-${{ github.sha }}-continue-3
-          titanium-commit: dd8d8a969fb6af762a3c2445ff455f7e48626993
-          vanadium-commit: 826316da0994ebd78601a86ba5c0cb34b46ba32d
-          chromium-commit: 334b65d254ccc35df4fca82706d1753227b01039
-          chromium-version: 154.0.8037.92
-          patch-mode: strict
-          build-budget-minutes: "270"
-
-  continue-4:
-    needs: continue-3
-    if: needs.continue-3.outputs.done != 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 350
-    outputs:
-      done: ${{ steps.build.outputs.done }}
-    steps:
-      - uses: actions/checkout@v5
-      - id: build
-        uses: ./.github/actions/kiwi-build-stage
-        with:
-          restore-key: kiwi-154-${{ github.sha }}-continue-3
-          require-restore: "true"
-          save-key: kiwi-154-${{ github.sha }}-continue-4
-          final-cache-key: kiwi-incremental-154-${{ github.sha }}-continue-4
-          titanium-commit: dd8d8a969fb6af762a3c2445ff455f7e48626993
-          vanadium-commit: 826316da0994ebd78601a86ba5c0cb34b46ba32d
-          chromium-commit: 334b65d254ccc35df4fca82706d1753227b01039
-          chromium-version: 154.0.8037.92
-          patch-mode: strict
-          build-budget-minutes: "270"
-
-  require-apk:
-    needs: [build, continue-1, continue-2, continue-3, continue-4]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Require one stage to finish the APK
-        env:
-          S11: ${{ needs.build.outputs.done }}
-          S12: ${{ needs.continue-1.outputs.done }}
-          S13: ${{ needs.continue-2.outputs.done }}
-          S14: ${{ needs.continue-3.outputs.done }}
-          S15: ${{ needs.continue-4.outputs.done }}
+          path: work/titanium/chromium/src/out/Default
+          key: kiwi-154-6df5931ce5664d898c599acac4bcb0ae005381a4-build
+          fail-on-cache-miss: true
+      - name: Read auxiliary-search Ninja dependency files without compiling
         run: |
-          if [[ "$S11" != true && "$S12" != true && "$S13" != true && "$S14" != true && "$S15" != true ]]; then
-            echo "Build and exact-cache continuations ended without producing an APK." >&2
-            exit 1
-          fi
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import sys
+          sys.path.insert(0, "kiwi_port")
+          from checkpoint_compat import _parse_ninja_deps
+          out = Path("work/titanium/chromium/src/out/Default")
+          dest = Path("output/checkpoint-diagnostics")
+          dest.mkdir(parents=True)
+          for pattern in ("obj/chrome/browser/auxiliary_search/*.ninja",
+                          "gen/chrome/browser/auxiliary_search/*.d"):
+              for p in out.glob(pattern):
+                  raw = p.read_bytes()
+                  relative = p.relative_to(out)
+                  target = dest / relative
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(raw)
+                  print(f"FILE {relative} SHA256 {hashlib.sha256(raw).hexdigest()}")
+                  print(raw.decode(errors="replace"))
+          raw = (out / ".ninja_deps").read_bytes()
+          records, paths = _parse_ninja_deps(raw)
+          related = [p.decode(errors="replace") for p in paths if b"auxiliary_search" in p or b"magic_stack" in p]
+          (dest / "deps-paths.txt").write_text("\n".join(related))
+          print("NINJA_DEPS_SHA256", hashlib.sha256(raw).hexdigest())
+          print("Related .ninja_deps paths:", "\n".join(related))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kiwi-checkpoint-dependency-diagnostics
+          path: output/checkpoint-diagnostics
+          retention-days: 7
