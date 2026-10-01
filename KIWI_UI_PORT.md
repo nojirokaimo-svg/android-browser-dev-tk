@@ -1,68 +1,39 @@
-# Titanium-Kiwi Sol v2
+# Titanium-Kiwi UI port
 
-Titanium 152.0.7977.64へKiwi風UIを段階移植するための、固定版パッチとarm64ビルド構成です。
+Titanium `154.0.8037.92`へKiwi系UI・拡張機能・移行/バックアップ機能を固定パッチとして移植する構成です。
 
-## 現在実装している範囲
+## 2026-10-02 — Titanium 154 final APK (Build #172)
 
-- 3点メニュー上部の5操作行を維持
-- その直後に、現行Titaniumの拡張機能をカラーアイコン・バッジ付きで列挙
-- 拡張機能行から既存の権限判定・popup経路を使って実行
-- フラットな「拡張機能」行から `chrome://extensions` を開く
-- 通常メニューのアイコン表示と、Kiwiに近い小さい角丸popup
-- Chromiumの大きな下部メニュー機能とサブメニューを既定で無効化
-- Kiwiと同じ考え方の基本Night mode ON/OFF（UIを暗色へ切替えてAuto Darkを有効化）
-- 英語・日本語の追加文字列
+Build #172 (commit `1a40491d584ff313f1fa36aa34f9131f9877c65d`, run `36835438451`) completed the Titanium `154.0.8037.92` arm64 APK from exact incremental checkpoints without a clean or cold build.
 
-まだ完全移植ではありません。Kiwiの6種類のNight mode、設定画面全体、ツールバー設定、タブ表示方式、新規タブ・履歴等の全画面調整は後続工程です。APKをビルドしていない状態を「完成」とは扱いません。
+- Run: https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/36835438451
+- APK artifact: https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/36835438451/artifacts/11194275751
+- Artifact ZIP SHA-256: `f128448ffd20872b8a960bd5a45b63821191b0c047112ed710f2732e828ff529`
+- APK SHA-256: `a23d6ebcd533862985e45ff6d13b1ae0b6d54684024daf7b1fb62384c1627932`
+- Android APK Signature Scheme v2: verified `true`
+- Completed exact cache: `kiwi-incremental-154-1a40491d584ff313f1fa36aa34f9131f9877c65d-continue-2`
+- Source audit: all 99 before/after hashes match the manifest; all 25 ordered feature patch checksums and file lists match.
+- Verification: 39 CI tests passed; the fresh local suite ran 45 tests with 44 passed and only the real-Ninja fixture skipped because Ninja is unavailable locally. Strict apply/idempotence and conflict/best-effort diagnostics are covered and passed.
+- Removed features remain removed: ultra power-saving patch 220 and Hameln-specific injection patch 225 are not in the 25-patch series.
 
-## 固定しているソース
+The APK was not tested on a physical device, so runtime/UI behavior is not claimed as device-verified.
 
-- Titanium: `80ffcdf1cebe51cddc593f571a6f26c3374aea2e`
-- Vanadium: `150a27e23302cc265baf8a7fb7c0f0112bddf2fd`
-- Chromium: `506c834ecceaa943c5f41e6cfe7f68acb5c45346` (`152.0.7977.64`)
+## 固定ソース
 
-`kiwi_port/apply.py`は、Titaniumのパッチ適用後に対象ファイルのSHA-256が一致するか確認します。一致しない版や部分適用状態には変更を加えません。同じ完成状態へ再実行した場合は、そのまま正常終了します。
+- Titanium: `dd8d8a969fb6af762a3c2445ff455f7e48626993`
+- Vanadium: `826316da0994ebd78601a86ba5c0cb34b46ba32d`
+- Chromium: `334b65d254ccc35df4fca82706d1753227b01039` (`154.0.8037.92`)
 
-## GitHub Actionsでの試験ビルド
+## 保持している範囲
 
-このフォルダの中身をGitHubリポジトリのルートへ入れ、Actionsの **Build Titanium-Kiwi core** を手動実行します。自動更新、定期実行、Release公開は行いません。成功すると `Titanium-Kiwi-core-152-arm64` artifactにAPKとSHA-256が入ります。
+- Kiwi UI、拡張機能、移行、手動フルバックアップ、ローカル認証情報保存
+- コピーしたリンク候補、元の選択タブ維持、既定で非表示のタブ検索
+- ページ・カード・メニューの3種類の独立した暗色背景
+- strictな99ファイルbefore/afterハッシュ検証
+- 順序付き25機能パッチ、checksum/file-list検証、再適用idempotence、競合時の機能名・対象ファイル診断
 
-テスト版のパッケージ名は `io.github.nojirokaimo.titaniumkiwi` です。通常のTitaniumと共存できます。Chromiumのビルドターゲットが生成するテスト署名APKを使用するため、正式配布用ではありません。
+超省電力モード（旧patch 220）とHameln固有注入（旧patch 225）は削除済みで、復活させません。
 
-GitHubホストrunnerは容量・6時間制限に達する可能性があります。Chromium公式資料は100GB以上の空きを要求します。失敗した場合はfailure artifactの`args.gn`やログを確認し、容量不足なら100GB以上のself-hosted Linux runnerへ切り替えます。
+## 再ビルド
 
-## ローカルLinuxでの実行
-
-```bash
-chmod +x build_kiwi_ui_arm64.sh
-./build_kiwi_ui_arm64.sh
-```
-
-Windows単体ではChromium Androidの公式ビルド環境になりません。Windows PCを使う場合も、GitHub ActionsまたはLinux runner上で実行します。
-
-## ファイル
-
-- `kiwi_port/kiwi-ui-core.patch`: 実装差分
-- `kiwi_port/manifest.json`: 固定版、適用前後ハッシュ、実装範囲
-- `kiwi_port/apply.py`: 事前検査付き適用ツール
-- `build_kiwi_ui_arm64.sh`: 固定版取得からarm64 APK検証まで
-- `.github/workflows/build.yml`: 手動ビルドworkflow
-- `DESIGN.md`: 全体設計とSolへの工程分割
-
-## 検証済み / 未検証
-
-検証済み:
-
-- 変更Java 7ファイルの構文解析
-- `git diff --check`
-- cleanな選択ソースへのパッチ適用、適用後ハッシュ、再実行
-- Python構文、shell構文、JSON構文
-
-未検証:
-
-- GN依存解決とAndroid Javaの型コンパイル
-- Chromium/Titaniumの全ビルド
-- APK生成・署名検証・端末起動
-- 実際の拡張機能popup、シークレット、Night mode、回転・IME
-
-ビルドエラーは後続のSol工程で処理します。レンダラーへKiwiの6プリセットを実装する段階は、先にAstraで設計を確定します。
+完成キャッシュ `kiwi-incremental-154-1a40491d584ff313f1fa36aa34f9131f9877c65d-continue-2` をexact restoreし、cache miss時は停止します。cold build、`out/Default`削除、`gn clean`、古い/空キャッシュへのfallbackは禁止です。

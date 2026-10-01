@@ -4,7 +4,7 @@
   "vanadium_commit": "826316da0994ebd78601a86ba5c0cb34b46ba32d",
   "chromium_version": "154.0.8037.92",
   "scope": "M154 rebase of the existing Kiwi UI, extensions, migration, full backups, credentials, Night mode, copied-link row, active-tab preservation, default-hidden tab search and independent page/card/menu dark colors. Extra power-saving menu/settings/runtime removed.",
-  "complete_kiwi_ui_port": false,
+  "complete_kiwi_ui_port": true,
   "files": {
     "base/android/java/src/org/chromium/base/shared_preferences/StrictPreferenceKeyChecker.java": {
       "before_sha256": "f00f376ae7c1e7e6249f3f4024cfd59cf458b7f098952bfba5d7c026b8f373a0",
@@ -402,5 +402,16 @@
       "before_sha256": "306e7ab9806b2ded72aefb572067aed0b9faaf2bb04d47c78a65136a3fff2480",
       "after_sha256": "bb7bace7cea0a6a647ebfdedd01c7f871fbf29f840ab643d0e09972fbc4661f8"
     }
+  },
+  "completed_build": {
+    "run_number": 172,
+    "run_id": 36835438451,
+    "commit": "1a40491d584ff313f1fa36aa34f9131f9877c65d",
+    "artifact_id": 11194275751,
+    "artifact_zip_sha256": "f128448ffd20872b8a960bd5a45b63821191b0c047112ed710f2732e828ff529",
+    "apk_sha256": "a23d6ebcd533862985e45ff6d13b1ae0b6d54684024daf7b1fb62384c1627932",
+    "android_v2_signature_verified": true,
+    "completed_cache_key": "kiwi-incremental-154-1a40491d584ff313f1fa36aa34f9131f9877c65d-continue-2",
+    "physical_device_tested": false
   }
 }
