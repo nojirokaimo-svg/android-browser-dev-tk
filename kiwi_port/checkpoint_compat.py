@@ -64,10 +64,34 @@ def _prune_deps_for_output(deps_path: Path, output: str) -> int:
     original = deps_path.read_bytes()
     records, paths = _parse_ninja_deps(original)
     output_bytes = output.encode()
-    try:
-        output_id = paths.index(output_bytes)
-    except ValueError as exc:
-        raise ValueError(f"output is absent from .ninja_deps: {output}") from exc
+    normalized_output = output_bytes.replace(b"\\", b"/")
+    candidates = [
+        node_id
+        for node_id, path in enumerate(paths)
+        if path.replace(b"\\", b"/") == normalized_output
+        or path.replace(b"\\", b"/").endswith(b"/" + normalized_output)
+    ]
+    if not candidates:
+        # Some Chromium Ninja revisions spell the target's leading directories
+        # differently. Constrain the fallback to the unique module and output
+        # basename rather than accepting an arbitrary suffix match.
+        candidates = [
+            node_id
+            for node_id, path in enumerate(paths)
+            if b"/auxiliary_search/" in path.replace(b"\\", b"/")
+            and path.replace(b"\\", b"/").endswith(b"/java.turbine.jar")
+        ]
+    if len(candidates) != 1:
+        related = [
+            path.decode(errors="backslashreplace")
+            for path in paths
+            if b"auxiliary_search" in path
+        ]
+        raise ValueError(
+            f"expected one .ninja_deps output for {output}; found {len(candidates)}; "
+            f"related paths: {related[:20]}"
+        )
+    output_id = candidates[0]
 
     kept: list[bytes] = []
     removed = 0

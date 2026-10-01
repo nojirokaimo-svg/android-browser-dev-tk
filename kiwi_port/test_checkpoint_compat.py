@@ -45,7 +45,8 @@ class CheckpointCompatibilityTest(unittest.TestCase):
             turbine.write_bytes(b"preserved turbine jar")
             deps = out / ".ninja_deps"
             target = M154_AUXILIARY_SEARCH_TURBINE.as_posix()
-            target_path = path_record(target, 0)
+            stored_target = "../../out/Default/" + target
+            target_path = path_record(stored_target, 0)
             old_dependency_path = path_record(
                 "obj/chrome/browser/magic_stack/android/java.turbine.jar", 1
             )
