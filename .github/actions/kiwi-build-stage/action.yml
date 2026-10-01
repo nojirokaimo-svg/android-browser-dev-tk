@@ -70,10 +70,11 @@ runs:
       shell: bash
       run: |
         python3 kiwi_port/verify_series.py
-        python3 -m py_compile kiwi_port/apply.py kiwi_port/incremental_sources.py
+        python3 -m py_compile kiwi_port/apply.py kiwi_port/incremental_sources.py kiwi_port/checkpoint_compat.py
         PYTHONPATH=kiwi_port python3 -m unittest \
           kiwi_port.test_reapply \
           kiwi_port.test_incremental_sources \
+          kiwi_port.test_checkpoint_compat \
           kiwi_port.test_night_mode_patch \
           kiwi_port.test_credentials_patch \
           kiwi_port.test_job_budget

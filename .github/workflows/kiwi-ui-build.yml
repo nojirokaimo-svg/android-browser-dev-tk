@@ -27,7 +27,7 @@ jobs:
         with:
           # Build #165 saved this exact M154 partial checkpoint after source preparation.
           # Keep Ninja history and object files; a cache miss stops the build.
-          restore-key: kiwi-154-315336208b979e1af3d1d6ea7991cb938036dc6e-build
+          restore-key: kiwi-154-6df5931ce5664d898c599acac4bcb0ae005381a4-build
           require-restore: "true"
           # The source identity is already M154. Invalidate only the obsolete M153
           # auxiliary_search turbine dependency that was retained in .ninja_deps.
