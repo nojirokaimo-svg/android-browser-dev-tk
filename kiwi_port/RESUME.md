@@ -113,3 +113,14 @@ Remaining device validation:
   backup/restore, toolbar/status-bar transitions and extension UI.
 - If a device-only defect is found, repair only its feature patch and resume from
   the exact completed cache above.
+
+
+## 2026-10-01 M154 checkpoint dependency correction
+
+Build #169 stopped before compilation because the auxiliary_search turbine output is absent from `.ninja_deps`; the earlier path-prefix hypothesis was incorrect. Build #170 (`36820039153`) restored the exact #166 key and performed read-only diagnostics without source preparation, compilation, or cache save. Its artifact `11143495032` contains the actual Java depfile.
+
+The old M153 edge is in `gen/chrome/browser/auxiliary_search/java__header.d`, whose SHA-256 is `dabfa69d4762becd172cd7117ed908123bf3d8cc61552f77e5f6a48382e05bec`. It lists `obj/chrome/browser/magic_stack/android/java.turbine.jar` as a dependency of `obj/chrome/browser/auxiliary_search/java.turbine.jar`. `.ninja_deps` SHA-256 from the exact cache is `5ed76c99344522dcc3f5bcf766ac6a3c8779d1f7308d30cd121a37d58fd20717`.
+
+Resume from literal `kiwi-154-6df5931ce5664d898c599acac4bcb0ae005381a4-build`, with empty transition identity. The v3 adjustment runs immediately after exact restore, removes only the obsolete magic_stack token from that one text depfile, backs up the original as `.d.kiwi-m153-backup`, and ages the preserved turbine jar. `.ninja_deps`, `.ninja_log`, other outputs, and cached object contents are unchanged. The v3 marker prevents repeated adjustment.
+
+Local verification: 44 tests passed (including real Ninja), 25 patch checksums passed, YAML parsed. A separate test using the exact downloaded depfile reproduced the cycle before correction and passed Ninja's dry-run after correction. This establishes the targeted checkpoint repair, not a completed APK or device behavior. Resume the normal core workflow and inspect its result before declaring completion.

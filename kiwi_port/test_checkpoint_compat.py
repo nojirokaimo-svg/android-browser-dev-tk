@@ -37,48 +37,81 @@ def ninja_deps(records: list[bytes]) -> bytes:
 
 
 class CheckpointCompatibilityTest(unittest.TestCase):
-    def test_invalidates_only_stale_auxiliary_search_turbine_dependency(self):
+    def test_rejects_wrong_depfile_output_without_touching_checkpoint(self):
         with tempfile.TemporaryDirectory() as temp:
             out = Path(temp)
-            turbine = out / M154_AUXILIARY_SEARCH_TURBINE
-            turbine.parent.mkdir(parents=True)
-            turbine.write_bytes(b"preserved turbine jar")
-            deps = out / ".ninja_deps"
-            target = M154_AUXILIARY_SEARCH_TURBINE.as_posix()
-            stored_target = "../../out/Default/" + target
-            target_path = path_record(stored_target, 0)
-            old_dependency_path = path_record(
-                "obj/chrome/browser/magic_stack/android/java.turbine.jar", 1
-            )
-            unrelated_path = path_record("obj/unrelated/java.turbine.jar", 2)
-            stale_target_record = deps_record(0, [1])
-            unrelated_record = deps_record(2, [1])
-            deps.write_bytes(
-                ninja_deps(
-                    [
-                        target_path,
-                        old_dependency_path,
-                        unrelated_path,
-                        stale_target_record,
-                        unrelated_record,
-                        # The latest record wins in Ninja. Remove every historical
-                        # record for the target so recompaction cannot revive one.
-                        deps_record(0, [2], mtime=456),
-                    ]
-                )
-            )
+            target = out / M154_AUXILIARY_SEARCH_TURBINE
+            target.parent.mkdir(parents=True)
+            target.write_bytes(b"preserved")
+            (out / ".ninja_deps").write_bytes(ninja_deps([]))
+            depfile = out / "gen/chrome/browser/auxiliary_search/java__header.d"
+            depfile.parent.mkdir(parents=True)
+            original = b"obj/other.jar: obj/chrome/browser/magic_stack/android/java.turbine.jar\n"
+            depfile.write_bytes(original)
+            with self.assertRaisesRegex(ValueError, "unexpected output"):
+                invalidate_m154_auxiliary_search_cycle(out)
+            self.assertEqual(original, depfile.read_bytes())
+            self.assertFalse((out / M154_AUXILIARY_SEARCH_MARKER).exists())
 
+    def test_does_not_overwrite_existing_dependency_backup(self):
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp)
+            target = out / M154_AUXILIARY_SEARCH_TURBINE
+            target.parent.mkdir(parents=True)
+            target.write_bytes(b"preserved")
+            (out / ".ninja_deps").write_bytes(ninja_deps([]))
+            depfile = out / "gen/chrome/browser/auxiliary_search/java__header.d"
+            depfile.parent.mkdir(parents=True)
+            original = (M154_AUXILIARY_SEARCH_TURBINE.as_posix() +
+                        ": obj/chrome/browser/magic_stack/android/java.turbine.jar\n").encode()
+            depfile.write_bytes(original)
+            backup = depfile.with_suffix(".d.kiwi-m153-backup")
+            backup.write_bytes(b"previous backup")
+            with self.assertRaisesRegex(ValueError, "refusing to overwrite"):
+                invalidate_m154_auxiliary_search_cycle(out)
+            self.assertEqual(original, depfile.read_bytes())
+            self.assertEqual(b"previous backup", backup.read_bytes())
+
+    @unittest.skipUnless(shutil.which("ninja"), "ninja is required")
+    def test_java_depfile_cycle_is_removed_without_changing_ninja_deps(self):
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp)
+            auxiliary = M154_AUXILIARY_SEARCH_TURBINE.as_posix()
+            magic = "obj/chrome/browser/magic_stack/android/java.turbine.jar"
+            depfile = out / "gen/chrome/browser/auxiliary_search/java__header.d"
+            depfile.parent.mkdir(parents=True)
+            original_depfile = f"{auxiliary}: input {magic}\n".encode()
+            depfile.write_bytes(original_depfile)
+            for relative in (auxiliary, magic):
+                path = out / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"preserved output")
+            (out / "input").write_text("source\n")
+            original_deps = ninja_deps([path_record("obj/unrelated.o", 0)])
+            (out / ".ninja_deps").write_bytes(original_deps)
+            (out / "build.ninja").write_text(
+                "rule compile\n"
+                "  command = touch $out\n"
+                "  depfile = gen/chrome/browser/auxiliary_search/java__header.d\n"
+                f"build {auxiliary}: compile input\n"
+                f"build {magic}: phony {auxiliary}\n"
+                f"default {auxiliary}\n"
+            )
+            def plan():
+                return subprocess.run(["ninja", "-C", str(out), "-n", auxiliary],
+                                      text=True, stdout=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT, check=False)
+            before = plan()
+            self.assertNotEqual(0, before.returncode, before.stdout)
+            self.assertIn("dependency cycle", before.stdout)
             self.assertTrue(invalidate_m154_auxiliary_search_cycle(out))
-
-            self.assertEqual(b"preserved turbine jar", turbine.read_bytes())
-            self.assertEqual(AGE_NS, turbine.stat().st_mtime_ns)
-            self.assertEqual(
-                ninja_deps(
-                    [target_path, old_dependency_path, unrelated_path, unrelated_record]
-                ),
-                deps.read_bytes(),
-            )
-            self.assertTrue((out / M154_AUXILIARY_SEARCH_MARKER).is_file())
+            self.assertEqual(original_deps, (out / ".ninja_deps").read_bytes())
+            self.assertEqual(f"{auxiliary}: input\n".encode(), depfile.read_bytes())
+            self.assertEqual(original_depfile, depfile.with_suffix(".d.kiwi-m153-backup").read_bytes())
+            self.assertEqual(b"preserved output", (out / auxiliary).read_bytes())
+            after = plan()
+            self.assertEqual(0, after.returncode, after.stdout)
+            self.assertFalse(invalidate_m154_auxiliary_search_cycle(out))
 
     def test_marker_makes_invalidation_one_time(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -117,58 +150,6 @@ class CheckpointCompatibilityTest(unittest.TestCase):
             self.assertEqual(malformed, deps.read_bytes())
             self.assertFalse((out / M154_AUXILIARY_SEARCH_MARKER).exists())
 
-    @unittest.skipUnless(shutil.which("ninja"), "ninja is required")
-    def test_targeted_rewrite_breaks_the_real_ninja_dependency_cycle(self):
-        with tempfile.TemporaryDirectory() as temp:
-            out = Path(temp)
-            auxiliary = M154_AUXILIARY_SEARCH_TURBINE.as_posix()
-            magic = "obj/chrome/browser/magic_stack/android/java.turbine.jar"
-            auxiliary_file = out / auxiliary
-            auxiliary_file.parent.mkdir(parents=True)
-            auxiliary_file.write_bytes(b"old auxiliary output")
-            (out / magic).parent.mkdir(parents=True)
-            (out / magic).write_bytes(b"magic output")
-            (out / "input").write_text("source\n")
-            (out / "build.ninja").write_text(
-                "rule compile\n"
-                "  command = touch $out\n"
-                "  deps = gcc\n"
-                "  depfile = $out.d\n"
-                "build " + auxiliary + ": compile input\n"
-                "build " + magic + ": phony " + auxiliary + "\n"
-                "default " + auxiliary + "\n"
-            )
-            (out / ".ninja_deps").write_bytes(
-                ninja_deps(
-                    [
-                        path_record(auxiliary, 0),
-                        path_record(magic, 1),
-                        # Ninja treats a deps record as valid while the output is
-                        # not newer than the recorded mtime.
-                        deps_record(0, [1], mtime=2_000_000_000 * 10**9),
-                    ]
-                )
-            )
-
-            before = subprocess.run(
-                ["ninja", "-C", str(out), "-n", auxiliary],
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                check=False,
-            )
-            self.assertNotEqual(0, before.returncode)
-            self.assertIn("dependency cycle", before.stdout)
-
-            self.assertTrue(invalidate_m154_auxiliary_search_cycle(out))
-            after = subprocess.run(
-                ["ninja", "-C", str(out), "-n", auxiliary],
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                check=False,
-            )
-            self.assertEqual(0, after.returncode, after.stdout)
 
 
 if __name__ == "__main__":

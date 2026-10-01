@@ -6,13 +6,16 @@ from __future__ import annotations
 import argparse
 import os
 from pathlib import Path
+import re
 import struct
 
 AGE_NS = 946684800 * 10**9
 M154_AUXILIARY_SEARCH_TURBINE = Path(
     "obj/chrome/browser/auxiliary_search/java.turbine.jar"
 )
-M154_AUXILIARY_SEARCH_MARKER = ".kiwi-m154-auxiliary-search-deps-pruned-v2"
+M154_AUXILIARY_SEARCH_MARKER = ".kiwi-m154-auxiliary-search-depfile-pruned-v3"
+M154_AUXILIARY_SEARCH_DEPFILE = Path("gen/chrome/browser/auxiliary_search/java__header.d")
+M153_MAGIC_STACK_TURBINE = b"obj/chrome/browser/magic_stack/android/java.turbine.jar"
 
 NINJA_DEPS_SIGNATURE = b"# ninjadeps\n"
 NINJA_DEPS_VERSION = 4
@@ -60,81 +63,14 @@ def _parse_ninja_deps(data: bytes) -> tuple[list[tuple[bool, bytes]], list[bytes
     return records, paths
 
 
-def _prune_deps_for_output(deps_path: Path, output: str) -> int:
-    original = deps_path.read_bytes()
-    records, paths = _parse_ninja_deps(original)
-    output_bytes = output.encode()
-    normalized_output = output_bytes.replace(b"\\", b"/")
-    candidates = [
-        node_id
-        for node_id, path in enumerate(paths)
-        if path.replace(b"\\", b"/") == normalized_output
-        or path.replace(b"\\", b"/").endswith(b"/" + normalized_output)
-    ]
-    if not candidates:
-        # Some Chromium Ninja revisions spell the target's leading directories
-        # differently. Constrain the fallback to the unique module and output
-        # basename rather than accepting an arbitrary suffix match.
-        candidates = [
-            node_id
-            for node_id, path in enumerate(paths)
-            if b"/auxiliary_search/" in path.replace(b"\\", b"/")
-            and path.replace(b"\\", b"/").endswith(b"/java.turbine.jar")
-        ]
-    if len(candidates) != 1:
-        related = [
-            path.decode(errors="backslashreplace")
-            for path in paths
-            if b"auxiliary_search" in path
-        ]
-        raise ValueError(
-            f"expected one .ninja_deps output for {output}; found {len(candidates)}; "
-            f"related paths: {related[:20]}"
-        )
-    output_id = candidates[0]
-
-    kept: list[bytes] = []
-    removed = 0
-    for is_deps, raw_record in records:
-        if is_deps:
-            (record_output_id,) = struct.unpack_from("<I", raw_record, 4)
-            if record_output_id >= len(paths):
-                raise ValueError("dependency record refers to an unknown path id")
-            if record_output_id == output_id:
-                removed += 1
-                continue
-        kept.append(raw_record)
-
-    if not removed:
-        return 0
-    rewritten = NINJA_DEPS_SIGNATURE + struct.pack("<I", NINJA_DEPS_VERSION) + b"".join(kept)
-    # Parse the result before the atomic replacement. This preserves every path and
-    # unrelated dependency record byte-for-byte while removing only the obsolete edge.
-    rewritten_records, rewritten_paths = _parse_ninja_deps(rewritten)
-    if rewritten_paths != paths or any(
-        is_deps and struct.unpack_from("<I", raw, 4)[0] == output_id
-        for is_deps, raw in rewritten_records
-    ):
-        raise ValueError("failed to verify targeted .ninja_deps rewrite")
-
-    temporary = deps_path.with_name(deps_path.name + ".kiwi-prune.tmp")
-    with temporary.open("wb") as stream:
-        stream.write(rewritten)
-        stream.flush()
-        os.fsync(stream.fileno())
-    os.replace(temporary, deps_path)
-    return removed
-
-
 def invalidate_m154_auxiliary_search_cycle(out: Path) -> bool:
-    """Invalidate the one M153 turbine output whose recorded dependency reversed in M154.
+    """Remove the proven M153 reverse edge from the Java action's text depfile.
 
-    Chromium M153 made auxiliary_search:java depend on magic_stack:java. M154 moved the
-    module classes into module_java and made magic_stack:java depend on
-    auxiliary_search:java. An exact M153 checkpoint can therefore retain the removed edge
-    in .ninja_deps and combine it with the new edge into a cycle. Remove every historical
-    dependency record for that single output, leave all other records byte-identical, and
-    age the output so Ninja rebuilds it. No dependency log or generated output is deleted.
+    Build #170's exact checkpoint audit showed that GN's Java action reads
+    gen/chrome/browser/auxiliary_search/java__header.d, without deps=gcc.
+    The turbine output is absent from .ninja_deps. Preserve that log entirely;
+    remove only the magic_stack turbine token from this one text depfile,
+    keep its original bytes in a backup, and age the preserved jar for rebuild.
     """
     out = Path(out)
     marker = out / M154_AUXILIARY_SEARCH_MARKER
@@ -146,13 +82,40 @@ def invalidate_m154_auxiliary_search_cycle(out: Path) -> bool:
     deps = out / ".ninja_deps"
     if not deps.is_file():
         raise ValueError("restored checkpoint has no .ninja_deps")
-    removed = _prune_deps_for_output(deps, M154_AUXILIARY_SEARCH_TURBINE.as_posix())
+    _parse_ninja_deps(deps.read_bytes())
+    depfile = out / M154_AUXILIARY_SEARCH_DEPFILE
+    if not depfile.is_file():
+        return False
+    original = depfile.read_bytes()
+    outputs, separator, inputs = original.partition(b":")
+    if separator != b":" or outputs.strip() != M154_AUXILIARY_SEARCH_TURBINE.as_posix().encode():
+        raise ValueError(f"unexpected output in {depfile}: {outputs!r}")
+    pattern = rb"[ \t]+" + re.escape(M153_MAGIC_STACK_TURBINE) + rb"(?=\s|$)"
+    rewritten_inputs, removed = re.subn(pattern, b"", inputs)
     if not removed:
         return False
+    if removed != 1:
+        raise ValueError(f"expected one stale magic_stack dependency in {depfile}, found {removed}")
+    rewritten = outputs + separator + rewritten_inputs
+    backup = depfile.with_suffix(".d.kiwi-m153-backup")
+    if backup.exists() and backup.read_bytes() != original:
+        raise ValueError(f"refusing to overwrite different dependency backup: {backup}")
+    if not backup.exists():
+        with backup.open("xb") as stream:
+            stream.write(original)
+            stream.flush()
+            os.fsync(stream.fileno())
+    temporary = depfile.with_name(depfile.name + ".kiwi-prune.tmp")
+    with temporary.open("wb") as stream:
+        stream.write(rewritten)
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, depfile)
     os.utime(turbine, ns=(AGE_NS, AGE_NS))
     marker.write_text(
-        f"Removed {removed} stale M153 auxiliary_search dependency record(s) for M154\n"
+        f"Removed magic_stack turbine from {M154_AUXILIARY_SEARCH_DEPFILE}; .ninja_deps unchanged\n"
     )
+    print(f"Removed the stale M153 magic_stack edge from {depfile}; original backed up at {backup}")
     return True
 
 
