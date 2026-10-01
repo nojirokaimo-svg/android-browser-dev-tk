@@ -125,6 +125,15 @@ class ReapplyTest(unittest.TestCase):
         self.assertIn('tabswitcher_preferences.xml', target.read_text())
         self.assertFalse(reject.exists())
 
+    def test_strict_rejects_unmeasured_source_without_modifying_it(self):
+        target = self.src / 'a.txt'
+        target.write_text('before\nunexpected upstream content\n')
+        result = self.apply()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('manifest', result.stderr)
+        self.assertEqual(target.read_text(), 'before\nunexpected upstream content\n')
+        self.assertEqual((self.src / 'b.txt').read_text(), 'before\n')
+
     def test_apply_and_idempotence(self):
         self.assertEqual(self.apply().returncode, 0)
         before = self.git('diff').stdout

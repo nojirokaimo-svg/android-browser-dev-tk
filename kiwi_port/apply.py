@@ -236,6 +236,15 @@ def main() -> int:
             )
         return 0
 
+    if not args.best_effort and any(state == "mismatch" for state in states.values()):
+        bad = [path for path, state in states.items() if state == "mismatch"]
+        features = [
+            f"{feature['id']} ({feature['name']}): "
+            + ", ".join(path for path in feature['files'] if path in bad)
+            for feature in SERIES['features'] if any(path in bad for path in feature['files'])
+        ]
+        raise RuntimeError("strict manifest pre-apply verification failed: "
+                           + ", ".join(bad) + "\n  " + "\n  ".join(features))
     pinned_before = all(state == "before" for state in states.values())
     if not args.best_effort:
         # Check the complete ordered series against a disposable copy of only

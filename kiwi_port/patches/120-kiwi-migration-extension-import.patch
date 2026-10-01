@@ -1,18 +1,8 @@
-diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
---- a/chrome/android/chrome_java_sources.gni
-+++ b/chrome/android/chrome_java_sources.gni
-@@ -228,6 +228,7 @@ chrome_java_sources = [
-   "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
-   "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
-   "java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
-+  "java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java",
-   "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
-   "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
-   "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
+index b912be67e40803af7087f7705370feae13096ef9..904dbe55a1d190bc6b96eaf7427f8954f6a669c1 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
-@@ -3724,6 +3724,7 @@ if (_is_default_toolchain) {
+@@ -3060,6 +3060,7 @@ if (_is_default_toolchain) {
        "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
@@ -20,10 +10,23 @@ diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
        "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
        "java/src/org/chromium/chrome/browser/browserservices/digitalgoods/SiteIsolator.java",
        "java/src/org/chromium/chrome/browser/browserservices/permissiondelegation/InstalledWebappBridge.java",
+diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
+index 61fce0e7de17990b58fca91433311c221ed15cc4..24d9fa9883d8ddcb99bb02d71bb6f762049232e3 100644
+--- a/chrome/android/chrome_java_sources.gni
++++ b/chrome/android/chrome_java_sources.gni
+@@ -246,6 +246,7 @@ chrome_java_sources = [
+   "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
+   "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
+   "java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
++  "java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java",
+   "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
+   "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
+   "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+index 984784fd4280df61a0a86f41c8863e2b73692898..06090cee8d346f132f283cecc2a1f5b055151550 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
-@@ -243,6 +243,11 @@ found in the LICENSE file.
+@@ -269,6 +269,11 @@ by a child template that "extends" this file.
              android:theme="@style/Theme.Chromium.Settings"
              android:exported="false">
          </activity>
@@ -35,41 +38,9 @@ diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/Andro
          <activity android:name="org.chromium.chrome.browser.document.ChromeLauncherActivity"
              android:theme="@style/LauncherTheme"
              android:relinquishTaskIdentity="true"
-diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
---- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-+++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-@@ -39,7 +39,8 @@ import org.chromium.build.annotations.Nullable;
- import org.chromium.chrome.R;
- import org.chromium.chrome.browser.appearance.settings.AppearanceSettingsFragment;
- import org.chromium.chrome.browser.autofill.settings.SettingsNavigationHelper;
- import org.chromium.chrome.browser.backup.KiwiFullBackupActivity;
-+import org.chromium.chrome.browser.backup.KiwiMigrationActivity;
- import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFragment;
- import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsMediator;
- import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsReferrer;
-@@ -363,5 +364,20 @@ public class MainSettings extends ChromeBaseSettingsFragment
-                 });
-         getPreferenceScreen().addPreference(fullBackupPreference);
-+        Preference kiwiMigrationPreference = new Preference(requireContext());
-+        kiwiMigrationPreference.setKey("kiwi_browser_migration");
-+        kiwiMigrationPreference.setTitle(
-+                isJapanese ? "Kiwi Browserから移行" : "Migrate from Kiwi Browser");
-+        kiwiMigrationPreference.setSummary(
-+                isJapanese
-+                        ? "ブックマーク、元日時付き履歴、タブをネイティブ取り込み"
-+                        : "Natively import bookmarks, original visit times and tabs");
-+        kiwiMigrationPreference.setOrder(Integer.MAX_VALUE - 11);
-+        kiwiMigrationPreference.setOnPreferenceClickListener(
-+                preference -> {
-+                    startActivity(new Intent(requireContext(), KiwiMigrationActivity.class));
-+                    return true;
-+                });
-+        getPreferenceScreen().addPreference(kiwiMigrationPreference);
- 
-         IdentityManager identityManager =
-                 IdentityServicesProvider.get().getIdentityManager(getProfile());
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
 new file mode 100644
+index 0000000000000000000000000000000000000000..7c57d830bd61361bc730936269c5fe0ca6ac5110
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
 @@ -0,0 +1,476 @@
@@ -549,10 +520,45 @@ new file mode 100644
 +        boolean loadUnpacked(@JniType("Profile*") Profile profile, String uri);
 +    }
 +}
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
+index dc8da5d0c7b8cf65dac7be450ccd40d9847e72ae..621d81db82e6f7c49c912148bee8d00f32caca52 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
+@@ -44,6 +44,7 @@ import org.chromium.chrome.R;
+ import org.chromium.chrome.browser.appearance.settings.AppearanceSettingsFragment;
+ import org.chromium.chrome.browser.autofill.settings.SettingsNavigationHelper;
+ import org.chromium.chrome.browser.backup.KiwiFullBackupActivity;
++import org.chromium.chrome.browser.backup.KiwiMigrationActivity;
+ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFragment;
+ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsMediator;
+ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsReferrer;
+@@ -377,6 +378,21 @@ public class MainSettings extends ChromeBaseSettingsFragment
+                     return true;
+                 });
+         getPreferenceScreen().addPreference(fullBackupPreference);
++        Preference kiwiMigrationPreference = new Preference(requireContext());
++        kiwiMigrationPreference.setKey("kiwi_browser_migration");
++        kiwiMigrationPreference.setTitle(
++                isJapanese ? "Kiwi Browserから移行" : "Migrate from Kiwi Browser");
++        kiwiMigrationPreference.setSummary(
++                isJapanese
++                        ? "ブックマーク、元日時付き履歴、タブをネイティブ取り込み"
++                        : "Natively import bookmarks, original visit times and tabs");
++        kiwiMigrationPreference.setOrder(Integer.MAX_VALUE - 11);
++        kiwiMigrationPreference.setOnPreferenceClickListener(
++                preference -> {
++                    startActivity(new Intent(requireContext(), KiwiMigrationActivity.class));
++                    return true;
++                });
++        getPreferenceScreen().addPreference(kiwiMigrationPreference);
+ 
+         IdentityManager identityManager =
+                 IdentityServicesProvider.get().getIdentityManager(getProfile());
 diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
+index 071935ef135bce9ac8d9f92493a8f45868a17527..e005923adbc0bcac9c4258b2f9057efb23242542 100644
 --- a/chrome/browser/android/BUILD.gn
 +++ b/chrome/browser/android/BUILD.gn
-@@ -129,6 +129,7 @@ if (is_android) {
+@@ -144,6 +144,7 @@ if (is_android) {
        "background_task_scheduler/proxy_native_task.cc",
        "background_task_scheduler/proxy_native_task.h",
        "backup/chrome_backup_agent.cc",
@@ -562,6 +568,7 @@ diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
        "browserservices/site_isolator.cc",
 diff --git a/chrome/browser/android/backup/kiwi_migration_bridge.cc b/chrome/browser/android/backup/kiwi_migration_bridge.cc
 new file mode 100644
+index 0000000000000000000000000000000000000000..87b1b735fc0d40908f10309ec8cb568993e1284e
 --- /dev/null
 +++ b/chrome/browser/android/backup/kiwi_migration_bridge.cc
 @@ -0,0 +1,211 @@
@@ -776,11 +783,12 @@ new file mode 100644
 +DEFINE_JNI(KiwiMigrationActivity)
 +
 +}  // namespace chrome::android
-
 diff --git a/chrome/browser/resources/extensions/toolbar.html.ts b/chrome/browser/resources/extensions/toolbar.html.ts
+index f2de5b086ddc9508c8cfac534482aa183e8a8359..bc2cda37579647e63423cfed2ec65a2f5cf400b6 100644
 --- a/chrome/browser/resources/extensions/toolbar.html.ts
 +++ b/chrome/browser/resources/extensions/toolbar.html.ts
-@@ -43,5 +43,10 @@ export function getHtml(this: ToolbarElement) {
+@@ -41,6 +41,11 @@ ${this.showPackDialog_ ? html`
+ ` : ''}
  <div id="devDrawer" ?expanded="${this.expanded_}">
    <div id="buttonStrip">
 +<if expr="is_android">
@@ -792,9 +800,10 @@ diff --git a/chrome/browser/resources/extensions/toolbar.html.ts b/chrome/browse
          @click="${this.onLoadUnpackedClick_}">
        $i18n{toolbarLoadUnpacked}
 diff --git a/chrome/browser/resources/extensions/toolbar.ts b/chrome/browser/resources/extensions/toolbar.ts
+index 178a09a2e5a81510b548a2d01930d3b3d473a4f0..22a234233107b02eab172c20d020deef8689dd7f 100644
 --- a/chrome/browser/resources/extensions/toolbar.ts
 +++ b/chrome/browser/resources/extensions/toolbar.ts
-@@ -173,6 +173,13 @@ export class ExtensionsToolbarElement extends ExtensionsToolbarElementBase {
+@@ -179,6 +179,13 @@ export class ExtensionsToolbarElement extends ExtensionsToolbarElementBase {
      this.expanded_ = !this.expanded_;
    }
  
@@ -809,9 +818,10 @@ diff --git a/chrome/browser/resources/extensions/toolbar.ts b/chrome/browser/res
      this.delegate.loadUnpacked()
          .then((success) => {
 diff --git a/chrome/browser/ui/webui/extensions/extensions_ui.cc b/chrome/browser/ui/webui/extensions/extensions_ui.cc
+index c9e85f3caae895e5fd345ec4f1623b78079b1d19..87d9ac4bab4beaa73b78ad824b099d5c0eddbdd3 100644
 --- a/chrome/browser/ui/webui/extensions/extensions_ui.cc
 +++ b/chrome/browser/ui/webui/extensions/extensions_ui.cc
-@@ -43,6 +43,8 @@
+@@ -54,6 +54,8 @@
  #include "ui/webui/webui_util.h"
  
  #if BUILDFLAG(IS_ANDROID)
@@ -820,7 +830,7 @@ diff --git a/chrome/browser/ui/webui/extensions/extensions_ui.cc b/chrome/browse
  #include "chrome/browser/ui/webui/current_channel_logo.h"
  #endif  // BUILDFLAG(IS_ANDROID)
  
-@@ -371,6 +373,11 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
+@@ -514,6 +516,11 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
  #if BUILDFLAG(IS_ANDROID)
    source->AddResourcePath("images/product_logo.png",
                            webui::CurrentChannelLogoResourceId());
@@ -832,7 +842,7 @@ diff --git a/chrome/browser/ui/webui/extensions/extensions_ui.cc b/chrome/browse
  #endif  // BUILDFLAG(IS_ANDROID)
  
  #if BUILDFLAG(IS_CHROMEOS)
-@@ -438,6 +445,15 @@ ExtensionsUI::ExtensionsUI(content::WebUI* web_ui)
+@@ -561,6 +568,15 @@ ExtensionsUI::ExtensionsUI(content::WebUI* web_ui)
    source = CreateAndAddExtensionsSource(profile, *in_dev_mode_);
    ManagedUIHandler::Initialize(web_ui, source);
  

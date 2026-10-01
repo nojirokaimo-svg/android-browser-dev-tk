@@ -1,7 +1,8 @@
 diff --git a/chrome/browser/resources/extensions/item_list.css b/chrome/browser/resources/extensions/item_list.css
+index 5bf72f6775f9cd1cc1fa1ade2ebe35c25029fdaa..6a2b5a8f3052fe10edbdd2b9667aa542ccd98251 100644
 --- a/chrome/browser/resources/extensions/item_list.css
 +++ b/chrome/browser/resources/extensions/item_list.css
-@@ -120,3 +120,13 @@
+@@ -120,3 +120,13 @@ managed-footnote {
     * is clickable. */
    z-index: 1;
  }

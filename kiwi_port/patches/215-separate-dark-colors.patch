@@ -1,8 +1,8 @@
 diff --git a/chrome/android/java/res/xml/appearance_preferences.xml b/chrome/android/java/res/xml/appearance_preferences.xml
-index 08b8bd9fafe2d55c8db3e4eabb30f3fe1e4d62f3..77a5a4f95e535cf2908b135f4ad3ed45ddcc0591 100644
+index a35194f3b581978500531b8d5e56f46d74372e6a..d9a576746434e2df594a2123cdbba044760d84cf 100644
 --- a/chrome/android/java/res/xml/appearance_preferences.xml
 +++ b/chrome/android/java/res/xml/appearance_preferences.xml
-@@ -38,5 +38,11 @@ exclusive options. -->
+@@ -37,5 +37,11 @@ exclusive options. -->
      <Preference
          android:key="kiwi_dark_surface_color"
          android:order="3" />
@@ -15,10 +15,10 @@ index 08b8bd9fafe2d55c8db3e4eabb30f3fe1e4d62f3..77a5a4f95e535cf2908b135f4ad3ed45
  
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-index 506cd296787a85b6cee60563e79a1a85d7ec4a70..2c8a58de4bb2a8ae6643bf629e0de4fe444a7820 100644
+index 5d740431e2ecb48743c2c683cbcbd05fac7deba0..4f41954814452e30c8b9f07fb49939206d068d99 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-@@ -74,21 +74,34 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -76,21 +76,34 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
          initToolbarShortcutPref();
          initUiThemePref();
          initDarkSurfaceColorPref();
@@ -57,7 +57,7 @@ index 506cd296787a85b6cee60563e79a1a85d7ec4a70..2c8a58de4bb2a8ae6643bf629e0de4fe
                          : chosen);
          preference.setOnPreferenceClickListener(
                  ignored -> {
-@@ -110,45 +123,48 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -112,45 +125,48 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
                                                          ? null
                                                          : new String[] {"#000000", "#16171B", "#202124"}[
                                                                  which - 1];
@@ -114,7 +114,7 @@ index 506cd296787a85b6cee60563e79a1a85d7ec4a70..2c8a58de4bb2a8ae6643bf629e0de4fe
                          .setView(input)
                          .setPositiveButton(ja ? "適用" : "Apply", null)
                          .setNegativeButton(ja ? "キャンセル" : "Cancel", null)
-@@ -168,7 +184,7 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -170,7 +186,7 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
                                                                  : "Enter a dark #RRGGBB color");
                                                  return;
                                              }
@@ -124,10 +124,10 @@ index 506cd296787a85b6cee60563e79a1a85d7ec4a70..2c8a58de4bb2a8ae6643bf629e0de4fe
                                          }));
          dialog.show();
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-index eb999cdc036b1bd4485967f7a261bf708f07e92c..c40a01c1307a048cf8ff186d9f66b88138c1d557 100644
+index 72d2a3454aefa27189efd3d90082a4cc6a57040e..0dee1da546e8f1a8a1beea55764e357d5dd6125a 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -979,7 +979,7 @@ class AppMenu implements OnKeyListener {
+@@ -998,7 +998,7 @@ class AppMenu implements OnKeyListener {
      }
  
      private static int getKiwiMenuBackgroundColor(Context context) {

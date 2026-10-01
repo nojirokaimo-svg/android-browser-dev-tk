@@ -1,7 +1,8 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java
+index d0b19c161e83eefff9ef8c770d412dd14a903022..ad445780bc2537c068435cec2037d491c07f9dcd 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java
-@@ -14,18 +14,34 @@
+@@ -14,18 +14,34 @@ import android.net.Uri;
  import android.os.Bundle;
  import android.os.Process;
  import android.os.SystemClock;
@@ -36,7 +37,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
  import java.io.File;
  import java.io.FileInputStream;
  import java.io.FileOutputStream;
-@@ -33,6 +49,8 @@
+@@ -33,6 +49,8 @@ import java.io.IOException;
  import java.io.InputStream;
  import java.io.OutputStream;
  import java.nio.charset.StandardCharsets;
@@ -45,7 +46,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
  import java.text.SimpleDateFormat;
  import java.util.Arrays;
  import java.util.Comparator;
-@@ -42,6 +60,12 @@
+@@ -42,6 +60,12 @@ import java.util.zip.ZipEntry;
  import java.util.zip.ZipInputStream;
  import java.util.zip.ZipOutputStream;
  
@@ -58,7 +59,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
  /**
   * Manual full browser-state backup for Titanium-Kiwi.
   *
-@@ -58,8 +82,16 @@
+@@ -58,7 +82,15 @@ public final class KiwiFullBackupActivity extends Activity {
      private static final String TABS_ROOT = "app_tabs";
      private static final String PENDING_ARCHIVE = "titanium-kiwi-restore.pending.zip";
      private static final String RESTORE_WORK = "titanium-kiwi-restore-work";
@@ -69,13 +70,12 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
 +    private static final int PBKDF2_ITERATIONS = 200000;
      private static final long MAX_RESTORE_BYTES = 8L * 1024L * 1024L * 1024L;
 +    private static final int MAX_PORTABLE_BYTES = 64 * 1024 * 1024;
- 
-+    private @Nullable char[] mPortablePassphrase;
 +
++    private @Nullable char[] mPortablePassphrase;
+ 
      @Override
      protected void onCreate(@Nullable Bundle savedInstanceState) {
-         super.onCreate(savedInstanceState);
-@@ -73,6 +105,9 @@
+@@ -73,6 +105,9 @@ public final class KiwiFullBackupActivity extends Activity {
                                  & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
          setTitle(isJapanese() ? "フルバックアップ / 復元" : "Full backup / restore");
          setContentView(createContentView());
@@ -85,21 +85,21 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
      }
  
      private View createContentView() {
-@@ -87,10 +122,10 @@
+@@ -87,10 +122,10 @@ public final class KiwiFullBackupActivity extends Activity {
          description.setTextSize(16);
          description.setText(
                  isJapanese()
+-                        ? "ブックマーク、閲覧履歴、ダウンロード履歴、開いているタブとタブ状態をZIPに保存します。\n"
 +                        ? "通常バックアップはブラウザ状態を保存します。移行バックアップはさらにCookieとローカル保存パスワードを\n"
 +                                + "パスフレーズで暗号化して含め、再インストールや別端末への移行に備えます。\n"
--                        ? "ブックマーク、閲覧履歴、ダウンロード履歴、開いているタブとタブ状態をZIPに保存します。\n"
                                  + "ダウンロード済みファイル本体は含みません。"
-+                        : "Normal backup saves browser state. Migration backup also includes cookies and local saved passwords encrypted with a passphrase for reinstall/device migration.\nDownloaded files themselves are not included.");
 -                        : "Saves bookmarks, browsing/download history, open tabs and tab state "
 -                                + "to a ZIP archive.\nDownloaded files themselves are not included.");
++                        : "Normal backup saves browser state. Migration backup also includes cookies and local saved passwords encrypted with a passphrase for reinstall/device migration.\nDownloaded files themselves are not included.");
          LinearLayout.LayoutParams textParams =
                  new LinearLayout.LayoutParams(
                          LinearLayout.LayoutParams.MATCH_PARENT,
-@@ -107,6 +142,16 @@
+@@ -107,6 +142,16 @@ public final class KiwiFullBackupActivity extends Activity {
                          LinearLayout.LayoutParams.MATCH_PARENT,
                          LinearLayout.LayoutParams.WRAP_CONTENT));
  
@@ -116,7 +116,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
          Button restore = new Button(this);
          restore.setText(isJapanese() ? "バックアップから復元" : "Restore backup");
          restore.setOnClickListener(view -> chooseRestoreArchive());
-@@ -136,6 +181,15 @@
+@@ -136,6 +181,15 @@ public final class KiwiFullBackupActivity extends Activity {
          startActivityForResult(intent, CREATE_BACKUP_REQUEST);
      }
  
@@ -132,10 +132,11 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
      private void chooseRestoreArchive() {
          Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
          intent.addCategory(Intent.CATEGORY_OPENABLE);
-@@ -149,7 +203,13 @@
+@@ -149,7 +203,13 @@ public final class KiwiFullBackupActivity extends Activity {
          if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
          Uri uri = data.getData();
          if (requestCode == CREATE_BACKUP_REQUEST) {
+-            createBackup(uri);
 +            char[] portablePassphrase = mPortablePassphrase;
 +            mPortablePassphrase = null;
 +            if (portablePassphrase != null) {
@@ -143,11 +144,10 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
 +            } else {
 +                createBackup(uri);
 +            }
--            createBackup(uri);
          } else if (requestCode == RESTORE_BACKUP_REQUEST) {
              stageRestore(uri);
          }
-@@ -179,7 +239,74 @@
+@@ -179,7 +239,74 @@ public final class KiwiFullBackupActivity extends Activity {
                  .start();
      }
  
@@ -222,7 +222,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
          OutputStream output = getContentResolver().openOutputStream(uri, "w");
          if (output == null) throw new IOException("Unable to open destination");
          try (ZipOutputStream zip =
-@@ -196,6 +319,12 @@
+@@ -196,6 +323,12 @@ public final class KiwiFullBackupActivity extends Activity {
              zip.closeEntry();
              zipDirectory(zip, getDir("chrome", Context.MODE_PRIVATE), CHROME_ROOT);
              zipDirectory(zip, getDir("tabs", Context.MODE_PRIVATE), TABS_ROOT);
@@ -235,7 +235,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
          }
      }
  
-@@ -274,11 +403,12 @@
+@@ -274,11 +407,12 @@ public final class KiwiFullBackupActivity extends Activity {
                              }
                              try {
                                  validateArchive(temporary);
@@ -244,12 +244,12 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
                                  if (!temporary.renameTo(pending)) {
                                      throw new IOException("Unable to stage restore archive");
                                  }
-+                                runOnUiThread(() -> restartForRestore(portable));
 -                                runOnUiThread(this::restartForRestore);
++                                runOnUiThread(() -> restartForRestore(portable));
                              } catch (IOException exception) {
                                  deleteRecursively(temporary);
                                  showToast(
-@@ -318,6 +448,9 @@
+@@ -318,6 +452,9 @@ public final class KiwiFullBackupActivity extends Activity {
              if (part.equals("..")) return false;
          }
          return name.equals(ARCHIVE_MARKER)
@@ -259,10 +259,11 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
                  || name.equals(CHROME_ROOT)
                  || name.equals(CHROME_ROOT + "/")
                  || name.startsWith(CHROME_ROOT + "/")
-@@ -326,13 +459,45 @@
+@@ -326,13 +463,45 @@ public final class KiwiFullBackupActivity extends Activity {
                  || name.startsWith(TABS_ROOT + "/");
      }
  
+-    private void restartForRestore() {
 +    private boolean stagePortablePayload(File archive) throws IOException {
 +        File pendingPortable = new File(getNoBackupFilesDir(), PENDING_PORTABLE);
 +        deleteRecursively(pendingPortable);
@@ -293,21 +294,20 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
 +    }
 +
 +    private void restartForRestore(boolean portable) {
--    private void restartForRestore() {
          Toast.makeText(
                          this,
                          isJapanese() ? "再起動して復元します" : "Restarting to restore backup",
                          Toast.LENGTH_SHORT)
                  .show();
+-        Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
 +        Intent launch =
 +                portable
 +                        ? new Intent(this, KiwiFullBackupActivity.class)
 +                        : getPackageManager().getLaunchIntentForPackage(getPackageName());
--        Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
          if (launch == null) {
              showToast(isJapanese() ? "再起動できません" : "Unable to restart browser");
              return;
-@@ -351,6 +516,248 @@
+@@ -351,6 +520,248 @@ public final class KiwiFullBackupActivity extends Activity {
          Process.killProcess(Process.myPid());
      }
  
@@ -556,10 +556,25 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFull
      /** Restores a staged archive before the browser profile is opened. */
      public static void restorePendingBackupIfAny(Context context) {
          File pending = new File(context.getNoBackupFilesDir(), PENDING_ARCHIVE);
+diff --git a/chrome/browser/android/cookies/cookies_fetcher_restore_util.cc b/chrome/browser/android/cookies/cookies_fetcher_restore_util.cc
+index b1e9f8ae623396722c328644fa854cc4f787ed74..10d84b61e52fcba01dad0b2e2d2085dec5327693 100644
+--- a/chrome/browser/android/cookies/cookies_fetcher_restore_util.cc
++++ b/chrome/browser/android/cookies/cookies_fetcher_restore_util.cc
+@@ -61,7 +61,8 @@ void CookiesFetcherRestoreCookiesImpl(JNIEnv* env,
+                                       int32_t source_scheme,
+                                       int32_t source_port,
+                                       int32_t source_type) {
+-  CHECK(profile->IsOffTheRecord());
++  // Titanium-Kiwi also uses this path for explicit, user-initiated portable backup restore.
++  // The caller supplies the regular profile only after decrypting the migration payload.
+ 
+   // TODO (crbug.com/326605834) Once ancestor chain bit changes are
+   // implemented update this method utilize the ancestor bit.
 diff --git a/chrome/browser/android/cookies/java/src/org/chromium/chrome/browser/cookies/CookiesFetcher.java b/chrome/browser/android/cookies/java/src/org/chromium/chrome/browser/cookies/CookiesFetcher.java
+index b2f5a35b94047d1db21b4b889ad22cbeab8f7f33..809e3dc4192d6dadba02c40f62489074733a54cc 100644
 --- a/chrome/browser/android/cookies/java/src/org/chromium/chrome/browser/cookies/CookiesFetcher.java
 +++ b/chrome/browser/android/cookies/java/src/org/chromium/chrome/browser/cookies/CookiesFetcher.java
-@@ -10,6 +10,7 @@
+@@ -10,6 +10,7 @@ import org.jni_zero.CalledByNative;
  import org.jni_zero.JniType;
  import org.jni_zero.NativeMethods;
  
@@ -567,7 +582,7 @@ diff --git a/chrome/browser/android/cookies/java/src/org/chromium/chrome/browser
  import org.chromium.base.ContextUtils;
  import org.chromium.base.ImportantFileWriterAndroid;
  import org.chromium.base.Log;
-@@ -58,6 +59,7 @@
+@@ -58,6 +59,7 @@ public class CookiesFetcher implements Destroyable {
      private final CipherFactory mCipherFactory;
      private final ProfileManager.Observer mProfileManagerObserver;
      private final String mCookieDirPath;
@@ -575,7 +590,7 @@ diff --git a/chrome/browser/android/cookies/java/src/org/chromium/chrome/browser
  
      /**
       * Constructs a CookiesFetcher for a given {@link ProfileProvider}.
-@@ -143,6 +145,60 @@
+@@ -143,6 +145,60 @@ public class CookiesFetcher implements Destroyable {
          CookiesFetcherJni.get().persistCookies(offTheRecordProfile, this);
      }
  
@@ -636,7 +651,7 @@ diff --git a/chrome/browser/android/cookies/java/src/org/chromium/chrome/browser
      /**
       * If an incognito profile exists, synchronously fetch cookies from the file specified and
       * populate the incognito profile with it. Otherwise deletes the file and does not restore the
-@@ -306,6 +362,32 @@
+@@ -306,6 +362,32 @@ public class CookiesFetcher implements Destroyable {
      @VisibleForTesting
      @CalledByNative
      void onCookieFetchFinished(final CanonicalCookie[] cookies) {
@@ -669,16 +684,3 @@ diff --git a/chrome/browser/android/cookies/java/src/org/chromium/chrome/browser
          // Cookies fetching requires operations with the profile and must be
          // done in the main thread. Once that is done, do the save to disk
          // part in {@link BackgroundOnlyAsyncTask} to avoid strict mode violations.
-diff --git a/chrome/browser/android/cookies/cookies_fetcher_restore_util.cc b/chrome/browser/android/cookies/cookies_fetcher_restore_util.cc
---- a/chrome/browser/android/cookies/cookies_fetcher_restore_util.cc
-+++ b/chrome/browser/android/cookies/cookies_fetcher_restore_util.cc
-@@ -61,7 +61,8 @@
-                                       int32_t source_scheme,
-                                       int32_t source_port,
-                                       int32_t source_type) {
-+  // Titanium-Kiwi also uses this path for explicit, user-initiated portable backup restore.
-+  // The caller supplies the regular profile only after decrypting the migration payload.
--  CHECK(profile->IsOffTheRecord());
- 
-   // TODO (crbug.com/326605834) Once ancestor chain bit changes are
-   // implemented update this method utilize the ancestor bit.

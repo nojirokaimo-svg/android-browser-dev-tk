@@ -1,13 +1,14 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
+index 54172cddaf6c5b62c1ba3225e5362728f431cdb7..032bee1a5a2e3a12584b37450cdc8acecb8b2a6e 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -5591,19 +5591,14 @@
-     public ChromeNextTabPolicySupplier getNextTabPolicySupplier() {
+@@ -5751,16 +5751,11 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
          return (ChromeNextTabPolicySupplier) mNextTabPolicySupplier;
      }
  
 -    /** Returns whether to show a NTP as the home surface at startup on tablet in regular mode. */
--    private boolean shouldShowNtpHomeSurfaceOnStartup() {
++    /** Keep the selected tab visible when Titanium returns to the foreground. */
+     private boolean shouldShowNtpHomeSurfaceOnStartup() {
 -        if (mTabModelSelector.isIncognitoSelected()) return false;
 -
 -        assert mInactivityTrackerSupplier.get() != null;
@@ -16,14 +17,9 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedAct
 -                getSavedInstanceState(),
 -                getPersistentInstanceState(),
 -                mInactivityTrackerSupplier.get());
--    }
-+    /** Keep the selected tab visible when Titanium returns to the foreground. */
-+    private boolean shouldShowNtpHomeSurfaceOnStartup() {
 +        // The inactive-startup home surface creates or selects a new tab after a long pause.
 +        // Restore the existing tab model without switching away from the active tab.
 +        return false;
-+    }
+     }
  
      /**
-      * Creates an adapter between the hub's overview alpha observer that takes a float and the
-      * format that the hub expects which is a double.

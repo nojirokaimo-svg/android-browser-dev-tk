@@ -1,8 +1,8 @@
 diff --git a/chrome/android/java/res/xml/appearance_preferences.xml b/chrome/android/java/res/xml/appearance_preferences.xml
-index d5b5533..08b8bd9 100644
+index de61fd03bda5b77cec13c74e0557d70a9a57038a..a35194f3b581978500531b8d5e56f46d74372e6a 100644
 --- a/chrome/android/java/res/xml/appearance_preferences.xml
 +++ b/chrome/android/java/res/xml/appearance_preferences.xml
-@@ -35,4 +35,8 @@ exclusive options. -->
+@@ -34,4 +34,8 @@ exclusive options. -->
          android:title="@string/bookmark_bar_setting"
          android:summary="@string/bookmark_bar_setting_subtitle" />
  
@@ -12,7 +12,7 @@ index d5b5533..08b8bd9 100644
 +
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-index 427570b..506cd29 100644
+index 25d834b49e43932cb1c7e20f87810d7464bf8aef..5d740431e2ecb48743c2c683cbcbd05fac7deba0 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 @@ -4,9 +4,12 @@
@@ -26,9 +26,9 @@ index 427570b..506cd29 100644
  import android.os.Bundle;
 +import android.widget.EditText;
  
+ import androidx.annotation.StringRes;
  import androidx.preference.Preference;
- 
-@@ -39,6 +42,8 @@ import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
+@@ -41,6 +44,8 @@ import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
  import org.chromium.components.prefs.PrefChangeRegistrar;
  import org.chromium.components.prefs.PrefChangeRegistrar.PrefObserver;
  
@@ -37,7 +37,7 @@ index 427570b..506cd29 100644
  /** Fragment to manage appearance settings. */
  @NullMarked
  public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
-@@ -68,6 +73,105 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -70,6 +75,105 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
          initBookmarkBarPref();
          initToolbarShortcutPref();
          initUiThemePref();
@@ -144,7 +144,7 @@ index 427570b..506cd29 100644
  
      @Override
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
-index b230ef0..f9e4c03 100644
+index bfb46e079a573ad000539a541fc3c1dd4759235a..0d2753d2958f4f9a6987f6c7bb6d8649a2dc8c4e 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
 @@ -44,6 +44,7 @@ import org.chromium.chrome.browser.ui.messages.snackbar.Snackbar;
@@ -155,7 +155,7 @@ index b230ef0..f9e4c03 100644
  import org.chromium.components.browser_ui.settings.SettingsNavigation;
  import org.chromium.components.browser_ui.widget.DateDividedAdapter.ItemViewType;
  import org.chromium.components.browser_ui.widget.gesture.BackPressHandler;
-@@ -187,6 +188,9 @@ public class HistoryManager
+@@ -188,6 +189,9 @@ public class HistoryManager
          }
  
          mRootView = new FrameLayout(mActivity);
@@ -163,20 +163,21 @@ index b230ef0..f9e4c03 100644
 +                SemanticColorUtils.getCustomDarkSurfaceColor(mActivity);
 +        if (customDarkSurface != null) mRootView.setBackgroundColor(customDarkSurface);
  
-         // 1. Create selectable components.
-         mSelectableListLayout =
-@@ -227,6 +231,10 @@ public class HistoryManager
+         final boolean isDesktopLayoutEnabled =
+                 ChromeFeatureList.isEnabled(ChromeFeatureList.ANDROID_DESKTOP_HISTORY_LAYOUT);
+@@ -240,6 +244,11 @@ public class HistoryManager
                  mContentManager.getAdapter(),
                  mContentManager.getRecyclerView(),
                  edgeToEdgePadAdjusterGenerator);
 +        if (customDarkSurface != null) {
++            mainView.setBackgroundColor(customDarkSurface);
 +            mSelectableListLayout.setBackgroundColor(customDarkSurface);
 +            mContentManager.getRecyclerView().setBackgroundColor(customDarkSurface);
 +        }
  
-         mIsLargeFormFactorDevice = DeviceFormFactor.isNonMultiDisplayContextOnTablet(mActivity);
-         if (mContentManager.showAppFilter() || mIsLargeFormFactorDevice) {
-@@ -254,6 +262,7 @@ public class HistoryManager
+         if (isDesktopLayoutEnabled) {
+             View navigationPane = mainView.findViewById(R.id.navigation_pane);
+@@ -277,6 +286,7 @@ public class HistoryManager
                                          ? R.menu.app_specific_history_manager_menu
                                          : R.menu.history_manager_menu,
                                  launchedForApp);
@@ -185,10 +186,10 @@ index b230ef0..f9e4c03 100644
          mToolbar.setMenuDelegate(
                  new HistoryManagerToolbar.HistoryManagerMenuDelegate() {
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-index da35533..eb999cd 100644
+index a4c85d1db93f3c3756d47ad0e015e88488d55cac..72d2a3454aefa27189efd3d90082a4cc6a57040e 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -979,6 +979,8 @@ class AppMenu implements OnKeyListener {
+@@ -998,6 +998,8 @@ class AppMenu implements OnKeyListener {
      }
  
      private static int getKiwiMenuBackgroundColor(Context context) {
@@ -198,7 +199,7 @@ index da35533..eb999cd 100644
          boolean isDark =
                  Color.red(menuBgColor) * 299
 diff --git a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
-index 9265792..087864d 100644
+index 92657928590d171b20c2cdf5c1a4d3f53f16fc9f..087864d06a8de8d85e64d94bee192ef72a97fa4c 100644
 --- a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 +++ b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 @@ -27,6 +27,19 @@ import org.chromium.ui.util.ColorUtils;

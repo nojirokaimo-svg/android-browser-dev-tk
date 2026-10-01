@@ -1,7 +1,8 @@
 diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java
+index bda8d2b45a65818b4d7256470b749eb0ac0cd971..ec1430619c37f5f5dbd76d27ba705b227ed492b8 100644
 --- a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java
 +++ b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsThemeClient.java
-@@ -11,11 +11,11 @@
+@@ -11,11 +11,11 @@ import org.jni_zero.JNINamespace;
  import org.jni_zero.JniType;
  
  import org.chromium.build.annotations.NullMarked;
@@ -14,7 +15,7 @@ diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/b
  
  /** A client to provide dark mode information for a given WebContents. */
  @NullMarked
-@@ -36,18 +36,21 @@
+@@ -36,18 +36,21 @@ public class WebContentsThemeClient {
      public static boolean isForceDarkWebContentEnabled(
              @JniType("content::WebContents*") WebContents webContents) {
          if (webContents == null) return false;

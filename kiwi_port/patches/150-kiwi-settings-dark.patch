@@ -1,7 +1,8 @@
 diff --git a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
+index a766a70c7c28186f1bc4d36cb791410eb3b19466..92657928590d171b20c2cdf5c1a4d3f53f16fc9f 100644
 --- a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 +++ b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
-@@ -6,6 +6,7 @@
+@@ -6,6 +6,7 @@ package org.chromium.components.browser_ui.styles;
  
  import android.content.Context;
  import android.content.res.ColorStateList;
@@ -9,7 +10,7 @@ diff --git a/components/browser_ui/styles/android/java/src/org/chromium/componen
  
  import androidx.annotation.AttrRes;
  import androidx.annotation.ColorInt;
-@@ -16,6 +17,7 @@
+@@ -16,6 +17,7 @@ import com.google.android.material.color.MaterialColors;
  import org.chromium.base.ResettersForTesting;
  import org.chromium.build.annotations.NullMarked;
  import org.chromium.build.annotations.Nullable;
@@ -17,7 +18,7 @@ diff --git a/components/browser_ui/styles/android/java/src/org/chromium/componen
  
  /**
   * Provides semantic color values, typically in place of <macro>s which currently cannot be used in
-@@ -152,10 +154,17 @@ public class SemanticColorUtils {
+@@ -152,11 +154,18 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color value that corresponds to settings_bg_color. */
      public static @ColorInt int getSettingsBackgroundColor(Context context) {
@@ -35,3 +36,4 @@ diff --git a/components/browser_ui/styles/android/java/src/org/chromium/componen
 +        }
          return getColorSurfaceBright(context);
      }
+ 

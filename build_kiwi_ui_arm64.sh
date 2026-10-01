@@ -5,10 +5,10 @@ KIT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 BUILD_ROOT="${KIWI_BUILD_ROOT:-$KIT_ROOT/work}"
 TITANIUM_DIR="$BUILD_ROOT/titanium"
 TITANIUM_REPOSITORY="${TITANIUM_REPOSITORY:-https://github.com/jqssun/android-titanium-browser.git}"
-TITANIUM_COMMIT="${TITANIUM_COMMIT:-97a21b7a98e4446142a39bd38190023ebb34cd74}"
-VANADIUM_COMMIT="${VANADIUM_COMMIT:-2aaf9dfc919e620564409f94beedaedca5301e81}"
-CHROMIUM_COMMIT="${CHROMIUM_COMMIT:-78e5e45d4bb41035e17ea4da2cc257f496416ac9}"
-VERSION="${CHROMIUM_VERSION:-153.0.8010.52}"
+TITANIUM_COMMIT="${TITANIUM_COMMIT:-dd8d8a969fb6af762a3c2445ff455f7e48626993}"
+VANADIUM_COMMIT="${VANADIUM_COMMIT:-826316da0994ebd78601a86ba5c0cb34b46ba32d}"
+CHROMIUM_COMMIT="${CHROMIUM_COMMIT:-334b65d254ccc35df4fca82706d1753227b01039}"
+VERSION="${CHROMIUM_VERSION:-154.0.8037.92}"
 PHASE="${KIWI_BUILD_PHASE:-all}"
 PATCH_MODE="${KIWI_PATCH_MODE:-strict}"
 
@@ -128,22 +128,31 @@ version_lt() {
   [[ "$1" != "$2" ]] && [[ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1)" == "$1" ]]
 }
 source "$TITANIUM_DIR/patch.sh"
-for kiwi_hash_file in \
-  chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java \
-  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java \
-  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java \
-  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java \
-  chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java \
-  chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java \
-  chrome/android/java/res/xml/appearance_preferences.xml \
-  chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java \
-  chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java \
-  components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java \
-  components/omnibox/browser/clipboard_provider.cc \
-  components/open_from_clipboard/clipboard_recent_content.cc; do
-  printf "KIWI_SOURCE_SHA256 before %s " "$kiwi_hash_file"
-  sha256sum "$kiwi_hash_file" | cut -d" " -f1
-done
+audit_kiwi_sources() {
+  python3 - "$KIT_ROOT" "$PWD" "$1" <<'PY_AUDIT'
+import hashlib, json, sys, tarfile
+from pathlib import Path
+kit, source, phase = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+manifest = json.loads((kit / "kiwi_port/manifest.json").read_text())
+output = kit / "output"
+output.mkdir(exist_ok=True)
+hashes = {}
+with tarfile.open(output / f"kiwi-sources-{phase}.tar.gz", "w:gz") as archive:
+    for relative in manifest["files"]:
+        path = source / relative
+        actual = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+        hashes[relative] = actual
+        print(f"KIWI_SOURCE_SHA256 {phase} {relative} {actual}")
+        if path.is_file():
+            archive.add(path, arcname=relative, recursive=False)
+(output / f"kiwi-source-hashes-{phase}.json").write_text(
+    json.dumps({"titanium_commit": manifest["titanium_commit"],
+                "vanadium_commit": manifest["vanadium_commit"],
+                "chromium_commit": manifest["chromium_commit"],
+                "phase": phase, "files": hashes}, indent=2) + "\n")
+PY_AUDIT
+}
+audit_kiwi_sources before
 PATCH_ARGS=()
 if [[ "$PATCH_MODE" == "best-effort" ]]; then
   PATCH_ARGS+=(--best-effort --report "${KIWI_PATCH_REPORT:-$KIT_ROOT/output/kiwi-patch-report.md}")
@@ -152,22 +161,7 @@ elif [[ "$PATCH_MODE" != "strict" ]]; then
   exit 2
 fi
 python3 "$KIT_ROOT/kiwi_port/apply.py" "$PWD" "${PATCH_ARGS[@]}"
-for kiwi_hash_file in \
-  chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java \
-  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java \
-  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java \
-  chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java \
-  chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java \
-  chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java \
-  chrome/android/java/res/xml/appearance_preferences.xml \
-  chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java \
-  chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java \
-  components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java \
-  components/omnibox/browser/clipboard_provider.cc \
-  components/open_from_clipboard/clipboard_recent_content.cc; do
-  printf "KIWI_SOURCE_SHA256 after %s " "$kiwi_hash_file"
-  sha256sum "$kiwi_hash_file" | cut -d" " -f1
-done
+audit_kiwi_sources after
 
 # Install compiler packages only after every source patch has applied cleanly.
 ./build/install-build-deps.sh --no-prompt
@@ -207,6 +201,8 @@ s = s.replace(
 # without changing generated release code by dropping external symbols/linker map.
 s = s.replace('symbol_level = 1', 'symbol_level = 0')
 s = s.replace('generate_linker_map = true', 'generate_linker_map = false')
+# Resume Ninja history; Siso cannot consume this checkpoint.
+s = s.replace('use_siso = true', 'use_siso = false')
 s += '\nblink_symbol_level = 0\nv8_symbol_level = 0\ntreat_warnings_as_errors = false\n'
 if 'is_debug = false' not in s or 'is_official_build = true' not in s:
     raise SystemExit('Titanium release optimization flags are missing from args.gn')
@@ -231,7 +227,11 @@ fi
 printf 'Build command:'
 printf ' %q' "${BUILD_COMMAND[@]}"
 printf '\n'
-if [[ -n "${KIWI_BUILD_BUDGET_MINUTES:-}" ]]; then
+if [[ -n "${KIWI_BUILD_BUDGET_SECONDS:-}" ]]; then
+  timeout --signal=INT --kill-after=5m \
+    "${KIWI_BUILD_BUDGET_SECONDS}s" \
+    "${BUILD_COMMAND[@]}" || BUILD_STATUS=$?
+elif [[ -n "${KIWI_BUILD_BUDGET_MINUTES:-}" ]]; then
   timeout --signal=INT --kill-after=5m \
     "${KIWI_BUILD_BUDGET_MINUTES}m" \
     "${BUILD_COMMAND[@]}" || BUILD_STATUS=$?
@@ -299,6 +299,7 @@ PY
 
 APKSIGNER="$(find third_party/android_sdk/public/build-tools -type f -name apksigner | sort | tail -n 1)"
 test -x "$APKSIGNER"
-"$APKSIGNER" verify --verbose "$OUTPUT_APK"
+"$APKSIGNER" verify --verbose "$OUTPUT_APK" | tee "$KIT_ROOT/output/apk-signature.txt"
+grep -Fq "Verified using v2 scheme (APK Signature Scheme v2): true" "$KIT_ROOT/output/apk-signature.txt"
 sha256sum "$OUTPUT_APK" > "$KIT_ROOT/output/SHA256SUMS.txt"
 touch "$KIT_ROOT/output/BUILD_COMPLETE"

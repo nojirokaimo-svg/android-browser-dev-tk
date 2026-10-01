@@ -1,7 +1,8 @@
 diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsDarkModeController.java b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsDarkModeController.java
+index 2ec6c177f6e96d91d909e086f563e83bfa2e93dd..e29c438edcd5963a7b1ae3c0ae30a46c7520d53b 100644
 --- a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsDarkModeController.java
 +++ b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsDarkModeController.java
-@@ -16,7 +16,6 @@ import org.chromium.components.content_settings.ContentSettingsType;
+@@ -14,7 +14,6 @@ import org.chromium.components.content_settings.ContentSettingsType;
  import org.chromium.components.ukm.UkmRecorder;
  import org.chromium.content_public.browser.BrowserContextHandle;
  import org.chromium.content_public.browser.WebContents;
@@ -9,7 +10,7 @@ diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/b
  import org.chromium.url.GURL;
  
  /**
-@@ -75,8 +74,7 @@ public class WebContentsDarkModeController {
+@@ -69,8 +68,7 @@ public class WebContentsDarkModeController {
  
          public boolean isFeatureEnabled(
                  Context context, BrowserContextHandle browserContextHandle) {
@@ -19,7 +20,7 @@ diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/b
          }
  
          public void recordAutoDarkUkm(WebContents webContents, boolean enabled) {
-@@ -89,9 +87,6 @@ public class WebContentsDarkModeController {
+@@ -85,9 +83,6 @@ public class WebContentsDarkModeController {
              if (!isGlobalUserSettingsEnabled(browserContextHandle)) {
                  return false;
              }

@@ -1,8 +1,9 @@
 diff --git a/chrome/browser/single_tab/android/java/src/org/chromium/chrome/browser/single_tab/SingleTabModuleBuilder.java b/chrome/browser/single_tab/android/java/src/org/chromium/chrome/browser/single_tab/SingleTabModuleBuilder.java
-index 5f59c27616d0a..4816aec30aede 100644
+index efe1ac2d020594aba7725a7dd6627de7ffb34f89..69c0e94bd0568d70dea292817cd8323eac90d28c 100644
 --- a/chrome/browser/single_tab/android/java/src/org/chromium/chrome/browser/single_tab/SingleTabModuleBuilder.java
 +++ b/chrome/browser/single_tab/android/java/src/org/chromium/chrome/browser/single_tab/SingleTabModuleBuilder.java
-@@ -114,6 +114,8 @@ public class SingleTabModuleBuilder implements ModuleProviderBuilder {
+@@ -114,7 +114,9 @@ public class SingleTabModuleBuilder implements ModuleProviderBuilder {
+ 
      @Override
      public boolean isEligible() {
 -        return true;

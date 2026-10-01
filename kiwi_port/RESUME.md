@@ -1,13 +1,46 @@
 # Current implementation checkpoint
 
-The current target is Titanium `v153.0.8010.52` with upstream commits
-`97a21b7a98e4446142a39bd38190023ebb34cd74` (Titanium),
-`2aaf9dfc919e620564409f94beedaedca5301e81` (Vanadium), and
-`78e5e45d4bb41035e17ea4da2cc257f496416ac9` (Chromium). Build #146 is
-the most recent completed baseline, with exact immutable cache
-`kiwi-incremental-153-8816925c2c1c0f2b96c723a4b5f7509c2816cb56-stage-1`.
-See `CHATGPT_HANDOFF.md` for build status and unresolved validation. Later
-sections document the historical 153.0.8010.36 checkpoint.
+## 2026-10-01: Titanium 154 update
+
+| Upstream | Pinned revision |
+|---|---|
+| Titanium v154.0.8037.92 | `dd8d8a969fb6af762a3c2445ff455f7e48626993` |
+| Vanadium | `826316da0994ebd78601a86ba5c0cb34b46ba32d` |
+| Chromium 154.0.8037.92 | `334b65d254ccc35df4fca82706d1753227b01039` |
+
+The unused extra power-saving feature (220) is removed: no menu toggle,
+settings switches, renderer limit, reduced-motion override, or Prerender2
+suppression is installed by the Kiwi series. Existing saved values are inert.
+The independent dark page/card/menu colors, default-hidden tab search,
+copied-link row, extensions and backups remain in the 25-feature series.
+The Hameln-specific injection remains withdrawn.
+
+All 25 patches were rebased in order against the M154 post-Titanium subset.
+The manifest now measures every patch-owned file: 99 before/after hashes,
+including ChromeTabbedActivity.java. Strict application must match these
+hashes again in the actual runner preparation; unknown drift stops before
+compiling. Best-effort mode still identifies feature/file conflicts and applies
+independent clean hunks. Full before/after source archives and hashes are uploaded.
+Local verification: 38 Python tests, complete patch integrity, strict ordered
+reapplication, all 99 final hashes, and idempotence passed. APK compilation
+and device behavior remain pending.
+
+The first job restores only Build #163's completed immutable checkpoint:
+`kiwi-incremental-153-780689451ec17d83ff74d72a733205b5644fa279-stage-11`.
+Its save was confirmed in job 108056714484 on 2026-09-25 at 12:15:56 UTC.
+The source transition accepts only the exact prior M153 identity, preserves
+Ninja history/objects/generated outputs, and regenerates GN for M154 using
+Ninja (`use_siso=false`). Cache miss stops immediately. No deletion, clean,
+cache overwrite, or older/empty fallback is permitted.
+
+GitHub-hosted jobs have a six-hour limit. Jobs use 350 minutes with a
+maximum 270-minute compile budget; elapsed preparation reduces that budget
+when necessary to reserve 45 minutes for shutdown, signing, cache save and
+artifact upload. Continuation jobs run only when the APK is unfinished and
+the preceding job succeeded in saving its exact checkpoint. Compiler failures
+require diagnosis before a new resume, not blind retries or restarting from #163.
+Final completion requires Android v2 signing, APK/artifact SHA-256, runner
+source verification and updated handoff records. Device claims require device evidence.
 
 ## Historical 153.0.8010.36 checkpoint
 

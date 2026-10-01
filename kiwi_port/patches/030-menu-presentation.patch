@@ -1,8 +1,9 @@
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-index 4dea03c56a8b6..0000000000000 100644
+index 5456f0963343c0d6db1b2c8b3b08e0e30214bdc0..a4c85d1db93f3c3756d47ad0e015e88488d55cac 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -399,12 +399,13 @@ class AppMenu implements OnKeyListener {
+@@ -417,11 +417,12 @@ class AppMenu implements OnKeyListener {
+             mListView.setVerticalScrollBarEnabled(false);
          }
  
 -        if (SysUtils.isLowEndDevice()) {
@@ -16,9 +17,7 @@ index 4dea03c56a8b6..0000000000000 100644
                  drawable.setTintMode(PorterDuff.Mode.MULTIPLY);
                  contentView.setBackground(drawable);
              }
-         }
- 
-@@ -977,11 +979,42 @@ class AppMenu implements OnKeyListener {
+@@ -996,11 +997,42 @@ class AppMenu implements OnKeyListener {
          mMenuItemEnterAnimator.start();
      }
  
@@ -61,12 +60,11 @@ index 4dea03c56a8b6..0000000000000 100644
  
          // Ensure the inner shape has standard padding, and conditionally add visual menu top
          // padding.
-
 diff --git a/components/browser_ui/styles/android/java/res/values/styles.xml b/components/browser_ui/styles/android/java/res/values/styles.xml
-index 2876f1d44b33835568a2f7ca3ed66134cc935711..69d0f1a94c1a929212784e5fdebeb2d6e0c11eb8 100644
+index ef76cf812a5d56f663b24d139c9ebe6e281f7a16..2ec9d17a72b60c50745b445d3ddbf6b232508aab 100644
 --- a/components/browser_ui/styles/android/java/res/values/styles.xml
 +++ b/components/browser_ui/styles/android/java/res/values/styles.xml
-@@ -126,7 +126,7 @@ found in the LICENSE file.
+@@ -136,7 +136,7 @@ found in the LICENSE file.
      <!-- Expressive styling for an icon in an overflow menu icon row. -->
      <style name="OverflowMenuButton" parent="Widget.Material3Expressive.Button.IconButton.Tonal">
          <item name="materialSizeOverlay">?attr/iconRowButtonSizeOverlay</item>

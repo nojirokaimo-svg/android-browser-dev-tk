@@ -26,21 +26,21 @@ inputs:
     required: false
     default: ""
   transition-from-identity:
-    description: Exact previous source identity allowed for one patch-level upstream transition.
+    description: Exact previous source identity allowed for one explicit upstream transition.
     required: false
     default: ""
   titanium-commit:
     required: false
-    default: "97a21b7a98e4446142a39bd38190023ebb34cd74"
+    default: "dd8d8a969fb6af762a3c2445ff455f7e48626993"
   vanadium-commit:
     required: false
-    default: "2aaf9dfc919e620564409f94beedaedca5301e81"
+    default: "826316da0994ebd78601a86ba5c0cb34b46ba32d"
   chromium-commit:
     required: false
-    default: "78e5e45d4bb41035e17ea4da2cc257f496416ac9"
+    default: "334b65d254ccc35df4fca82706d1753227b01039"
   chromium-version:
     required: false
-    default: "153.0.8010.52"
+    default: "154.0.8037.92"
   patch-mode:
     description: strict for pinned builds; best-effort for a newly resolved upstream.
     required: false
@@ -48,7 +48,7 @@ inputs:
   build-budget-minutes:
     description: Maximum Ninja runtime, leaving time for an immutable checkpoint save.
     required: false
-    default: "315"
+    default: "270"
 
 outputs:
   done:
@@ -58,6 +58,10 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Record job deadline for checkpoint-safe compilation
+      shell: bash
+      run: echo "KIWI_STAGE_START=$(date +%s)" >> "$GITHUB_ENV"
+
     - name: Verify complete patch series integrity
       shell: bash
       run: |
@@ -67,7 +71,8 @@ runs:
           kiwi_port.test_reapply \
           kiwi_port.test_incremental_sources \
           kiwi_port.test_night_mode_patch \
-          kiwi_port.test_credentials_patch
+          kiwi_port.test_credentials_patch \
+          kiwi_port.test_job_budget
 
     - name: Enforce checkpoint-only resume
       if: inputs.require-restore == 'true' && inputs.restore-key == ''
@@ -133,25 +138,14 @@ runs:
       run: ./build_kiwi_ui_arm64.sh
 
     - name: Preserve the prepared UI source for exact manifest verification
-      if: always() && hashFiles('work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java') != ''
+      if: always() && hashFiles('output/kiwi-sources-before.tar.gz') != ''
       uses: actions/upload-artifact@v4
       with:
         name: kiwi-ui-source-audit-${{ inputs.save-key }}
         path: |
-          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-          work/titanium/chromium/src/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
-          work/titanium/chromium/src/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
-          work/titanium/chromium/src/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-          work/titanium/chromium/src/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java
-          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
-          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
-          work/titanium/chromium/src/chrome/android/java/res/xml/tabswitcher_preferences.xml
-          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-          work/titanium/chromium/src/chrome/android/java/res/xml/appearance_preferences.xml
-          work/titanium/chromium/src/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
-          work/titanium/chromium/src/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-          work/titanium/chromium/src/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
+          output/kiwi-sources-*.tar.gz
+          output/kiwi-source-hashes-*.json
+          output/kiwi-patch-report.*
         if-no-files-found: error
         retention-days: 7
 
@@ -255,6 +249,12 @@ runs:
           fi
           date +%s%N > output/incremental-build-start-ns
         fi
+        elapsed=$(( $(date +%s) - KIWI_STAGE_START ))
+        export KIWI_BUILD_BUDGET_SECONDS
+        KIWI_BUILD_BUDGET_SECONDS=$(python3 kiwi_port/job_budget.py \
+          --elapsed-seconds "$elapsed" \
+          --requested-minutes "$KIWI_BUILD_BUDGET_MINUTES")
+        echo "Ninja budget: ${KIWI_BUILD_BUDGET_SECONDS}s; 45 minutes reserved for checkpoint/signing/upload."
         ./build_kiwi_ui_arm64.sh 2>&1 | tee output/build.log
 
     - name: Record result and checkpoint size
@@ -291,6 +291,7 @@ runs:
         path: |
           output/Titanium-Kiwi-core-*-arm64-v8a.apk
           output/SHA256SUMS.txt
+          output/apk-signature.txt
         if-no-files-found: error
         retention-days: 14
 

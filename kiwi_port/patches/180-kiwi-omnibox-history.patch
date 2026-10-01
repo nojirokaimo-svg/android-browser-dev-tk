@@ -1,35 +1,19 @@
-diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
---- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
-+++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
-@@ -1,7 +1,9 @@
-         @Override
-         public boolean isLocationBarShownInNtp() {
-             if (mIsDestroyed) return false;
--            return isInSingleUrlBarMode() && !mNewTabPageCoordinator.urlFocusAnimationsDisabled();
-+            // Kiwi keeps the real toolbar omnibox pinned at the top of a new tab instead of
-+            // morphing it into Chromium's large in-page fake search box.
-+            return false;
-         }
- 
-         @Override
-diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
---- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
-+++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
-@@ -2,6 +2,10 @@
-                         mProfile,
-                         mBackPressManager);
-         mModel.set(NewTabPageLayoutProperties.SEARCH_BOX_VIEW, mNtpSearchBox.getView());
-+        // The real toolbar omnibox is always used on phones for the Kiwi layout. Keep the
-+        // Chromium fakebox instantiated for the surrounding NTP plumbing, but remove it from
-+        // layout so it does not reserve the oversized centered search-box space.
-+        mNtpSearchBox.getView().setVisibility(View.GONE);
- 
-         updateSearchBoxTwoSideMargin();
-         initializeLogoCoordinator();
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryContentManager.java b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryContentManager.java
+index 2814ad9f7cf38c507e5f3abce2e3a3e187a2e04d..892da2fa8f0cee6fb907b183e3fa18de97951111 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryContentManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryContentManager.java
-@@ -2,11 +2,9 @@
+@@ -613,7 +613,9 @@ public class HistoryContentManager implements SignInStateObserver, PrefObserver
+      * Note that this may return true even if there are currently no privacy disclaimers.
+      */
+     boolean getShouldShowPrivacyDisclaimersIfAvailable() {
+-        return mShouldShowPrivacyDisclaimers;
++        // Kiwi omits the informational privacy/app-history card entirely. The clear-browsing-data
++        // header is a separate item and remains visible.
++        return false;
+     }
+ 
+     /** Called to notify when the privacy disclaimer visibility has changed. */
+@@ -640,11 +642,9 @@ public class HistoryContentManager implements SignInStateObserver, PrefObserver
          return HistoryManager.isAppSpecificHistoryEnabled() && mShowAppFilter;
      }
  
@@ -43,39 +27,53 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/History
      }
  
      /** Called after a user clicks the privacy disclaimer link. */
-@@ -610,7 +608,9 @@
-      * Note that this may return true even if there are currently no privacy disclaimers.
-      */
-     boolean getShouldShowPrivacyDisclaimersIfAvailable() {
--        return mShouldShowPrivacyDisclaimers;
-+        // Kiwi omits the informational privacy/app-history card entirely. The clear-browsing-data
-+        // header is a separate item and remains visible.
-+        return false;
-     }
- 
-     /** Called to notify when the privacy disclaimer visibility has changed. */
-diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
---- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
-+++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
-@@ -1,10 +1,13 @@
-         holder.dropdown.setBackgroundColor(backgroundColor);
- 
-+        // Kiwi leaves the current page visible behind the focused omnibox and darkens it with a
-+        // translucent scrim. The dropdown itself remains opaque; only the unused phone area is
-+        // translucent so the page can still be seen.
-         if (model.get(SuggestionListProperties.IS_LARGE_SCREEN)
-                 && layoutMode != FuseboxLayoutMode.SUGGESTIONS_POPOVER) {
-             holder.container.setBackgroundColor(Color.TRANSPARENT);
-         } else {
--            holder.container.setBackgroundColor(backgroundColor);
-+            holder.container.setBackgroundColor(Color.argb(115, 0, 0, 0));
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
+index 34e76fe0c4a0ab8ed374cf4b97bf044b5f349d13..6be9ebfbb0d7b6c8e55d77cac1a3669848fceefb 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
+@@ -273,7 +273,9 @@ public class NewTabPage
+         @Override
+         public boolean isLocationBarShownInNtp() {
+             if (mIsDestroyed) return false;
+-            return isInSingleUrlBarMode() && !mNewTabPageCoordinator.urlFocusAnimationsDisabled();
++            // Kiwi keeps the real toolbar omnibox pinned at the top of a new tab instead of
++            // morphing it into Chromium's large in-page fake search box.
++            return false;
          }
-     }
  
+         @Override
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
+index 63ad92399f0e4b76a51fd08d8a0c80e4cbc3f186..60aecd081c1a49518960dcff30b5b15b0b24d8ad 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
+@@ -416,6 +416,10 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
+                         mProfile,
+                         mBackPressManager);
+         mModel.set(NewTabPageLayoutProperties.SEARCH_BOX_VIEW, mNtpSearchBox.getView());
++        // The real toolbar omnibox is always used on phones for the Kiwi layout. Keep the
++        // Chromium fakebox instantiated for the surrounding NTP plumbing, but remove it from
++        // layout so it does not reserve the oversized centered search-box space.
++        mNtpSearchBox.getView().setVisibility(View.GONE);
+ 
+         updateSearchBoxTwoSideMargin();
+         initializeLogoCoordinator();
+diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
+index 59d5b1d5ab8fef115b26a44f8bb4bbaaeec46f35..72ba3ed44f44026079151504e8ebb2d21afa3e5f 100644
+--- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
++++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
+@@ -191,6 +191,7 @@ public class AutocompleteCoordinator implements OmniboxSuggestionsVisualState {
+                 (holder) -> {
+                     mContainer = holder.container;
+                     mDropdown = holder.dropdown;
++                    mContainer.setDismissOmniboxCallback(delegate::clearOmniboxFocus);
+                 });
+         LazyConstructionPropertyMcp.create(
+                 listModel,
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/OmniboxSuggestionsContainer.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/OmniboxSuggestionsContainer.java
+index bb400f40caf92519b5ec97052e2898324ab2799e..2cc1cc15e22ac74c30fe4b4436c9ab8a2102770f 100644
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/OmniboxSuggestionsContainer.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/OmniboxSuggestionsContainer.java
-@@ -3,6 +3,7 @@
+@@ -43,6 +43,7 @@ public class OmniboxSuggestionsContainer extends FrameLayout {
      private OmniboxSuggestionsDropdown mDropdown;
      private @Nullable OmniboxSuggestionsDropdownEmbedder mEmbedder;
      private @Nullable Callback<Integer> mHeightChangeListener;
@@ -83,7 +81,7 @@ diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/brow
      private OmniboxAlignment mOmniboxAlignment = OmniboxAlignment.UNSPECIFIED;
  
      private int mListViewMaxHeight;
-@@ -54,13 +55,21 @@
+@@ -94,15 +95,22 @@ public class OmniboxSuggestionsContainer extends FrameLayout {
      @Override
      @SuppressLint("ClickableViewAccessibility")
      public boolean onTouchEvent(MotionEvent event) {
@@ -92,8 +90,7 @@ diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/brow
 -        // Omnibox.
 -        // Making the container `clickable=true` achieves similar goal, but this consumes all
 -        // activators, including keyboard <Enter> key.
-+        // Kiwi treats the dimmed area below the actual suggestions as a cancel target. Taps on
-+        // suggestion rows are still handled by the dropdown child itself.
++        // Dismiss only taps below the suggestion rows; dropdown handles row taps.
 +        if (event.getActionMasked() == MotionEvent.ACTION_UP
 +                && mDismissOmniboxCallback != null
 +                && (mDropdown.getVisibility() != View.VISIBLE
@@ -102,22 +99,28 @@ diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/brow
 +        }
          super.onTouchEvent(event);
          return true;
-+    }
-+
-+    /** Sets the callback used when the user taps the dimmed area outside suggestion rows. */
-+    public void setDismissOmniboxCallback(@Nullable Runnable callback) {
-+        mDismissOmniboxCallback = callback;
      }
  
-     /**
-diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
---- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
-+++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
-@@ -3,6 +3,7 @@
-                 (holder) -> {
-                     mContainer = holder.container;
-                     mDropdown = holder.dropdown;
-+                    mContainer.setDismissOmniboxCallback(delegate::clearOmniboxFocus);
-                 });
-         LazyConstructionPropertyMcp.create(
-                 listModel,
++    /** Sets the callback for taps outside the suggestion rows. */
++    public void setDismissOmniboxCallback(@Nullable Runnable callback) {
++        mDismissOmniboxCallback = callback;
++    }
++
+     @Override
+     public boolean onGenericMotionEvent(MotionEvent event) {
+         if (!OmniboxCapabilities.isDesktopPlatform()) return super.onGenericMotionEvent(event);
+diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
+index 932790a04d43d5f24cf47705ccc8094093e4df17..17f7ca0c75455b35f18627c47807cd08f957fcea 100644
+--- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
++++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
+@@ -166,7 +166,9 @@ class SuggestionListViewBinder
+                 && layoutMode != FuseboxLayoutMode.SUGGESTIONS_POPOVER) {
+             holder.container.setBackgroundColor(Color.TRANSPARENT);
+         } else {
+-            holder.container.setBackgroundColor(backgroundColor);
++            // Kiwi leaves the current page visible behind the focused omnibox and darkens it
++            // with a translucent scrim instead of an opaque black fill.
++            holder.container.setBackgroundColor(Color.argb(115, 0, 0, 0));
+         }
+     }
+ 

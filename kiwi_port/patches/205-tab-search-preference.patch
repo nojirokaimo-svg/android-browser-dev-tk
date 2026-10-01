@@ -1,5 +1,5 @@
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
-index 01f547a..243b566 100644
+index 01f547ac66a9672520cc96c4b62e08ea0da917cb..243b5662b9482e5727c1324e423c3a15df600316 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
 @@ -90,6 +90,13 @@ public abstract class TabSwitcherPaneBase extends PaneBase
@@ -49,10 +49,10 @@ index 01f547a..243b566 100644
          removeDelayedCallbacks();
  
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-index 7d8080c..f604268 100644
+index e35004d7532da8773935e2b7fbc2a48169cf7bdf..1e988dfd7a68d23768c684237507f84ace202953 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-@@ -1262,7 +1262,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
+@@ -1271,7 +1271,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
      private void maybeMakeSpaceForSearchBar() {
          Configuration config = mActivity.getResources().getConfiguration();
          boolean isTabletOrLandscape = HubUtils.isScreenWidthTablet(config.screenWidthDp);
@@ -64,10 +64,10 @@ index 7d8080c..f604268 100644
              if (mPinnedTabsCoordinator != null) {
                  mMediator.maybeTranslatePinnedStrip(
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
-index 45fda22..eb04c4b 100644
+index 7b8825d9f3308bdb1df89e8c48848e80756bda7d..c5d5969936a8408ef5d6a09753544f74e94942fc 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
-@@ -420,14 +420,18 @@ public class TabSwitcherPaneMediator
+@@ -419,14 +419,18 @@ public class TabSwitcherPaneMediator
  
      /** Sets the visibility of the Hub search box. */
      void setHubSearchBoxVisibility(boolean isVisible) {
@@ -89,7 +89,7 @@ index 45fda22..eb04c4b 100644
          mContainerViewModel.set(
                  ANIMATE_SUPPLEMENTARY_CONTAINER,
 diff --git a/chrome/android/java/res/xml/tabswitcher_preferences.xml b/chrome/android/java/res/xml/tabswitcher_preferences.xml
-index a11482c..141f969 100644
+index a11482c2c8eb1b4ff06fda9d09a8cf11cb96c321..141f969715d5a3018b9d4bcc2b16a5dca6502d55 100644
 --- a/chrome/android/java/res/xml/tabswitcher_preferences.xml
 +++ b/chrome/android/java/res/xml/tabswitcher_preferences.xml
 @@ -3,4 +3,7 @@
@@ -101,7 +101,7 @@ index a11482c..141f969 100644
 +        android:persistent="false" />
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
-index 22bded8..a9ce1f9 100644
+index 22bded8f32a7370590905d50102d8e78e5e3b575..a9ce1f9456b17d187767cb6be97269c641395685 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java
 @@ -4,8 +4,11 @@
@@ -153,7 +153,7 @@ index 22bded8..a9ce1f9 100644
  
      @Override
 diff --git a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java
-index 7b1f83a..dce484c 100644
+index 7b1f83acc49c9394a434f6e4396cf2dfc47d467d..dce484c37301dd55a93b94f83a1c0d63dfb80447 100644
 --- a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java
 +++ b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java
 @@ -105,8 +105,19 @@ public class HubToolbarMediator {

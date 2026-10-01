@@ -1,145 +1,5 @@
-diff --git a/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java b/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
---- a/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
-+++ b/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
-@@ -5,6 +5,7 @@
- package org.chromium.chrome.browser.ui.theme;
- 
- import android.content.Context;
-+import android.graphics.Color;
- 
- import androidx.annotation.ColorInt;
- 
-@@ -53,6 +54,9 @@
-      * color in dark mode.
-      */
-     public static @ColorInt int getHomeSurfaceBackgroundColor(Context context) {
-+        if (ColorUtils.inNightMode(context)) {
-+            return Color.BLACK;
-+        }
-         if (BottomBarConfigUtils.isBottomBarEnabled(context)) {
-             if (ColorUtils.inNightMode(context)) {
-                 return SemanticColorUtils.getColorSurface(context);
-diff --git a/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java b/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
---- a/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
-+++ b/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
-@@ -25,6 +25,7 @@
- import org.chromium.chrome.browser.profiles.Profile;
- import org.chromium.chrome.browser.theme.ThemeUtils;
- import org.chromium.chrome.browser.ui.theme.BrandedColorScheme;
-+import org.chromium.ui.util.ColorUtils;
- 
- /** Utility class for the composeplate view. */
- @NullMarked
-@@ -72,6 +73,16 @@
-      */
-     public static void applySearchBoxBackground(
-             Context context, View view, boolean applyWhiteBackground) {
-+        if (ColorUtils.inNightMode(context)) {
-+            Drawable background =
-+                    context.getDrawable(R.drawable.home_surface_search_box_background);
-+            if (background != null) {
-+                GradientDrawable amoledBackground = (GradientDrawable) background.mutate();
-+                amoledBackground.setColor(Color.BLACK);
-+                view.setBackground(amoledBackground);
-+            }
-+            return;
-+        }
-         if (applyWhiteBackground) {
-             if (NewTabPageUtils.isNtpAuroraEnabled()) {
-                 // When Aurora is enabled on customized image theme, use white mixed with 2% primary
-diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
---- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
-+++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
-@@ -12,6 +12,7 @@
- import android.graphics.BlurMaskFilter;
- import android.graphics.BlurMaskFilter.Blur;
- import android.graphics.Canvas;
-+import android.graphics.Color;
- import android.graphics.ColorFilter;
- import android.graphics.Paint;
- import android.graphics.Paint.Style;
-@@ -298,7 +299,10 @@
-      * @param color The color to set as the background.
-      */
-     public void setBackgroundColor(@ColorInt int color) {
--        mBackgroundGradient.setColor(color);
-+        // Dark location bar colors must stay pure black after focus and animation updates.
-+        long luminance =
-+                2126L * Color.red(color) + 7152L * Color.green(color) + 722L * Color.blue(color);
-+        mBackgroundGradient.setColor(luminance < 1280000L ? Color.BLACK : color);
-         invalidateSelf();
-     }
- 
-diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
---- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
-+++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
-@@ -12,6 +12,7 @@
- import android.content.res.Configuration;
- import android.content.res.Resources;
- import android.graphics.Bitmap;
-+import android.graphics.Color;
- import android.graphics.drawable.ColorDrawable;
- import android.graphics.drawable.Drawable;
- import android.graphics.drawable.Drawable.ConstantState;
-@@ -1041,6 +1042,9 @@
-     /** Returns the background color for suggestions in the given color scheme and context. */
-     public static @ColorInt int getStandardSuggestionBackgroundColor(
-             Context context, @BrandedColorScheme int colorScheme) {
-+        if (ColorUtils.inNightMode(context)) {
-+            return Color.BLACK;
-+        }
-         return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
-                 ? context.getColor(R.color.search_suggestion_bg_color_incognito)
-                 : ContextCompat.getColor(context, R.color.search_suggestion_bg_color);
-@@ -1052,6 +1056,9 @@
-      */
-     public static @ColorInt int getPopoverSuggestionBackgroundColor(
-             Context context, @BrandedColorScheme int colorScheme) {
-+        if (ColorUtils.inNightMode(context)) {
-+            return Color.BLACK;
-+        }
-         return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
-                 ? context.getColor(R.color.gm3_baseline_surface_container_dark)
-                 : ContextCompat.getColor(context, R.color.omnibox_popover_suggestion_bg_color);
-@@ -1102,6 +1109,9 @@
-      */
-     public static @ColorInt int getSuggestionsDropdownBackgroundColor(
-             Context context, @BrandedColorScheme int brandedColorScheme) {
-+        if (ColorUtils.inNightMode(context)) {
-+            return Color.BLACK;
-+        }
-         return brandedColorScheme == BrandedColorScheme.INCOGNITO
-                 ? context.getColor(R.color.omnibox_dropdown_bg_incognito)
-                 : ContextCompat.getColor(context, R.color.omnibox_suggestion_dropdown_bg);
-diff --git a/components/browser_ui/widget/android/BUILD.gn b/components/browser_ui/widget/android/BUILD.gn
---- a/components/browser_ui/widget/android/BUILD.gn
-+++ b/components/browser_ui/widget/android/BUILD.gn
-@@ -216,6 +216,7 @@ android_resources("java_resources") {
-     "java/res/color/tab_resumption_module_icon_background_color.xml",
-     "java/res/color/tile_view_icon_background_color.xml",
-     "java/res/color/toolbar_text_box_bg_color.xml",
-+    "java/res/drawable-night/home_surface_ui_background.xml",
-     "java/res/drawable-hdpi/ic_arrow_back_white_24dp.png",
-     "java/res/drawable-hdpi/ic_check_googblue_24dp.png",
-     "java/res/drawable-hdpi/ic_error_outline_googblue_24dp.png",
-diff --git a/components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml b/components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml
-new file mode 100644
---- /dev/null
-+++ b/components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml
-@@ -0,0 +1,12 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<!--
-+Copyright 2026 The Chromium Authors
-+Use of this source code is governed by a BSD-style license that can be
-+found in the LICENSE file.
-+-->
-+
-+<shape xmlns:android="http://schemas.android.com/apk/res/android"
-+    android:shape="rectangle">
-+  <solid android:color="@android:color/black"/>
-+  <corners android:radius="@dimen/home_surface_ui_background_radius"/>
-+</shape>
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabUiThemeProvider.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabUiThemeProvider.java
+index 29939c40136505d73d0102e6fc9460cdbe53baff..b3c9c616317a526ef2cb41f9308f896fce217185 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabUiThemeProvider.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabUiThemeProvider.java
 @@ -6,6 +6,7 @@ package org.chromium.chrome.browser.tasks.tab_management;
@@ -150,7 +10,8 @@ diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser
  
  import androidx.annotation.ColorInt;
  import androidx.annotation.ColorRes;
-@@ -19,5 +20,6 @@ import org.chromium.chrome.browser.tasks.tab_management.TabListEditorCoordinator.CreationMode;
+@@ -20,6 +21,7 @@ import org.chromium.chrome.browser.tab_ui.TabCardThemeUtil;
+ import org.chromium.chrome.browser.tasks.tab_management.TabListEditorCoordinator.CreationMode;
  import org.chromium.components.browser_ui.styles.SemanticColorUtils;
  import org.chromium.components.tab_groups.TabGroupColorId;
 +import org.chromium.ui.util.ColorUtils;
@@ -167,7 +28,37 @@ diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser
          return isIncognito
                  ? ContextCompat.getColor(context, R.color.default_bg_color_dark)
                  : SemanticColorUtils.getDefaultBgColor(context);
+diff --git a/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java b/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
+index 67c1474707f38dfcc2f82e3cdfc276afa396b04b..398d7bfec01a9910a0daf439c6a1840a76095243 100644
+--- a/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
++++ b/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
+@@ -25,6 +25,7 @@ import org.chromium.chrome.browser.ntp.NewTabPageUtils;
+ import org.chromium.chrome.browser.profiles.Profile;
+ import org.chromium.chrome.browser.theme.ThemeUtils;
+ import org.chromium.chrome.browser.ui.theme.BrandedColorScheme;
++import org.chromium.ui.util.ColorUtils;
+ 
+ /** Utility class for the composeplate view. */
+ @NullMarked
+@@ -68,6 +69,16 @@ public class ComposeplateUtils {
+      */
+     public static void applySearchBoxBackground(
+             Context context, View view, boolean applyWhiteBackground) {
++        if (ColorUtils.inNightMode(context)) {
++            Drawable background =
++                    context.getDrawable(R.drawable.home_surface_search_box_background);
++            if (background != null) {
++                GradientDrawable amoledBackground = (GradientDrawable) background.mutate();
++                amoledBackground.setColor(Color.BLACK);
++                view.setBackground(amoledBackground);
++            }
++            return;
++        }
+         if (applyWhiteBackground) {
+             if (NewTabPageUtils.isNtpAuroraEnabled()) {
+                 // When Aurora is enabled on customized image theme, use white mixed with 2% primary
 diff --git a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java
+index 2a1cd70bf95d4e95b96d58abd4b3723cf8c74328..e0d17dd9de9f8a115d524607b5699212a6932823 100644
 --- a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java
 +++ b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java
 @@ -52,6 +52,9 @@ public final class HubColors {
@@ -211,6 +102,7 @@ diff --git a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/br
              case HubColorScheme.DEFAULT -> SemanticColorUtils.getColorSurfaceContainer(context);
              case HubColorScheme.INCOGNITO ->
 diff --git a/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java b/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java
+index dc9a35a8f255f157eea1efc5e9b853393e5e6173..8577dee43608b772c8fcb1f0261f4022941d2e1b 100644
 --- a/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java
 +++ b/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java
 @@ -6,6 +6,7 @@ package org.chromium.chrome.browser.tab_ui;
@@ -221,8 +113,7 @@ diff --git a/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/
  
  import androidx.annotation.ColorInt;
  import androidx.annotation.ColorRes;
-@@ -138,7 +139,10 @@ public class TabCardThemeUtil {
-             return isIncognito
+@@ -139,6 +140,9 @@ public class TabCardThemeUtil {
                      ? ContextCompat.getColor(context, R.color.incognito_tab_bg_selected_color)
                      : MaterialColors.getColor(context, R.attr.colorPrimary, TAG);
          } else {
@@ -232,3 +123,121 @@ diff --git a/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/
              if (colorId != null) {
                  return TabGroupColorPickerUtils.getTabGroupCardColor(context, colorId, isIncognito);
              }
+diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
+index 5802fb20c25cc1e075a54798c9b00487779f6202..dbc54f509e10f33dceb8afcf2c1b3ad0ea263171 100644
+--- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
++++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LocationBarBackgroundDrawable.java
+@@ -12,6 +12,7 @@ import android.content.Context;
+ import android.graphics.BlurMaskFilter;
+ import android.graphics.BlurMaskFilter.Blur;
+ import android.graphics.Canvas;
++import android.graphics.Color;
+ import android.graphics.ColorFilter;
+ import android.graphics.Paint;
+ import android.graphics.Paint.Style;
+@@ -298,7 +299,10 @@ public class LocationBarBackgroundDrawable extends Drawable {
+      * @param color The color to set as the background.
+      */
+     public void setBackgroundColor(@ColorInt int color) {
+-        mBackgroundGradient.setColor(color);
++        // Dark location bar colors must stay pure black after focus and animation updates.
++        long luminance =
++                2126L * Color.red(color) + 7152L * Color.green(color) + 722L * Color.blue(color);
++        mBackgroundGradient.setColor(luminance < 1280000L ? Color.BLACK : color);
+         invalidateSelf();
+     }
+ 
+diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
+index d3a0de5be293826cf1eaed45fd233faf0c2621ae..6653c7e72f4e8ac6f7f541bbdf573182fa406328 100644
+--- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
++++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
+@@ -12,6 +12,7 @@ import android.content.res.ColorStateList;
+ import android.content.res.Configuration;
+ import android.content.res.Resources;
+ import android.graphics.Bitmap;
++import android.graphics.Color;
+ import android.graphics.drawable.ColorDrawable;
+ import android.graphics.drawable.Drawable;
+ import android.graphics.drawable.Drawable.ConstantState;
+@@ -1041,6 +1042,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
+     /** Returns the background color for suggestions in the given color scheme and context. */
+     public static @ColorInt int getStandardSuggestionBackgroundColor(
+             Context context, @BrandedColorScheme int colorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
+                 ? context.getColor(R.color.search_suggestion_bg_color_incognito)
+                 : ContextCompat.getColor(context, R.color.search_suggestion_bg_color);
+@@ -1052,6 +1056,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
+      */
+     public static @ColorInt int getPopoverSuggestionBackgroundColor(
+             Context context, @BrandedColorScheme int colorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
+                 ? context.getColor(R.color.gm3_baseline_surface_container_dark)
+                 : ContextCompat.getColor(context, R.color.omnibox_popover_suggestion_bg_color);
+@@ -1102,6 +1109,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
+      */
+     public static @ColorInt int getSuggestionsDropdownBackgroundColor(
+             Context context, @BrandedColorScheme int brandedColorScheme) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         return brandedColorScheme == BrandedColorScheme.INCOGNITO
+                 ? context.getColor(R.color.omnibox_dropdown_bg_incognito)
+                 : ContextCompat.getColor(context, R.color.omnibox_suggestion_dropdown_bg);
+diff --git a/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java b/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
+index 256284aa3630ac838bb51c617774719213d42b9e..3ea014fd6636293de8c9a60a7a834849bc23b885 100644
+--- a/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
++++ b/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/ui/theme/ChromeSemanticColorUtils.java
+@@ -5,6 +5,7 @@
+ package org.chromium.chrome.browser.ui.theme;
+ 
+ import android.content.Context;
++import android.graphics.Color;
+ 
+ import androidx.annotation.ColorInt;
+ 
+@@ -53,6 +54,9 @@ public class ChromeSemanticColorUtils {
+      * color in dark mode.
+      */
+     public static @ColorInt int getHomeSurfaceBackgroundColor(Context context) {
++        if (ColorUtils.inNightMode(context)) {
++            return Color.BLACK;
++        }
+         if (BottomBarConfigUtils.isBottomBarEnabled(context)) {
+             if (ColorUtils.inNightMode(context)) {
+                 return SemanticColorUtils.getColorSurface(context);
+diff --git a/components/browser_ui/widget/android/BUILD.gn b/components/browser_ui/widget/android/BUILD.gn
+index 4c569406408dbc9e2b3a79fe93e00040c5a6737a..c389499680264674f56fdc8e8d0f8abf447f65d4 100644
+--- a/components/browser_ui/widget/android/BUILD.gn
++++ b/components/browser_ui/widget/android/BUILD.gn
+@@ -219,6 +219,7 @@ android_resources("java_resources") {
+     "java/res/color/tab_resumption_module_icon_background_color.xml",
+     "java/res/color/tile_view_icon_background_color.xml",
+     "java/res/color/toolbar_text_box_bg_color.xml",
++    "java/res/drawable-night/home_surface_ui_background.xml",
+     "java/res/drawable-hdpi/ic_arrow_back_white_24dp.png",
+     "java/res/drawable-hdpi/ic_check_googblue_24dp.png",
+     "java/res/drawable-hdpi/ic_error_outline_googblue_24dp.png",
+diff --git a/components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml b/components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..d35f9d0ec379f00ffe772a74be8efdc6e1a6d8f4
+--- /dev/null
++++ b/components/browser_ui/widget/android/java/res/drawable-night/home_surface_ui_background.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++Copyright 2026 The Chromium Authors
++Use of this source code is governed by a BSD-style license that can be
++found in the LICENSE file.
++-->
++
++<shape xmlns:android="http://schemas.android.com/apk/res/android"
++    android:shape="rectangle">
++  <solid android:color="@android:color/black"/>
++  <corners android:radius="@dimen/home_surface_ui_background_radius"/>
++</shape>

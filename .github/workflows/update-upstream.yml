@@ -6,15 +6,15 @@ on:
       titanium_ref:
         description: Titanium branch, tag, or commit; blank uses upstream's default branch HEAD.
         required: false
-        default: ""
+        default: "v154.0.8037.92"
       incremental_cache_key:
         description: Exact completed out/Default cache key. Cache miss stops; no cold build.
         required: false
-        default: "kiwi-incremental-153-8816925c2c1c0f2b96c723a4b5f7509c2816cb56-stage-1"
+        default: "kiwi-incremental-153-780689451ec17d83ff74d72a733205b5644fa279-stage-11"
       transition_from_identity:
         description: Source identity stamped in that exact completed cache.
         required: false
-        default: "7584b534f6e1f9c29e8bb98df71d7610960a5db3:02d87ad8e17aee77d0fea49d122349a5da87ed2e:507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c:validation"
+        default: "97a21b7a98e4446142a39bd38190023ebb34cd74:2aaf9dfc919e620564409f94beedaedca5301e81:78e5e45d4bb41035e17ea4da2cc257f496416ac9:validation"
 
 permissions:
   contents: read
@@ -65,7 +65,7 @@ jobs:
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: "270"
 
   stage-2:
     needs: [resolve, stage-1]
@@ -88,7 +88,7 @@ jobs:
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: "270"
 
   stage-3:
     needs: [resolve, stage-2]
@@ -111,7 +111,7 @@ jobs:
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: "270"
 
   stage-4:
     needs: [resolve, stage-3]
@@ -134,7 +134,7 @@ jobs:
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: "270"
 
   stage-5:
     needs: [resolve, stage-4]
@@ -157,7 +157,7 @@ jobs:
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
           patch-mode: best-effort
-          build-budget-minutes: "90"
+          build-budget-minutes: "270"
 
   require-apk:
     needs: [resolve, stage-1, stage-2, stage-3, stage-4, stage-5]

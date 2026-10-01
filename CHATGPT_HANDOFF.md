@@ -1,3 +1,47 @@
+## 2026-10-01: Titanium 154 update
+
+| Upstream | Pinned revision |
+|---|---|
+| Titanium v154.0.8037.92 | `dd8d8a969fb6af762a3c2445ff455f7e48626993` |
+| Vanadium | `826316da0994ebd78601a86ba5c0cb34b46ba32d` |
+| Chromium 154.0.8037.92 | `334b65d254ccc35df4fca82706d1753227b01039` |
+
+The unused extra power-saving feature (220) is removed: no menu toggle,
+settings switches, renderer limit, reduced-motion override, or Prerender2
+suppression is installed by the Kiwi series. Existing saved values are inert.
+The independent dark page/card/menu colors, default-hidden tab search,
+copied-link row, extensions and backups remain in the 25-feature series.
+The Hameln-specific injection remains withdrawn.
+
+All 25 patches were rebased in order against the M154 post-Titanium subset.
+The manifest now measures every patch-owned file: 99 before/after hashes,
+including ChromeTabbedActivity.java. Strict application must match these
+hashes again in the actual runner preparation; unknown drift stops before
+compiling. Best-effort mode still identifies feature/file conflicts and applies
+independent clean hunks. Full before/after source archives and hashes are uploaded.
+Local verification: 38 Python tests, complete patch integrity, strict ordered
+reapplication, all 99 final hashes, and idempotence passed. APK compilation
+and device behavior remain pending.
+
+The first job restores only Build #163's completed immutable checkpoint:
+`kiwi-incremental-153-780689451ec17d83ff74d72a733205b5644fa279-stage-11`.
+Its save was confirmed in job 108056714484 on 2026-09-25 at 12:15:56 UTC.
+The source transition accepts only the exact prior M153 identity, preserves
+Ninja history/objects/generated outputs, and regenerates GN for M154 using
+Ninja (`use_siso=false`). Cache miss stops immediately. No deletion, clean,
+cache overwrite, or older/empty fallback is permitted.
+
+GitHub-hosted jobs have a six-hour limit. Jobs use 350 minutes with a
+maximum 270-minute compile budget; elapsed preparation reduces that budget
+when necessary to reserve 45 minutes for shutdown, signing, cache save and
+artifact upload. Continuation jobs run only when the APK is unfinished and
+the preceding job succeeded in saving its exact checkpoint. Compiler failures
+require diagnosis before a new resume, not blind retries or restarting from #163.
+Final completion requires Android v2 signing, APK/artifact SHA-256, runner
+source verification and updated handoff records. Device claims require device evidence.
+
+Older entries below are historical; current instructions above take precedence.
+
 ## 2026-09-24: Build #156 succeeded; new tab and dark-color settings pending
 
 Build #156, commit `fe51b864d2987e96a7a691f68ad6b4df94420330`, run

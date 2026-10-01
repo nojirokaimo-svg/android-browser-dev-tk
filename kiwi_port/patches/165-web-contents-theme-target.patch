@@ -1,8 +1,8 @@
 diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
+index e005923adbc0bcac9c4258b2f9057efb23242542..143ae945cdc4b48dc2adbc11b8e08492d5a84359 100644
 --- a/chrome/browser/android/BUILD.gn
 +++ b/chrome/browser/android/BUILD.gn
-@@ -126,7 +126,19 @@ if (is_android) {
-       "//url",
+@@ -133,6 +133,18 @@ if (is_android) {
      ]
    }
  
@@ -21,7 +21,7 @@ diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
    source_set("android") {
      sources = [
        "background_sync_launcher_android.cc",
-@@ -418,8 +429,6 @@ if (is_android) {
+@@ -419,8 +431,6 @@ if (is_android) {
        "usage_stats/usage_stats_database.h",
        "warmup_manager.cc",
        "web_contents_printer.cc",
@@ -30,7 +30,7 @@ diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
        "webapk/pwa_restore_bottom_sheet_mediator.cc",
        "webapk/pwa_restore_bottom_sheet_mediator.h",
        "webapk/webapk_database.cc",
-@@ -469,6 +478,7 @@ if (is_android) {
+@@ -473,6 +483,7 @@ if (is_android) {
        ":tabs_impl",
        ":tabs_public",
        ":usage_stats_proto",

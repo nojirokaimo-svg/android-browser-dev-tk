@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java b/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
-index 6efddf6f939ded1d209165e17575667585668f1f..214231b85f72c15885e8f7620611fd5009578531 100644
+index 21bb3dfb0422f036460f8f403c0a8b5e3dc40d8e..f96c2eaabd79ffb16b81cce1452f947b389d3b25 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
 @@ -31,6 +31,7 @@ import org.chromium.base.TraceEvent;
@@ -10,7 +10,7 @@ index 6efddf6f939ded1d209165e17575667585668f1f..214231b85f72c15885e8f7620611fd50
  import org.chromium.base.task.AsyncTask;
  import org.chromium.base.task.ChainedTasks;
  import org.chromium.base.task.PostTask;
-@@ -277,6 +278,10 @@ public class ProcessInitializationHandler {
+@@ -274,6 +275,10 @@ public class ProcessInitializationHandler {
          if (BuildConfig.ENABLE_ASSERTS) {
              AllPreferenceKeyRegistries.initializeKnownRegistries();
          }
@@ -91,13 +91,14 @@ index 0000000000000000000000000000000000000000..5554bf4b36693727a4924d12e4f26017
 +    </string-array>
 +</resources>
 diff --git a/chrome/browser/ui/android/night_mode/java/res/xml/theme_preferences.xml b/chrome/browser/ui/android/night_mode/java/res/xml/theme_preferences.xml
-index 8f0ff05bb21cd46d009be17a2cedfe736d7d9365..5940d08e10f5381b6daf4294c3f22c6bb95f1292 100644
+index 49d96d1ca4acb3f0e40dcaf06e69ddbd4bae26f4..5940d08e10f5381b6daf4294c3f22c6bb95f1292 100644
 --- a/chrome/browser/ui/android/night_mode/java/res/xml/theme_preferences.xml
 +++ b/chrome/browser/ui/android/night_mode/java/res/xml/theme_preferences.xml
 @@ -8,4 +8,17 @@ found in the LICENSE file.
  <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
      <org.chromium.chrome.browser.night_mode.settings.RadioButtonGroupThemePreference
          android:key="ui_theme_pref" />
+-</PreferenceScreen>
 +
 +    <androidx.preference.ListPreference
 +        android:key="kiwi_night_mode_preset"
@@ -111,7 +112,7 @@ index 8f0ff05bb21cd46d009be17a2cedfe736d7d9365..5940d08e10f5381b6daf4294c3f22c6b
 +        android:persistent="false"
 +        android:title="@string/kiwi_night_mode_restart_title"
 +        android:summary="@string/kiwi_night_mode_restart_summary" />
- </PreferenceScreen>
++</PreferenceScreen>
 \ No newline at end of file
 diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java
 index a8690622a9fc9438ea92f4bc50a6145592ee8c7d..76d8acc1cf7eefb2987bb0f79762de2b944318ab 100644

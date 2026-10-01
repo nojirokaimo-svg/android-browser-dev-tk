@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 0863193e6e2569edcbc798972ba545b1d647a635..7d877fd2057eecb05507a4049b04157b4a51fd7a 100644
+index b81b009a51850afadc5bb46a1ebde9ed82f349c1..54172cddaf6c5b62c1ba3225e5362728f431cdb7 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -58,6 +58,7 @@ import org.chromium.base.Callback;
@@ -10,7 +10,7 @@ index 0863193e6e2569edcbc798972ba545b1d647a635..7d877fd2057eecb05507a4049b04157b
  import org.chromium.base.DeviceInfo;
  import org.chromium.base.IntentUtils;
  import org.chromium.base.Log;
-@@ -202,7 +203,10 @@ import org.chromium.chrome.browser.multiwindow.UiUtils.NameWindowDialogSource;
+@@ -207,7 +208,10 @@ import org.chromium.chrome.browser.multiwindow.UiUtils.NameWindowDialogSource;
  import org.chromium.chrome.browser.native_page.NativePageAssassin;
  import org.chromium.chrome.browser.navigation_predictor.NavigationPredictorBridge;
  import org.chromium.chrome.browser.new_tab_url.DseNewTabUrlManager;
@@ -21,7 +21,7 @@ index 0863193e6e2569edcbc798972ba545b1d647a635..7d877fd2057eecb05507a4049b04157b
  import org.chromium.chrome.browser.notifications.tips.TipsPromoCoordinator;
  import org.chromium.chrome.browser.notifications.tips.TipsUtils;
  import org.chromium.chrome.browser.ntp.NewTabPage;
-@@ -4215,6 +4219,36 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -4348,6 +4352,36 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
              @Nullable Bundle menuItemData,
              @Nullable MotionEventInfo triggeringMotion) {
          final Tab currentTab = getActivityTab();
@@ -59,7 +59,7 @@ index 0863193e6e2569edcbc798972ba545b1d647a635..7d877fd2057eecb05507a4049b04157b
          if (id == R.id.new_tab_menu_id) {
              if (!mTabModelSelector.isTabStateInitialized()) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00e44b8e6c 100644
+index 513ec3f028b2268ed7817c48b880dabe1cd69490..6b722bca49d171202cc80de76434d9f35de41b84 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 @@ -8,7 +8,9 @@ import static org.chromium.build.NullUtil.assumeNonNull;
@@ -72,7 +72,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
  import android.util.SparseArray;
  import android.view.View;
  
-@@ -51,6 +53,7 @@ import org.chromium.chrome.browser.layouts.LayoutStateProvider;
+@@ -53,6 +55,7 @@ import org.chromium.chrome.browser.layouts.LayoutStateProvider;
  import org.chromium.chrome.browser.multiwindow.MultiInstanceManager.PersistedInstanceType;
  import org.chromium.chrome.browser.multiwindow.MultiWindowModeStateDispatcher;
  import org.chromium.chrome.browser.multiwindow.MultiWindowUtils;
@@ -80,7 +80,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
  import org.chromium.chrome.browser.omaha.UpdateMenuItemHelper;
  import org.chromium.chrome.browser.open_in_app.OpenInAppMenuItemProvider;
  import org.chromium.chrome.browser.preferences.Pref;
-@@ -63,6 +66,7 @@ import org.chromium.chrome.browser.tab.Tab;
+@@ -66,6 +69,7 @@ import org.chromium.chrome.browser.tab_group_sync.TabGroupSyncServiceFactory;
  import org.chromium.chrome.browser.tabmodel.TabModelSelector;
  import org.chromium.chrome.browser.task_manager.TaskManager;
  import org.chromium.chrome.browser.toolbar.ToolbarManager;
@@ -88,7 +88,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
  import org.chromium.chrome.browser.toolbar.menu_button.MenuItemState;
  import org.chromium.chrome.browser.toolbar.top.ToolbarUtils;
  import org.chromium.chrome.browser.ui.appmenu.AppMenuDelegate;
-@@ -97,7 +101,9 @@ import org.chromium.url.GURL;
+@@ -100,7 +104,9 @@ import org.chromium.url.GURL;
  import java.lang.annotation.Retention;
  import java.lang.annotation.RetentionPolicy;
  import java.util.ArrayList;
@@ -98,7 +98,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
  import java.util.function.BiFunction;
  import java.util.function.BooleanSupplier;
  import java.util.function.Supplier;
-@@ -287,6 +293,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -279,6 +285,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
  
      @Override
      public void destroy() {
@@ -106,7 +106,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
          super.destroy();
          mBookmarksItemBuilder.destroy();
          mHistoryItemBuilder.destroy();
-@@ -296,8 +303,57 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -288,8 +295,57 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
          }
      }
  
@@ -164,7 +164,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
          int menuGroup = getMenuGroup();
          MVCListAdapter.ModelList modelList = new MVCListAdapter.ModelList();
          if (menuGroup == MenuGroup.PAGE_MENU) {
-@@ -342,6 +398,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -333,6 +389,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                      R.id.icon_row_menu_id, iconModels, isMenuIconAtStart())));
          }
  
@@ -173,7 +173,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
          mUpdateMenuItemVisible = shouldShowUpdateMenuItem();
          Profile profile = getProfileFromTabModel();
          if (mUpdateMenuItemVisible) {
-@@ -441,7 +499,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -432,7 +490,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
  
          // Extensions
          if (shouldShowExtensionsItem()) {
@@ -182,7 +182,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
          }
  
          // Divider
-@@ -552,6 +610,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -543,6 +601,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
          // Divider Line
          AppMenuItemUtils.maybeAddDividerLine(modelList, R.id.divider_line_id);
  
@@ -192,7 +192,8 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
          // Settings
          modelList.add(buildSettingsItem());
  
-@@ -633,10 +694,10 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -624,9 +685,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+ 
          AppMenuItemUtils.maybeAddDividerLine(modelList, R.id.divider_line_id);
  
 -        // History and autofill parent
@@ -204,10 +205,7 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
          }
  
          // Delete browsing data
-         if (shouldShowQuickDeleteItem()) {
-             modelList.add(buildQuickDeleteItem());
-@@ -655,8 +716,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
-         modelList.add(mBookmarksItemBuilder.buildBookmarksParentItem(currentTab));
+@@ -649,7 +710,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
  
          // Extensions
          if (shouldShowExtensionsItem()) {
@@ -216,8 +214,8 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
          }
  
          // Passwords and autofill
-@@ -1128,6 +1189,32 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
-                 /* showIcon= */ false);
+@@ -1174,6 +1235,32 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+         return DeviceInfo.isDesktop() || isPdf;
      }
  
 +    private ListItem buildKiwiHistoryItem() {
@@ -246,11 +244,11 @@ index 812ccef53222d6d6616186805411481bb7cdd063..1d08a545dc8a3dd5af64fe1c55a23b00
 +                /* showIcon= */ true);
 +    }
 +
-     private ListItem buildChromeWebstoreItem() {
-         assert shouldShowExtensionsItem();
-         return AppMenuItemUtils.createStandardListItem(
+     private ListItem buildPrintItem(Tab currentTab) {
+         assert shouldShowPrintItem(currentTab);
+         return new ListItem(
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinator.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinator.java
-index 5a04f265511c034551387567fb6cea21107387d8..f70ed81ba4367b81fd4d269c2e04b8c6943d1278 100644
+index 76af6b111c1ea94ebb40a64269b5aa0586db3463..930fb62a7e1fdea1d3c2ccf7c312f2a9612e373b 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinator.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinator.java
 @@ -5,6 +5,7 @@
@@ -271,7 +269,7 @@ index 5a04f265511c034551387567fb6cea21107387d8..f70ed81ba4367b81fd4d269c2e04b8c6
  /**
   * The coordinator of the extension-related toolbar UI.
   *
-@@ -118,6 +122,35 @@ public interface ExtensionsToolbarCoordinator extends ChromeAndroidTaskFeature,
+@@ -121,6 +125,35 @@ public interface ExtensionsToolbarCoordinator extends ChromeAndroidTaskFeature,
       */
      boolean dispatchKeyEvent(KeyEvent event);
  
@@ -308,10 +306,10 @@ index 5a04f265511c034551387567fb6cea21107387d8..f70ed81ba4367b81fd4d269c2e04b8c6
       * Updates the ripple background of the extensions menu button
       *
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinatorImpl.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinatorImpl.java
-index 534cbaca081574c13ab53292f9fbd6ccfeec729b..af96e94edc93d2229d13c41e06a4cf270d60ae7b 100644
+index 000265df3d6e81a3d0f9db383571f36b0a9c73e3..63ce40cda50be40490b2d7ee01cdff34d619c870 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinatorImpl.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinatorImpl.java
-@@ -36,6 +36,7 @@ import org.chromium.chrome.browser.ui.browser_window.ChromeAndroidTask;
+@@ -37,6 +37,7 @@ import org.chromium.chrome.browser.ui.browser_window.ChromeAndroidTask;
  import org.chromium.chrome.browser.ui.browser_window.ChromeAndroidTaskFeature.InitInfo;
  import org.chromium.chrome.browser.ui.extensions.ExtensionActionsBridge;
  import org.chromium.chrome.browser.ui.extensions.ExtensionsToolbarBridge;
@@ -319,7 +317,7 @@ index 534cbaca081574c13ab53292f9fbd6ccfeec729b..af96e94edc93d2229d13c41e06a4cf27
  import org.chromium.chrome.browser.user_education.IphCommandBuilder;
  import org.chromium.chrome.browser.user_education.UserEducationHelper;
  import org.chromium.components.embedder_support.contextmenu.ContextMenuPopulatorFactory;
-@@ -52,7 +53,11 @@ import org.chromium.ui.modelutil.PropertyModel;
+@@ -53,7 +54,11 @@ import org.chromium.ui.modelutil.PropertyModel;
  import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
  import org.chromium.ui.widget.AnchoredPopupWindow.HorizontalOrientation;
  
@@ -331,7 +329,7 @@ index 534cbaca081574c13ab53292f9fbd6ccfeec729b..af96e94edc93d2229d13c41e06a4cf27
  
  /** The implementation of {@link extensionsToolbarCoordinator}. */
  @NullMarked
-@@ -288,6 +293,48 @@ if (!mPrefService.getBoolean(Pref.PIN_EXTENSIONS_MENU_BUTTON)) { mContainer.find
+@@ -294,6 +299,48 @@ if (!mPrefService.getBoolean(Pref.PIN_EXTENSIONS_MENU_BUTTON)) { mContainer.find
      @Override
      public void onLowMemory() {}
  
