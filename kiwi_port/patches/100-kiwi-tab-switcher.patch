@@ -492,10 +492,10 @@ index 0000000000000000000000000000000000000000..22bded8f32a7370590905d50102d8e78
 +    }
 +}
 diff --git a/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java b/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
-index 4c4252214c88f56551fd5f1c2fd97dbcd954fdc5..433cc767c9d4b1235f7512c867d7e6bc47013ca3 100644
+index 7c4cdefdeba4cffcd79cf6691fe443163dad8d92..59512be20370f69fee956e75ae5d90cef05cf256 100644
 --- a/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
 +++ b/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
-@@ -139,7 +139,8 @@ public final class SharedPrefsUtils {
+@@ -138,7 +138,8 @@ public final class SharedPrefsUtils {
                              List.of(
                                      SharedPrefsExt.CLOSE_TABS_ON_EXIT.getKey(),
                                      SharedPrefsExt.OPEN_LINKS_IN_INCOGNITO.getKey(),

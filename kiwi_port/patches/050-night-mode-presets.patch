@@ -91,14 +91,13 @@ index 0000000000000000000000000000000000000000..5554bf4b36693727a4924d12e4f26017
 +    </string-array>
 +</resources>
 diff --git a/chrome/browser/ui/android/night_mode/java/res/xml/theme_preferences.xml b/chrome/browser/ui/android/night_mode/java/res/xml/theme_preferences.xml
-index 49d96d1ca4acb3f0e40dcaf06e69ddbd4bae26f4..5940d08e10f5381b6daf4294c3f22c6bb95f1292 100644
+index 8f0ff05bb21cd46d009be17a2cedfe736d7d9365..5940d08e10f5381b6daf4294c3f22c6bb95f1292 100644
 --- a/chrome/browser/ui/android/night_mode/java/res/xml/theme_preferences.xml
 +++ b/chrome/browser/ui/android/night_mode/java/res/xml/theme_preferences.xml
 @@ -8,4 +8,17 @@ found in the LICENSE file.
  <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
      <org.chromium.chrome.browser.night_mode.settings.RadioButtonGroupThemePreference
          android:key="ui_theme_pref" />
--</PreferenceScreen>
 +
 +    <androidx.preference.ListPreference
 +        android:key="kiwi_night_mode_preset"
@@ -112,7 +111,7 @@ index 49d96d1ca4acb3f0e40dcaf06e69ddbd4bae26f4..5940d08e10f5381b6daf4294c3f22c6b
 +        android:persistent="false"
 +        android:title="@string/kiwi_night_mode_restart_title"
 +        android:summary="@string/kiwi_night_mode_restart_summary" />
-+</PreferenceScreen>
+ </PreferenceScreen>
 \ No newline at end of file
 diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java
 index a8690622a9fc9438ea92f4bc50a6145592ee8c7d..76d8acc1cf7eefb2987bb0f79762de2b944318ab 100644

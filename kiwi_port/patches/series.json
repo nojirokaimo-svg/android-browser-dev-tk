@@ -44,7 +44,7 @@
         "chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java",
         "titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java"
       ],
-      "sha256": "7625a1454a72acb6442a4ff244ad6e88ee1c1a73beed0e674d8a1aaf15cd516d"
+      "sha256": "84545717d8b15bbe3c238a4fa90d34133828418b8b65615e0d3ccf8c55772b22"
     },
     {
       "id": "night-mode-presets",
@@ -65,7 +65,7 @@
         "third_party/blink/renderer/platform/graphics/dark_mode_settings_builder.h",
         "third_party/blink/renderer/platform/graphics/dark_mode_filter_test.cc"
       ],
-      "sha256": "f4507f3e0cc6e915ed5bb0548ee9eb33cd235554565dbf2f537172c282891a28"
+      "sha256": "767e0bac78d51d839bf4df9ecc96d1dca7c11cf45dcc49402ac0aee185d0dfda"
     },
     {
       "id": "runtime-night-mode",
@@ -131,7 +131,7 @@
         "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java",
         "titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java"
       ],
-      "sha256": "9fb3cf40d45005b68abf673dda48ea251a371025b68fb622715557e35161492c"
+      "sha256": "abb33fcc03928d41ab53a2c25d7c2fd27d79dc5b526565987717ab56b65fdac4"
     },
     {
       "id": "amoled-surfaces",

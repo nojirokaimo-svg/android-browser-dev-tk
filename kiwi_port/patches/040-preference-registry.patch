@@ -41,7 +41,7 @@ index f5b1e8d704063e42f32f107a5c1681bb0169c815..add6c0346ccd1f81f2be9d4615386ac6
                              MultiInstanceSharedPreferences.REGISTRY)
                      : null;
 diff --git a/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java b/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
-index 0bacc94f580dca5f6e6d10debdaafd91a2dadd84..4c4252214c88f56551fd5f1c2fd97dbcd954fdc5 100644
+index e9f9abe73111dd169d6fb576c3fea841480aaf5b..7c4cdefdeba4cffcd79cf6691fe443163dad8d92 100644
 --- a/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
 +++ b/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
 @@ -1,8 +1,9 @@
@@ -56,7 +56,7 @@ index 0bacc94f580dca5f6e6d10debdaafd91a2dadd84..4c4252214c88f56551fd5f1c2fd97dbc
  
  /**
   * Wrapper utility class for both (Base)ChromePreferenceKeys and SharedPreferencesManager,
-@@ -124,19 +125,38 @@ public final class SharedPrefsUtils {
+@@ -123,19 +124,38 @@ public final class SharedPrefsUtils {
                  new BoolSharedPref("close_tabs_on_exit", false);
          public static final BoolSharedPref OPEN_LINKS_IN_INCOGNITO =
                  new BoolSharedPref("open_links_in_incognito", false);

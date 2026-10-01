@@ -223,7 +223,7 @@
       "after_sha256": "85527f3aba0a1798fe9d38fd8ea115e4cab10f0bc9479c3218e26b5c16acfb49"
     },
     "chrome/browser/ui/android/night_mode/java/res/xml/theme_preferences.xml": {
-      "before_sha256": "406ef64e4ac6a65519392ddc0720ed73a3e4f6ffddd7c158689dac6a110d990f",
+      "before_sha256": "95c3af1a24f5ca3d0f91aaff6afc560ece832a76ea2099395df152e6446c1094",
       "after_sha256": "8142f3ca862d54025ad4e100ea66d536d79861b842810f7453e6eab03571c11e"
     },
     "chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/WebContentsDarkModeController.java": {
@@ -391,8 +391,8 @@
       "after_sha256": "383112119bee8415df6c0394c25e76d0ce62d13cbf50b33152aa3253fb65a3a5"
     },
     "titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java": {
-      "before_sha256": "2bda534f5121fc7042eb4666c4ba5eabb5573407423bcbe85ae435e160f71d0a",
-      "after_sha256": "588d19d3581cd9352eed60931ff583f5ae0dbbf5e8d8267a5220bdfcba773ed8"
+      "before_sha256": "bec8e43d685db44ca81c0220eb206416212a3643895e01c5b4a70a83e47ac9ed",
+      "after_sha256": "6b24e1daca302a4893e012d192d9ccc37af9a8a3f25de6cd929ad9730a0a9f1e"
     },
     "ui/edge_to_edge/android/java/src/org/chromium/ui/edge_to_edge/BaseSystemBarColorHelper.java": {
       "before_sha256": "6a5d16b54af34c5d01538f90ca1618554f72b405b55321170c3566daf7656941",
