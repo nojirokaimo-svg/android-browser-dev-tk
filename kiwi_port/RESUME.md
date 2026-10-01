@@ -124,3 +124,10 @@ The old M153 edge is in `gen/chrome/browser/auxiliary_search/java__header.d`, wh
 Resume from literal `kiwi-154-6df5931ce5664d898c599acac4bcb0ae005381a4-build`, with empty transition identity. The v3 adjustment runs immediately after exact restore, removes only the obsolete magic_stack token from that one text depfile, backs up the original as `.d.kiwi-m153-backup`, and ages the preserved turbine jar. `.ninja_deps`, `.ninja_log`, other outputs, and cached object contents are unchanged. The v3 marker prevents repeated adjustment.
 
 Local verification: 44 tests passed (including real Ninja), 25 patch checksums passed, YAML parsed. A separate test using the exact downloaded depfile reproduced the cycle before correction and passed Ninja's dry-run after correction. This establishes the targeted checkpoint repair, not a completed APK or device behavior. Resume the normal core workflow and inspect its result before declaring completion.
+
+
+### Build #171 compile checkpoint
+
+Build #171 passed the dependency repair and compiled through step 20,981 of 63,777. It then exposed one M153 constructor argument left in patch 200: `createKiwiClipboardCandidate()` passed the removed integer between `serializedAnswerTemplate` and `fillIntoEdit`. The actual M154 signature was measured from source audit artifact `11143897964`; removing only that obsolete `0` gives `AutocompleteMatch.java` SHA-256 `0775efb9c35981b428d7d240859c0ee864cdbd1ec2a6210c7761640634ef6b89`. Patch 200 SHA-256 is `4153cb628c5163550dae58a4b3005a3726eb4035ddc3c0028b0aaa81fc3f32f9`.
+
+The 17 GB compile state was saved successfully at 2026-10-01T07:25:25Z under literal key `kiwi-154-e6e4a72c3416e98a333664da572c1731c9871920-build`. Resume only from that key. Local verification after the fix: 45 tests pass, 25 checksums pass, strict application from the #171 actual before-source yields zero manifest mismatches, and a second strict application is idempotent. No final APK exists yet.

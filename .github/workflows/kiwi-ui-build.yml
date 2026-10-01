@@ -25,9 +25,9 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Build #166 saved this exact M154 partial checkpoint after source preparation.
+          # Build #171 saved this exact M154 partial checkpoint after 20,981 compile steps.
           # Keep Ninja history and object files; a cache miss stops the build.
-          restore-key: kiwi-154-6df5931ce5664d898c599acac4bcb0ae005381a4-build
+          restore-key: kiwi-154-e6e4a72c3416e98a333664da572c1731c9871920-build
           require-restore: "true"
           # The source identity is already M154. Invalidate only the obsolete M153
           # auxiliary_search turbine dependency retained in java__header.d (not .ninja_deps).

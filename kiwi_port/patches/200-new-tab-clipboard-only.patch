@@ -367,7 +367,7 @@ index 298d453e82485c1a8063129a8ff229b31929788d..de5c4c243a43856dfcaf124df3598229
      private final Set<Integer> mSubtypes;
      private final boolean mIsSearchType;
      private final @OmniboxSuggestionKind int mSuggestionKind;
-@@ -204,6 +206,57 @@ public class AutocompleteMatch {
+@@ -204,6 +206,56 @@ public class AutocompleteMatch {
          updatePostContentType(postContentType);
      }
  
@@ -390,7 +390,6 @@ index 298d453e82485c1a8063129a8ff229b31929788d..de5c4c243a43856dfcaf124df3598229
 +                        description,
 +                        List.of(new MatchClassification(0, MatchClassificationStyle.NONE)),
 +                        null,
-+                        0,
 +                        "",
 +                        GURL.emptyGURL(),
 +                        GURL.emptyGURL(),

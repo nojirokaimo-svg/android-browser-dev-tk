@@ -332,7 +332,7 @@
     },
     "components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java": {
       "before_sha256": "d91f031f351f1dd455334ccba5abcddeb339654a9cf3988aa2c807a5b409e71c",
-      "after_sha256": "8a4ff0fe28139b32a88b2f7add6fcfdb1b3b6ac46baef1fddfc9fd0006af1c76"
+      "after_sha256": "0775efb9c35981b428d7d240859c0ee864cdbd1ec2a6210c7761640634ef6b89"
     },
     "components/omnibox/browser/autocomplete_controller.cc": {
       "before_sha256": "63e5dd7427095747d85716cbd0ec25d11a833a964572e613e68eeea57b35d502",
