@@ -132,13 +132,20 @@ class CheckpointCompatibilityTest(unittest.TestCase):
                 "rule compile\n"
                 "  command = touch $out\n"
                 "  deps = gcc\n"
+                "  depfile = $out.d\n"
                 "build " + auxiliary + ": compile input\n"
                 "build " + magic + ": phony " + auxiliary + "\n"
                 "default " + auxiliary + "\n"
             )
             (out / ".ninja_deps").write_bytes(
                 ninja_deps(
-                    [path_record(auxiliary, 0), path_record(magic, 1), deps_record(0, [1])]
+                    [
+                        path_record(auxiliary, 0),
+                        path_record(magic, 1),
+                        # Ninja treats a deps record as valid while the output is
+                        # not newer than the recorded mtime.
+                        deps_record(0, [1], mtime=2_000_000_000 * 10**9),
+                    ]
                 )
             )
 

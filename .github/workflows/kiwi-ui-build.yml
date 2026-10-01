@@ -25,7 +25,7 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Build #165 saved this exact M154 partial checkpoint after source preparation.
+          # Build #166 saved this exact M154 partial checkpoint after source preparation.
           # Keep Ninja history and object files; a cache miss stops the build.
           restore-key: kiwi-154-6df5931ce5664d898c599acac4bcb0ae005381a4-build
           require-restore: "true"
