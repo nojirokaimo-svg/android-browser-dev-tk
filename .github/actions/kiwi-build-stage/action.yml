@@ -29,6 +29,10 @@ inputs:
     description: Exact previous source identity allowed for one explicit upstream transition.
     required: false
     default: ""
+  invalidate-m153-auxiliary-search-deps:
+    description: One-time invalidation of the reversed M153 auxiliary_search turbine dependency.
+    required: false
+    default: "false"
   titanium-commit:
     required: false
     default: "dd8d8a969fb6af762a3c2445ff455f7e48626993"
@@ -215,6 +219,12 @@ runs:
           export PATH="$GITHUB_WORKSPACE/work/depot_tools:$PATH"
           (cd work/titanium/chromium/src && gn gen out/Default)
         fi
+
+    - name: Invalidate the reversed M153 auxiliary-search dependency once
+      if: inputs.invalidate-m153-auxiliary-search-deps == 'true'
+      shell: bash
+      run: |
+        python3 kiwi_port/checkpoint_compat.py work/titanium/chromium/src/out/Default
 
     - name: Continue arm64 APK compilation within the stage budget
       id: compile
