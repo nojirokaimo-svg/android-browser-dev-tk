@@ -1,10 +1,16 @@
-## 2026-10-07 — 154.0.8037.126 compilation checkpoint
+## 2026-10-07 — 154.0.8037.126 signed APK completed
 
-Build #173 (run `37561813890`) finished source auditing at 2026-10-07T02:49:37Z. It restored the exact completed #172 cache, applied all 25 features without conflicts, and restored the original output unchanged; it did not compile or save another cache. Actual audit artifact `11458465823` (ZIP SHA-256 `cd6ec3322bc40647353b3fee913b43dc4f7170460883893e5c8bf2df4f6ce20c`) confirms all 99 measured before/after hashes. Five affected patches have been re-serialized against these exact sources, with unchanged feature behavior.
+Build [#174](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/37564503375), commit `d37b865151e144bd2117984a84109ecdd8ba8c09`, completed successfully at 2026-10-07T14:02:09Z. The initial build and continue-1 preserved exact incremental checkpoints; continue-2 produced and signed the APK. No cold/clean build or output/cache deletion was performed.
 
-The normal core APK workflow is restored: strict patch verification, literal completed #172 cache, explicit one-time .92 to .126 identity transition, then run/attempt-unique immutable checkpoints and automatic exact-cache continuations. All Kiwi features and saved settings, including the user's Photopea JIT exception, remain retained. Removed 220/225 features stay removed. Pins: Titanium `26092e68277c970eaa94164e9d62438b1fe975ea`, Vanadium `5f832b54eab6d367d09166c49f57b7f6dfa7a5ae`, Chromium `8eaafabb47f12210d524f648b78bce074fa3c83e` (154.0.8037.126).
+- [APK artifact](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/37564503375/artifacts/11487127820): `Titanium-Kiwi-core-154.0.8037.126-arm64-v8a.apk`, 326,445,738 bytes.
+- APK SHA-256: `ee174ad5f0db4a6a59641b50ded11cc9e3b9276a652298ca3ddeca00e535d076`.
+- Artifact ZIP SHA-256: `540c53192d2fbd59a8360456e46d50f5181a6e913feb006ee5488f40a3120156` (143,722,096 bytes); downloaded bytes match the Actions digest.
+- Android v2 signature: verified by CI apksigner and independently from the downloaded APK (RSA signature, certificate/public-key match, and full APK protected-content digest). Certificate SHA-256: `32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0`.
+- Final source audit artifact `11484109132`, ZIP SHA-256 `e2e111e7072016200993e45683747eb50c2843fdef3ad431503284c021eb4d11`: all 99 before/after hashes match the manifest and actual tar contents. Strict ordered 25-patch reapplication from the actual runner baseline succeeds; all final hashes match; second application is idempotent.
+- All 25 patch checksums, registrations and file lists verify. CI's 39 relevant tests pass, including the real Ninja fixture. Local discovery: 45 tests, 44 passed and the real Ninja test skipped because Ninja is unavailable locally. Conflict diagnostics and independent clean-hunk application tests pass.
+- Completed immutable cache saved at **2026-10-07T14:01:46.2023505Z**, job `112800237132`: `kiwi-incremental-154126-d37b865151e144bd2117984a84109ecdd8ba8c09-37564503375-1-continue-2`. Main and update-upstream workflows now restore this literal completed key by default. Initial transition identity is empty; update-upstream defaults to `v154.0.8037.126`. Exact misses still stop immediately.
 
-The updated APK is pending compilation and signature verification. No physical-device test is claimed. Do not launch a separate workflow or push during automatic continuation.
+Pins: Titanium `26092e68277c970eaa94164e9d62438b1fe975ea`, Vanadium `5f832b54eab6d367d09166c49f57b7f6dfa7a5ae`, Chromium `8eaafabb47f12210d524f648b78bce074fa3c83e`. Existing 25 features and saved settings, including the user's Photopea JavaScript JIT exception, are retained. Removed 220 power-saving and 225 Hameln injection remain removed. **This APK has not been tested on a physical device.** Historical checkpoints below are superseded by this completed .126 result. The completion record and cache-default changes use `[skip ci]`; no extra APK build is requested.
 
 ## 2026-10-02 — Titanium 154 final APK (Build #172)
 
@@ -159,7 +165,7 @@ on tap remains to be verified on the device.
 
 The `codex/kiwi-ui-port` workflow applies the feature-scoped patches in
 `kiwi_port/patches/series.json` to pinned Titanium, Vanadium, and Chromium
-commits. The current target is Titanium `v154.0.8037.92`.
+commits. The current target is Titanium `v154.0.8037.126`.
 
 Upstream transitions restore an exact immutable completed `out/Default`
 checkpoint, prepare the new pinned source tree, regenerate GN metadata, and let
