@@ -1,8 +1,8 @@
 {
-  "titanium_commit": "dd8d8a969fb6af762a3c2445ff455f7e48626993",
-  "chromium_commit": "334b65d254ccc35df4fca82706d1753227b01039",
-  "vanadium_commit": "826316da0994ebd78601a86ba5c0cb34b46ba32d",
-  "chromium_version": "154.0.8037.92",
+  "titanium_commit": "26092e68277c970eaa94164e9d62438b1fe975ea",
+  "chromium_commit": "8eaafabb47f12210d524f648b78bce074fa3c83e",
+  "vanadium_commit": "5f832b54eab6d367d09166c49f57b7f6dfa7a5ae",
+  "chromium_version": "154.0.8037.126",
   "scope": "M154 rebase of the existing Kiwi UI, extensions, migration, full backups, credentials, Night mode, copied-link row, active-tab preservation, default-hidden tab search and independent page/card/menu dark colors. Extra power-saving menu/settings/runtime removed.",
   "complete_kiwi_ui_port": true,
   "files": {
