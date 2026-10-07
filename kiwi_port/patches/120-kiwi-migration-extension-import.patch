@@ -1,8 +1,8 @@
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
-index b912be67e40803af7087f7705370feae13096ef9..904dbe55a1d190bc6b96eaf7427f8954f6a669c1 100644
+index 4341ff9cd6f31792052f9ae13b34df5cec25a148..bcdd8cf85905a4154714f0938d049326b352bbb2 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
-@@ -3060,6 +3060,7 @@ if (_is_default_toolchain) {
+@@ -3065,6 +3065,7 @@ if (_is_default_toolchain) {
        "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",

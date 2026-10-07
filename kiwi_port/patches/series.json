@@ -23,7 +23,7 @@
         "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinator.java",
         "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinatorImpl.java"
       ],
-      "sha256": "6e595887b6bc3191b12c628cff6c832554edafdb01fd1791e7dc6423e5b16b00"
+      "sha256": "a23d884dfd52a9723f4e1e9a8e980671942e55daf7866127bffffd65c762e378"
     },
     {
       "id": "menu-presentation",
@@ -166,7 +166,7 @@
         "chrome/browser/resources/extensions/toolbar.ts",
         "chrome/browser/ui/webui/extensions/extensions_ui.cc"
       ],
-      "sha256": "67d8051c75d6e2e8e806b8e98f3f98b70beb60002a3fe254422ac6621af7d3ac"
+      "sha256": "bf93efdee4c6de8e0cb4050eea95484096d5971f055714f69ae6e66a92cf4cae"
     },
     {
       "id": "credentials-security",
@@ -178,7 +178,7 @@
         "components/password_manager/core/browser/password_manager.cc",
         "components/password_manager/core/common/password_manager_pref_names.h"
       ],
-      "sha256": "3507cb6ca4af2cf5cacc29331b1f3cd0d8dce45cafe0ce06c3a99b482a548dfa"
+      "sha256": "9c28d2452cf98ca9a28bbae75ccbb8e977c1024bc9b4a1391b9d247edfb00976"
     },
     {
       "id": "kiwi-settings-dark",
@@ -199,7 +199,7 @@
         "chrome/browser/ui/android/extensions/BUILD.gn",
         "chrome/browser/ui/android/extensions/extension_action_popup_contents.cc"
       ],
-      "sha256": "0dee0e3987e155d5628d5a1df5c7e40fc28123b0ee35ce591f2aff0ad1caf01c"
+      "sha256": "d25c36b235e76386e19a953b0dfe4ec8d592b3069db08e4e3c70aa9e99d9e036"
     },
     {
       "id": "web-contents-theme-target",
@@ -280,7 +280,7 @@
         "chrome/browser/ui/android/omnibox/java/res/values/kiwi_clipboard.xml",
         "chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml"
       ],
-      "sha256": "4153cb628c5163550dae58a4b3005a3726eb4035ddc3c0028b0aaa81fc3f32f9"
+      "sha256": "cb37626ac04f2736017ab6f46fdfef4b034914a9afb508c5e7f488f9e20880c3"
     },
     {
       "id": "tab-search-setting",

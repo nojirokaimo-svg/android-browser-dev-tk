@@ -59,7 +59,7 @@ index b81b009a51850afadc5bb46a1ebde9ed82f349c1..54172cddaf6c5b62c1ba3225e5362728
          if (id == R.id.new_tab_menu_id) {
              if (!mTabModelSelector.isTabStateInitialized()) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index 513ec3f028b2268ed7817c48b880dabe1cd69490..6b722bca49d171202cc80de76434d9f35de41b84 100644
+index 86a45eb0ec7f7db740854f82ac368e62e09cdd0c..32ad3636f6c8ad6e663ea51c53c18d12800a196f 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 @@ -8,7 +8,9 @@ import static org.chromium.build.NullUtil.assumeNonNull;

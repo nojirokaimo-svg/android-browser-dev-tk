@@ -355,7 +355,7 @@ index 79511773f5d091db3268b8d6cb50092305f16242..10f9b73a5eff7830f224f0c1dc65ec3d
              super.onSuggestionClicked(suggestion, position, modifiers);
              return;
 diff --git a/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java b/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
-index 298d453e82485c1a8063129a8ff229b31929788d..de5c4c243a43856dfcaf124df35982290be30845 100644
+index 298d453e82485c1a8063129a8ff229b31929788d..1e9360852c38b0520cb31055434e1c6073836720 100644
 --- a/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
 +++ b/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
 @@ -72,6 +72,8 @@ public class AutocompleteMatch {

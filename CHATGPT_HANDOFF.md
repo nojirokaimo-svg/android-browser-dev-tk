@@ -1,10 +1,10 @@
-## 2026-10-07 — 154.0.8037.126 update preparation
+## 2026-10-07 — 154.0.8037.126 compilation checkpoint
 
-The latest stable Titanium release is pinned to `26092e68277c970eaa94164e9d62438b1fe975ea`, Vanadium `5f832b54eab6d367d09166c49f57b7f6dfa7a5ae`, Chromium `8eaafabb47f12210d524f648b78bce074fa3c83e` (154.0.8037.126).
+Build #173 (run `37561813890`) finished source auditing at 2026-10-07T02:49:37Z. It restored the exact completed #172 cache, applied all 25 features without conflicts, and restored the original output unchanged; it did not compile or save another cache. Actual audit artifact `11458465823` (ZIP SHA-256 `cd6ec3322bc40647353b3fee913b43dc4f7170460883893e5c8bf2df4f6ce20c`) confirms all 99 measured before/after hashes. Five affected patches have been re-serialized against these exact sources, with unchanged feature behavior.
 
-The first run is source audit only: restore the literal completed Build #172 cache, protect it throughout preparation, collect the actual post-Titanium before sources, and apply the existing 25 ordered patches for diagnostics. No compilation or new cache save is permitted in this audit. Manifest file hashes still describe the previous verified baseline until measured from these actual new sources; do not run a strict compile until they have been updated and verified. All Kiwi features and saved preferences, including the user's Photopea JIT exception, are retained. Removed patches 220 and 225 stay removed. The user confirmed Photopea's slowdown was resolved by allowing JavaScript JIT on 2026-10-06.
+The normal core APK workflow is restored: strict patch verification, literal completed #172 cache, explicit one-time .92 to .126 identity transition, then run/attempt-unique immutable checkpoints and automatic exact-cache continuations. All Kiwi features and saved settings, including the user's Photopea JIT exception, remain retained. Removed 220/225 features stay removed. Pins: Titanium `26092e68277c970eaa94164e9d62438b1fe975ea`, Vanadium `5f832b54eab6d367d09166c49f57b7f6dfa7a5ae`, Chromium `8eaafabb47f12210d524f648b78bce074fa3c83e` (154.0.8037.126).
 
-After source measurement, regenerate only patches affected by source drift, verify all checksums and before/after hashes with strict ordered reapplication and idempotence, and restore the normal 350-minute core workflow. Its first transition must name the exact old source identity; subsequent checkpoints use an empty transition. Cache miss stops without cold fallback. This entry records preparation, not an APK result.
+The updated APK is pending compilation and signature verification. No physical-device test is claimed. Do not launch a separate workflow or push during automatic continuation.
 
 ## 2026-10-02 — Titanium 154 final APK (Build #172)
 

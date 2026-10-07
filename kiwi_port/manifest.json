@@ -11,8 +11,8 @@
       "after_sha256": "91a65571de599830024175f44b8d78f9e22f564ff4080ab1094c5e111f515f7e"
     },
     "chrome/android/BUILD.gn": {
-      "before_sha256": "509c796463881e7e142a228c58c24f2a3404ccaa61b8a0e551df4ccacbc674e6",
-      "after_sha256": "f63f753b2e99628ed4c2e82065e3c77d793fbb53e2476cd74180ee511c4129c5"
+      "before_sha256": "a704b7e329084d2c81710050de686df399493adfeb08674efaadc4b1fa0ce511",
+      "after_sha256": "c57da0aa7f61988acc1ee1bdf6e7fd1186f4795e58b454eb4eb03c3b0cc03add"
     },
     "chrome/android/chrome_java_resources.gni": {
       "before_sha256": "551e9e4a345e0f80aff272a247e1ef938b9f0116da732d866b808f5f0a7b1747",
@@ -135,8 +135,8 @@
       "after_sha256": "aba83c2b19bb8d31bdb6c8fac20b6fadc8a758946d4cc3406c30417af3751978"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java": {
-      "before_sha256": "91f97d8a354d982fb4e9c0c0f6ff321f2ddd845d427bdfa147c1dac49fdfb9b7",
-      "after_sha256": "7f2d3a1e2f27c14ba5dd2b4da75ec60648732f95906666d767ed4d93510fce9c"
+      "before_sha256": "95e7879bdec0f11fafbe05e9fbeae697ab554c14989d1ca388e13df82a82dbf4",
+      "after_sha256": "7972c64c623f4a35cbe2fad4aec53f7ff61654800dbaa89266c7ac2fc55b94ff"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java": {
       "before_sha256": "58a3c85d3ba516542066309e53f31a600cf3e1a2b50adef9691c7bf3c95453fc",
@@ -175,8 +175,8 @@
       "after_sha256": "892c8457d7351eea6bb2143a0ab393b4d81d65a06d1c3152536af534da2b53e0"
     },
     "chrome/browser/prefs/browser_prefs.cc": {
-      "before_sha256": "7f421931050c881a4448d6b9c71402ada700720399781e187722ab85755b1cb0",
-      "after_sha256": "bc4860f5ee5d0044ae131e980c3697f530e7974e95775987f2af2032d0a9e3b0"
+      "before_sha256": "2b99aa2923fb37d8fa78a0cd809d0f7a02eddc34c4e017e19e62c210f6519450",
+      "after_sha256": "284df7e5e6f34d218fd9a5e4cdf31075db2c7509b1d54149c149e4cdcfcdb59b"
     },
     "chrome/browser/resources/extensions/item_list.css": {
       "before_sha256": "93106b25ffbee1bd354f07e301c8e30a5ae33917720efee03f3e59e7e733b926",

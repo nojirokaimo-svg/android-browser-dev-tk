@@ -1,3 +1,11 @@
+## 2026-10-07 — 154.0.8037.126 compilation checkpoint
+
+Build #173 (run `37561813890`) finished source auditing at 2026-10-07T02:49:37Z. It restored the exact completed #172 cache, applied all 25 features without conflicts, and restored the original output unchanged; it did not compile or save another cache. Actual audit artifact `11458465823` (ZIP SHA-256 `cd6ec3322bc40647353b3fee913b43dc4f7170460883893e5c8bf2df4f6ce20c`) confirms all 99 measured before/after hashes. Five affected patches have been re-serialized against these exact sources, with unchanged feature behavior.
+
+The normal core APK workflow is restored: strict patch verification, literal completed #172 cache, explicit one-time .92 to .126 identity transition, then run/attempt-unique immutable checkpoints and automatic exact-cache continuations. All Kiwi features and saved settings, including the user's Photopea JIT exception, remain retained. Removed 220/225 features stay removed. Pins: Titanium `26092e68277c970eaa94164e9d62438b1fe975ea`, Vanadium `5f832b54eab6d367d09166c49f57b7f6dfa7a5ae`, Chromium `8eaafabb47f12210d524f648b78bce074fa3c83e` (154.0.8037.126).
+
+The updated APK is pending compilation and signature verification. No physical-device test is claimed. Do not launch a separate workflow or push during automatic continuation.
+
 ## 2026-10-02 — Titanium 154 final APK (Build #172)
 
 Build #172 (commit `1a40491d584ff313f1fa36aa34f9131f9877c65d`, run `36835438451`) completed the Titanium `154.0.8037.92` arm64 APK from exact incremental checkpoints without a clean or cold build.
