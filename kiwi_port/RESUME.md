@@ -1,3 +1,13 @@
+## 2026-10-10 — Titanium 155 update in progress
+
+User requested the 155 update and monitoring through signed APK completion. Formal target: `v155.0.8059.39`, published 2026-10-09T09:47:45Z. Pins: Titanium `c433018f78b54dea5573f2789ed086022c7ec6f1`, Vanadium `c1892f4db7a828b9fcbca9ab6a6898b0a7396fae`, Chromium `3ff7ac5a9224be9156d7f8703a06e22890aafd34`.
+
+The first run is cache-protected, source-audit-only, with best-effort conflict diagnostics. It restores only exact completed #174 cache `kiwi-incremental-154126-d37b865151e144bd2117984a84109ecdd8ba8c09-37564503375-1-continue-2`, returns the restored output unchanged, and never compiles or saves a cache. Manifest file hashes still describe the measured .126 baseline and are explicitly pending 155 verification. They are not claimed to be valid for 155.
+
+After obtaining the actual audit baseline, continue automatically: rebase all 25 ordered patches with minimum conflict fixes; measure before/after hashes, regenerate series checksums; test strict reapplication/idempotence/conflict diagnostics; restore the normal 350-minute core workflow (270-minute Ninja budget plus 45-minute finalization reserve), automatic continue-1 through continue-4 and require-apk. Initial restore remains the literal #174 completed cache. Initial transition identity: `26092e68277c970eaa94164e9d62438b1fe975ea:5f832b54eab6d367d09166c49f57b7f6dfa7a5ae:8eaafabb47f12210d524f648b78bce074fa3c83e:validation`; continuations use empty identity. Use immutable unique keys `kiwi-155-<sha>-<run_id>-<attempt>-build/continue-N`, final `kiwi-incremental-155-<sha>-<run_id>-<attempt>-build/continue-N`.
+
+Source auditing alone is not completion. Keep monitoring, diagnose failures, fix actual errors and resume exact saved partial checkpoints until signed APK delivery. No cold/clean builds, output/cache deletion or overwrite, or fallback. Exact miss stops and notifies. Do not push or dispatch while a production run auto-continues. Preserve all 25 features, saved settings and the Photopea JIT exception; removed 220/225 stay removed. No physical-device claim. At final success verify APK/ZIP hashes, v2 signature, actual source hashes/tests and completed cache save; update defaults/docs with skip-ci and then pause monitoring. Resume monitoring on every subsequent requested update.
+
 ## 2026-10-07 — 154.0.8037.126 signed APK completed
 
 Build [#174](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/37564503375), commit `d37b865151e144bd2117984a84109ecdd8ba8c09`, completed successfully at 2026-10-07T14:02:09Z. The initial build and continue-1 preserved exact incremental checkpoints; continue-2 produced and signed the APK. No cold/clean build or output/cache deletion was performed.

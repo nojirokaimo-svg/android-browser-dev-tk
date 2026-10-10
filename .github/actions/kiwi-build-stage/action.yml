@@ -35,16 +35,16 @@ inputs:
     default: "false"
   titanium-commit:
     required: false
-    default: "26092e68277c970eaa94164e9d62438b1fe975ea"
+    default: "c433018f78b54dea5573f2789ed086022c7ec6f1"
   vanadium-commit:
     required: false
-    default: "5f832b54eab6d367d09166c49f57b7f6dfa7a5ae"
+    default: "c1892f4db7a828b9fcbca9ab6a6898b0a7396fae"
   chromium-commit:
     required: false
-    default: "8eaafabb47f12210d524f648b78bce074fa3c83e"
+    default: "3ff7ac5a9224be9156d7f8703a06e22890aafd34"
   chromium-version:
     required: false
-    default: "154.0.8037.126"
+    default: "155.0.8059.39"
   patch-mode:
     description: strict for pinned builds; best-effort for a newly resolved upstream.
     required: false
@@ -77,6 +77,7 @@ runs:
           kiwi_port.test_checkpoint_compat \
           kiwi_port.test_night_mode_patch \
           kiwi_port.test_credentials_patch \
+          kiwi_port.test_checkpoint_restore \
           kiwi_port.test_job_budget
 
     - name: Enforce checkpoint-only resume
@@ -98,13 +99,21 @@ runs:
     - name: Verify restored checkpoint before preparation
       if: inputs.restore-key != ''
       shell: bash
+      env:
+        KIWI_CACHE_HIT: ${{ steps.restore.outputs.cache-hit }}
+        KIWI_MATCHED_CACHE_KEY: ${{ steps.restore.outputs.cache-matched-key }}
+        KIWI_EXPECTED_CACHE_KEY: ${{ inputs.restore-key }}
       run: |
+        if [[ "$KIWI_CACHE_HIT" != "true" || "$KIWI_MATCHED_CACHE_KEY" != "$KIWI_EXPECTED_CACHE_KEY" ]]; then
+          echo 'Exact checkpoint restore failed; refusing prefix match, fallback or cold build.' >&2
+          exit 1
+        fi
         out=work/titanium/chromium/src/out/Default
         test -f "$out/.ninja_log"
         test -f "$out/.ninja_deps"
         test -f "$out/build.ninja"
         test -f "$out/args.gn"
-        echo "Restored exact checkpoint: ${{ inputs.restore-key }}"
+        echo "Restored exact checkpoint: $KIWI_MATCHED_CACHE_KEY"
         du -sh "$out"
 
     - name: Invalidate the reversed M153 auxiliary-search dependency once

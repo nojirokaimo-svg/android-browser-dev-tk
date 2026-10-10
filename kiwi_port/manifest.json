@@ -1,8 +1,8 @@
 {
-  "titanium_commit": "26092e68277c970eaa94164e9d62438b1fe975ea",
-  "chromium_commit": "8eaafabb47f12210d524f648b78bce074fa3c83e",
-  "vanadium_commit": "5f832b54eab6d367d09166c49f57b7f6dfa7a5ae",
-  "chromium_version": "154.0.8037.126",
+  "titanium_commit": "c433018f78b54dea5573f2789ed086022c7ec6f1",
+  "chromium_commit": "3ff7ac5a9224be9156d7f8703a06e22890aafd34",
+  "vanadium_commit": "c1892f4db7a828b9fcbca9ab6a6898b0a7396fae",
+  "chromium_version": "155.0.8059.39",
   "scope": "M154 rebase of the existing Kiwi UI, extensions, migration, full backups, credentials, Night mode, copied-link row, active-tab preservation, default-hidden tab search and independent page/card/menu dark colors. Extra power-saving menu/settings/runtime removed.",
   "complete_kiwi_ui_port": true,
   "files": {
@@ -429,6 +429,13 @@
     "ci_tests_passed": 39,
     "local_tests_passed": 44,
     "local_tests_skipped": 1,
-    "physical_device_tested": false
+    "physical_device_tested": false,
+    "chromium_version": "154.0.8037.126"
+  },
+  "pending_source_verification": {
+    "target_version": "155.0.8059.39",
+    "status": "awaiting actual post-Titanium source audit and strict patch rebase",
+    "current_file_hash_baseline": "154.0.8037.126; not yet validated for 155",
+    "compile_permitted": false
   }
 }
