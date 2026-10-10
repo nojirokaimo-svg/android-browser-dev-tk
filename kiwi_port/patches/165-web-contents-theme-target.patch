@@ -1,8 +1,8 @@
 diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
-index e005923adbc0bcac9c4258b2f9057efb23242542..143ae945cdc4b48dc2adbc11b8e08492d5a84359 100644
+index aae8c158816290e769918e795c1a6c24ba6d5c7f..86730ca71c097db1371c2719e77c2bf7215836f3 100644
 --- a/chrome/browser/android/BUILD.gn
 +++ b/chrome/browser/android/BUILD.gn
-@@ -133,6 +133,18 @@ if (is_android) {
+@@ -138,6 +138,18 @@ if (is_android) {
      ]
    }
  
@@ -21,7 +21,7 @@ index e005923adbc0bcac9c4258b2f9057efb23242542..143ae945cdc4b48dc2adbc11b8e08492
    source_set("android") {
      sources = [
        "background_sync_launcher_android.cc",
-@@ -419,8 +431,6 @@ if (is_android) {
+@@ -428,8 +440,6 @@ if (is_android) {
        "usage_stats/usage_stats_database.h",
        "warmup_manager.cc",
        "web_contents_printer.cc",
@@ -29,7 +29,7 @@ index e005923adbc0bcac9c4258b2f9057efb23242542..143ae945cdc4b48dc2adbc11b8e08492
 -      "web_contents_theme_client.h",
        "webapk/pwa_restore_bottom_sheet_mediator.cc",
        "webapk/pwa_restore_bottom_sheet_mediator.h",
-       "webapk/webapk_database.cc",
+       "webapk/webapk_install_service.cc",
 @@ -473,6 +483,7 @@ if (is_android) {
        ":tabs_impl",
        ":tabs_public",

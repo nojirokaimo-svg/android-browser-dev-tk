@@ -1,8 +1,8 @@
 diff --git a/chrome/android/chrome_java_resources.gni b/chrome/android/chrome_java_resources.gni
-index 4ad4dba68c7ad5e1dc941cab4a96dd50e1d42804..7d1cb3dc88f88041bba9e3db6aa8fa0366a44a8f 100644
+index 18b8986bb6d035c20a59a997cb038ad67458f31b..def315a4d0cab76b3942168e38e772bb6bcc400d 100644
 --- a/chrome/android/chrome_java_resources.gni
 +++ b/chrome/android/chrome_java_resources.gni
-@@ -582,6 +582,7 @@ chrome_java_resources = [
+@@ -583,6 +583,7 @@ chrome_java_resources = [
    "java/res/layout/powered_by_chrome_footer.xml",
    "java/res/layout/radio_button_group_bookmark_bar_preference.xml",
    "java/res/layout/radio_button_group_homepage_preference.xml",
@@ -10,7 +10,7 @@ index 4ad4dba68c7ad5e1dc941cab4a96dd50e1d42804..7d1cb3dc88f88041bba9e3db6aa8fa03
    "java/res/layout/reader_mode_bottom_sheet.xml",
    "java/res/layout/reader_mode_prefs_bottom_content.xml",
    "java/res/layout/reader_mode_prefs_bottom_content_with_toggle_links.xml",
-@@ -679,6 +680,7 @@ chrome_java_resources = [
+@@ -681,6 +682,7 @@ chrome_java_resources = [
    "java/res/xml/homepage_preferences.xml",
    "java/res/xml/legal_information_preferences.xml",
    "java/res/xml/main_preferences.xml",
@@ -19,10 +19,10 @@ index 4ad4dba68c7ad5e1dc941cab4a96dd50e1d42804..7d1cb3dc88f88041bba9e3db6aa8fa03
    "java/res/xml/privacy_preferences.xml",
    "java/res/xml/search_widget_info.xml",
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 7c1bb7b908a940aeaa0dd0e3537a9dcae8c6c07d..61fce0e7de17990b58fca91433311c221ed15cc4 100644
+index b74f42d79c2b2528fa2f0814f0b94435b0b1d86f..f7f33cf8cdc575c5ec4e23771041475cc9100bdb 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -1097,6 +1097,8 @@ chrome_java_sources = [
+@@ -1104,6 +1104,8 @@ chrome_java_sources = [
  
    # LINT.ThenChange(//components/browser_ui/settings/android/java/src/org/chromium/components/browser_ui/settings/search/SettingsIndexData.java:MainSettingsClassName)
    "java/src/org/chromium/chrome/browser/settings/MultiColumnSettings.java",
@@ -32,7 +32,7 @@ index 7c1bb7b908a940aeaa0dd0e3537a9dcae8c6c07d..61fce0e7de17990b58fca91433311c22
    "java/src/org/chromium/chrome/browser/settings/SelectionDecoration.java",
    "java/src/org/chromium/chrome/browser/settings/SettingsActivity.java",
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java
-index 1f479f31732e14cdddea6373eb2eb74fec06af45..79f611120f67b2d52dd5e008d3942e1de16bc6af 100644
+index eb6d7adee6d482404bb09ac5adf2e3cda16e1f6e..b71416f18fcf30a007625ad9198c8dbe9770759b 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java
 @@ -30,6 +30,7 @@ import androidx.core.widget.ImageViewCompat;
@@ -43,7 +43,7 @@ index 1f479f31732e14cdddea6373eb2eb74fec06af45..79f611120f67b2d52dd5e008d3942e1d
  import org.chromium.base.ResettersForTesting;
  import org.chromium.build.annotations.NullMarked;
  import org.chromium.build.annotations.Nullable;
-@@ -189,6 +190,14 @@ public class TabGridViewBinder {
+@@ -191,6 +192,14 @@ public class TabGridViewBinder {
                  layoutParams.width = width;
                  view.setLayoutParams(layoutParams);
              }
@@ -59,7 +59,7 @@ index 1f479f31732e14cdddea6373eb2eb74fec06af45..79f611120f67b2d52dd5e008d3942e1d
              // current thumbnail is a placeholder and we were waiting on a thumbnail.
              updateThumbnail(view, model, /* onlyUpdateIfPlaceholder= */ !sizeChanged);
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListCoordinator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListCoordinator.java
-index aa2d5909bac842ccc089fd3b72cd224ae50e7705..72635aaaf26c8e7cae56a6a4d6f8cc8552f617a3 100644
+index e41428a8ec7319129739a1dee88aefa793e3ba02..9ed58daa0b34314aa21274cdce13039f39101898 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListCoordinator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListCoordinator.java
 @@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView.ItemAnimator.ItemAnimatorFinish
@@ -70,7 +70,7 @@ index aa2d5909bac842ccc089fd3b72cd224ae50e7705..72635aaaf26c8e7cae56a6a4d6f8cc85
  import org.chromium.base.Log;
  import org.chromium.base.ObserverList;
  import org.chromium.base.Token;
-@@ -391,8 +392,15 @@ public class TabListCoordinator implements PriceWelcomeMessageProvider, DestroyO
+@@ -383,8 +384,15 @@ public class TabListCoordinator implements PriceWelcomeMessageProvider, DestroyO
              if (recyclerListener != null) mRecyclerView.setRecyclerListener(recyclerListener);
  
              if (mMode == TabListMode.GRID) {
@@ -87,7 +87,7 @@ index aa2d5909bac842ccc089fd3b72cd224ae50e7705..72635aaaf26c8e7cae56a6a4d6f8cc85
                              @Override
                              public void onLayoutCompleted(RecyclerView.State state) {
                                  super.onLayoutCompleted(state);
-@@ -685,13 +693,28 @@ public class TabListCoordinator implements PriceWelcomeMessageProvider, DestroyO
+@@ -668,13 +676,28 @@ public class TabListCoordinator implements PriceWelcomeMessageProvider, DestroyO
              // Update the cards for the span change.
              ViewUtils.requestLayout(mRecyclerView, "TabListCoordinator#updateGridCardLayout");
          }
@@ -123,7 +123,7 @@ index aa2d5909bac842ccc089fd3b72cd224ae50e7705..72635aaaf26c8e7cae56a6a4d6f8cc85
          final Size oldDefaultSize = mMediator.getDefaultGridCardSize();
          final Size newDefaultSize = new Size(cardWidthPx, cardHeightPx);
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java
-index a9509fa23034c36ac3b4f316b761bb56c7c347ee..4e9edac51067b14fc5ed001f88a68cecd43163e8 100644
+index 9ec60322f0ed9d81c2eb52a08c5fce9c92b58eb2..6ba494c53c3791358005de1bdc4ec2a7f3d90833 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java
 @@ -45,6 +45,7 @@ import androidx.recyclerview.widget.RecyclerView;
@@ -134,7 +134,7 @@ index a9509fa23034c36ac3b4f316b761bb56c7c347ee..4e9edac51067b14fc5ed001f88a68cec
  import org.chromium.base.DeviceInfo;
  import org.chromium.base.Log;
  import org.chromium.base.ResettersForTesting;
-@@ -1574,6 +1575,16 @@ public class TabListMediator implements TabListNotificationHandler {
+@@ -1421,6 +1422,16 @@ public class TabListMediator implements TabListNotificationHandler {
       */
      @VisibleForTesting
      int getSpanCount(int screenWidthDp) {
@@ -152,7 +152,7 @@ index a9509fa23034c36ac3b4f316b761bb56c7c347ee..4e9edac51067b14fc5ed001f88a68cec
              // The layout span count is restricted to medium on XR immersive devices to display
              // larger tab thumbnails, despite the large screen width.
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-index 9b20987256aee32fec78886c0dacddf17ecf6661..e35004d7532da8773935e2b7fbc2a48169cf7bdf 100644
+index 58c9a3b20482d1f85bc852cb7d2ecfa3ad6d9849..cb6e6cd06d982530f45aeecd501058ca54177a90 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
 @@ -39,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView;
@@ -178,15 +178,17 @@ index 9b20987256aee32fec78886c0dacddf17ecf6661..e35004d7532da8773935e2b7fbc2a481
              TabListCoordinator tabListCoordinator =
                      new TabListCoordinator(
                              mode,
-@@ -434,7 +443,7 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
+@@ -434,7 +443,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
                              mModalDialogManager,
                              tabModelSupplier,
                              mMultiThumbnailCardProvider,
--                            /* actionOnRelatedTabs= */ true,
-+                            /* actionOnRelatedTabs= */ actionOnRelatedTabs,
+-                            TabListLayoutType.GROUPED,
++                            actionOnRelatedTabs
++                                    ? TabListLayoutType.GROUPED
++                                    : TabListLayoutType.FLAT,
                              dataSharingTabManager,
                              getTabListItemOnClickListenerProvider(),
-                             /* dialogHandler= */ null,
+                             /* ungroupBarStatusHandler= */ null,
 diff --git a/chrome/android/java/res/layout/radio_button_group_tabswitcher_preference.xml b/chrome/android/java/res/layout/radio_button_group_tabswitcher_preference.xml
 new file mode 100644
 index 0000000000000000000000000000000000000000..519f03a324a7c8c7f9cd5cc193d23abac08cc0f9

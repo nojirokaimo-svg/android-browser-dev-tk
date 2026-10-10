@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java b/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
-index 21bb3dfb0422f036460f8f403c0a8b5e3dc40d8e..f96c2eaabd79ffb16b81cce1452f947b389d3b25 100644
+index 7356bc646f72edd9e1c746179cd62a355300ebdc..7e0367cd5b80e0700bbb48d8e4e59fed7de8660c 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
 @@ -31,6 +31,7 @@ import org.chromium.base.TraceEvent;
@@ -10,7 +10,7 @@ index 21bb3dfb0422f036460f8f403c0a8b5e3dc40d8e..f96c2eaabd79ffb16b81cce1452f947b
  import org.chromium.base.task.AsyncTask;
  import org.chromium.base.task.ChainedTasks;
  import org.chromium.base.task.PostTask;
-@@ -274,6 +275,10 @@ public class ProcessInitializationHandler {
+@@ -277,6 +278,10 @@ public class ProcessInitializationHandler {
          if (BuildConfig.ENABLE_ASSERTS) {
              AllPreferenceKeyRegistries.initializeKnownRegistries();
          }

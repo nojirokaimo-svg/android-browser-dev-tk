@@ -1,8 +1,8 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index b81b009a51850afadc5bb46a1ebde9ed82f349c1..54172cddaf6c5b62c1ba3225e5362728f431cdb7 100644
+index 5591cf7932c173cb7e85a34d6ac9d0ecb28aa17e..720e10d5017838f30aa38065e666cf652878c7f0 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -58,6 +58,7 @@ import org.chromium.base.Callback;
+@@ -57,6 +57,7 @@ import org.chromium.base.Callback;
  import org.chromium.base.CallbackController;
  import org.chromium.base.CallbackUtils;
  import org.chromium.base.CommandLine;
@@ -21,7 +21,7 @@ index b81b009a51850afadc5bb46a1ebde9ed82f349c1..54172cddaf6c5b62c1ba3225e5362728
  import org.chromium.chrome.browser.notifications.tips.TipsPromoCoordinator;
  import org.chromium.chrome.browser.notifications.tips.TipsUtils;
  import org.chromium.chrome.browser.ntp.NewTabPage;
-@@ -4348,6 +4352,36 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -4365,6 +4369,36 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
              @Nullable Bundle menuItemData,
              @Nullable MotionEventInfo triggeringMotion) {
          final Tab currentTab = getActivityTab();
@@ -59,7 +59,7 @@ index b81b009a51850afadc5bb46a1ebde9ed82f349c1..54172cddaf6c5b62c1ba3225e5362728
          if (id == R.id.new_tab_menu_id) {
              if (!mTabModelSelector.isTabStateInitialized()) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index 86a45eb0ec7f7db740854f82ac368e62e09cdd0c..32ad3636f6c8ad6e663ea51c53c18d12800a196f 100644
+index fcc45d9653fe3a2d22f4d8b3b06bc062f979f89d..9bd9d01d36b196820a20935efd186ea37710b030 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 @@ -8,7 +8,9 @@ import static org.chromium.build.NullUtil.assumeNonNull;

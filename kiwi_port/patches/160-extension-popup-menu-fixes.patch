@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index 32ad3636f6c8ad6e663ea51c53c18d12800a196f..8ef133aa511622162a7e4991b65374bc2cf0147b 100644
+index 9bd9d01d36b196820a20935efd186ea37710b030..44c58cc2b6c6c8d150cb11b3c6474cca80d3de74 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 @@ -799,6 +799,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
@@ -13,17 +13,17 @@ index 32ad3636f6c8ad6e663ea51c53c18d12800a196f..8ef133aa511622162a7e4991b65374bc
          modelList.add(buildSettingsItem());
  
 diff --git a/chrome/browser/ui/android/extensions/BUILD.gn b/chrome/browser/ui/android/extensions/BUILD.gn
-index 4d1c4cb1c9672d74dad2af60e2e67d0a4a7aa4bb..f3b29fa1897c314e32c90cd4267a7ceefd23210d 100644
+index 8522cd8ba02dcf692e73b0f55b2905f5c34e51f8..4852660a49d28fd43fc56b71003190bfcf4fce7a 100644
 --- a/chrome/browser/ui/android/extensions/BUILD.gn
 +++ b/chrome/browser/ui/android/extensions/BUILD.gn
-@@ -45,6 +45,7 @@ if (enable_extensions_core) {
-     ]
+@@ -47,6 +47,7 @@ if (enable_extensions_core) {
      deps = [
        "//base",
-+      "//chrome/browser/android:web_contents_theme_client",
        "//chrome/app:generated_resources",
++      "//chrome/browser/android:web_contents_theme_client",
        "//chrome/browser/devtools",
        "//chrome/browser/extensions",
+       "//chrome/browser/extensions/api/omnibox",
 diff --git a/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc b/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc
 index 873977bba9206a60f10007a22fbd74bf71b2e7f6..530c1423bcc6e43b02af42c8f6a4062eb4d171d0 100644
 --- a/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc

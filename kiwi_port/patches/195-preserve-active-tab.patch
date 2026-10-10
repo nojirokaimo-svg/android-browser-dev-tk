@@ -1,8 +1,8 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 54172cddaf6c5b62c1ba3225e5362728f431cdb7..032bee1a5a2e3a12584b37450cdc8acecb8b2a6e 100644
+index 720e10d5017838f30aa38065e666cf652878c7f0..5acfb638f3e5faae015659eaeefae8d59602b8e8 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -5751,16 +5751,11 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -5803,16 +5803,11 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
          return (ChromeNextTabPolicySupplier) mNextTabPolicySupplier;
      }
  

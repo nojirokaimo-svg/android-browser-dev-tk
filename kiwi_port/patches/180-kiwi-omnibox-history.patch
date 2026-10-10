@@ -43,10 +43,10 @@ index 34e76fe0c4a0ab8ed374cf4b97bf044b5f349d13..6be9ebfbb0d7b6c8e55d77cac1a36698
  
          @Override
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
-index 63ad92399f0e4b76a51fd08d8a0c80e4cbc3f186..60aecd081c1a49518960dcff30b5b15b0b24d8ad 100644
+index b44a8bf83282c15bee50d6ca01fb05394fa790cc..b71e01dc17b5645f0a7ab8f2be22486d3a5a74af 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
-@@ -416,6 +416,10 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
+@@ -417,6 +417,10 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
                          mProfile,
                          mBackPressManager);
          mModel.set(NewTabPageLayoutProperties.SEARCH_BOX_VIEW, mNtpSearchBox.getView());
@@ -58,7 +58,7 @@ index 63ad92399f0e4b76a51fd08d8a0c80e4cbc3f186..60aecd081c1a49518960dcff30b5b15b
          updateSearchBoxTwoSideMargin();
          initializeLogoCoordinator();
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
-index 59d5b1d5ab8fef115b26a44f8bb4bbaaeec46f35..72ba3ed44f44026079151504e8ebb2d21afa3e5f 100644
+index 50b5c58f788d6304356667029b54672cb54ef1ea..c60131b39b349b5f197f7bb8aca2b61b98e5852f 100644
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
 @@ -191,6 +191,7 @@ public class AutocompleteCoordinator implements OmniboxSuggestionsVisualState {
@@ -110,10 +110,10 @@ index bb400f40caf92519b5ec97052e2898324ab2799e..2cc1cc15e22ac74c30fe4b4436c9ab8a
      public boolean onGenericMotionEvent(MotionEvent event) {
          if (!OmniboxCapabilities.isDesktopPlatform()) return super.onGenericMotionEvent(event);
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
-index 932790a04d43d5f24cf47705ccc8094093e4df17..17f7ca0c75455b35f18627c47807cd08f957fcea 100644
+index b175e7cf5b52a4042c019ad4ec3aec6e36cdf397..af3eaccff6b118ea904fdee7fb2b7bd3df477f71 100644
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/SuggestionListViewBinder.java
-@@ -166,7 +166,9 @@ class SuggestionListViewBinder
+@@ -172,7 +172,9 @@ class SuggestionListViewBinder
                  && layoutMode != FuseboxLayoutMode.SUGGESTIONS_POPOVER) {
              holder.container.setBackgroundColor(Color.TRANSPARENT);
          } else {

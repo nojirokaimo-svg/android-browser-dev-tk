@@ -1,8 +1,8 @@
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 131916ccc97c69ea85a1f75db9bcb9a13026c4ca..7c1bb7b908a940aeaa0dd0e3537a9dcae8c6c07d 100644
+index 7d93bddb1ba2c067d9337372b9bc288fedd8bb6f..b74f42d79c2b2528fa2f0814f0b94435b0b1d86f 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -245,6 +245,7 @@ chrome_java_sources = [
+@@ -246,6 +246,7 @@ chrome_java_sources = [
    "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
@@ -11,10 +11,10 @@ index 131916ccc97c69ea85a1f75db9bcb9a13026c4ca..7c1bb7b908a940aeaa0dd0e3537a9dca
    "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
    "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
-index 79b836fe1d7b96941a066e5524192f67d0b66d19..984784fd4280df61a0a86f41c8863e2b73692898 100644
+index a3694f0a26052daebcb257c1f719bcb258b46b78..eff915dd1003fa08db4b4ffced6f7531aae64712 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
-@@ -264,6 +264,11 @@ by a child template that "extends" this file.
+@@ -265,6 +265,11 @@ by a child template that "extends" this file.
               Since this activity (shown in the launcher) and the application
               (shown in Android's Settings/Apps list) share the same label, we
               do not specify one here to allow it to inherit from the app. -->
@@ -27,18 +27,18 @@ index 79b836fe1d7b96941a066e5524192f67d0b66d19..984784fd4280df61a0a86f41c8863e2b
              android:theme="@style/LauncherTheme"
              android:relinquishTaskIdentity="true"
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
-index 2bfa050056621ee9c70e1d1da189cc7886586c0b..29d0284076dbb613c88c8839a5ae4eb5c718eb1a 100644
+index b11ba335a283b9d9f14778e82a8fa8646f7d3c57..93e3666d3dde287a141306197b796562994951ce 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
-@@ -16,6 +16,7 @@ import org.chromium.build.annotations.NullMarked;
- import org.chromium.chrome.browser.accessibility.hierarchysnapshotter.HierarchySnapshotter;
+@@ -17,6 +17,7 @@ import org.chromium.chrome.browser.accessibility.hierarchysnapshotter.HierarchyS
  import org.chromium.chrome.browser.app.notifications.ContextualNotificationPermissionRequesterImpl;
+ import org.chromium.chrome.browser.app.tab_activity_glue.PopupCreatorImpl;
  import org.chromium.chrome.browser.background_task_scheduler.ChromeBackgroundTaskFactory;
 +import org.chromium.chrome.browser.backup.KiwiFullBackupActivity;
  import org.chromium.chrome.browser.base.SplitCompatApplication;
  import org.chromium.chrome.browser.crash.ChromePureJavaExceptionReporter;
  import org.chromium.chrome.browser.customtabs.CustomTabsConnection;
-@@ -52,6 +53,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {
+@@ -54,6 +55,7 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {
          super.onCreate();
  
          ChromeApplicationImplHooks.onCreate();
@@ -540,10 +540,10 @@ index 0000000000000000000000000000000000000000..d0b19c161e83eefff9ef8c770d412dd1
 +    }
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 914c163bacc702fc346cba97359a669fdde0e43e..dc8da5d0c7b8cf65dac7be450ccd40d9847e72ae 100644
+index 22c553316f31940985474f117a58ee07dafaa612..4fafd9797922dd363dfe974d6be0d8b80b0b7daf 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-@@ -43,6 +43,7 @@ import org.chromium.build.annotations.Nullable;
+@@ -38,6 +38,7 @@ import org.chromium.build.annotations.Nullable;
  import org.chromium.chrome.R;
  import org.chromium.chrome.browser.appearance.settings.AppearanceSettingsFragment;
  import org.chromium.chrome.browser.autofill.settings.SettingsNavigationHelper;
@@ -551,7 +551,7 @@ index 914c163bacc702fc346cba97359a669fdde0e43e..dc8da5d0c7b8cf65dac7be450ccd40d9
  import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFragment;
  import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsMediator;
  import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsReferrer;
-@@ -361,6 +362,21 @@ public class MainSettings extends ChromeBaseSettingsFragment
+@@ -359,6 +360,21 @@ public class MainSettings extends ChromeBaseSettingsFragment
          mManagedPreferenceDelegate = createManagedPreferenceDelegate();
  
          SettingsUtils.addPreferencesFromResource(this, R.xml.main_preferences);
@@ -592,7 +592,7 @@ index 06f0fa32a74f704b5e8881a7f99530cf732c394c..afb1bf4a4df85621e6b1bdcff9e0b3a1
          final View root = window.getDecorView().getRootView();
          boolean needsDarkStatusBarIcons = !ColorUtils.shouldUseLightForegroundOnBackground(color);
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java
-index 6d3c374317dd9fd5b593fae68c1c6b76c045d6ea..0fc0af3a8c4feeeb2d269e0ec71cddacb54e1029 100644
+index d02d7ac7b4864228cd12ff90ec7eff7bee7b5880..dd0c9fc9ed35b561f8b2dfa58306330594d5c1ec 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java
 @@ -333,7 +333,7 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
@@ -619,7 +619,7 @@ index 6d3c374317dd9fd5b593fae68c1c6b76c045d6ea..0fc0af3a8c4feeeb2d269e0ec71cddac
      /** The layout that handles generating the toolbar view resource. */
      // Only publicly visible due to lint warnings.
      public static class ToolbarViewResourceCoordinatorLayout extends ViewResourceCoordinatorLayout {
-@@ -1432,7 +1440,7 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
+@@ -1428,7 +1436,7 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
      private void updateBackgroundColor() {
          if (mToolbarDataProvider != null
                  && (mShowLocationBarOnly || getVerticalTabsTopMargin() > 0)) {
@@ -661,7 +661,7 @@ index d489d6efb0409238be768251860e82a217e17341..433664b510ba0761d27149dbec434d3f
          mToolbarBackground.setColor(color);
          setToolbarHairlineColor(color);
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java
-index 167c2cbfe361b021b67fe0ac4f577aa11c2c91cf..08559bc938a8861ebacdfc229ef1a609ad462d08 100644
+index efb0d70c8c9ce10a6021afc9ab2647d59cf575a0..2dd3004f3118f1ef22705915d864c272463a0100 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/TopToolbarOverlayMediator.java
 @@ -7,6 +7,7 @@ package org.chromium.chrome.browser.toolbar.top;
@@ -672,7 +672,7 @@ index 167c2cbfe361b021b67fe0ac4f577aa11c2c91cf..08559bc938a8861ebacdfc229ef1a609
  import android.graphics.Rect;
  import android.view.View;
  
-@@ -485,9 +486,22 @@ public class TopToolbarOverlayMediator implements ThemeColorObserver {
+@@ -481,9 +482,22 @@ public class TopToolbarOverlayMediator implements ThemeColorObserver {
       * @param tab The tab to base the colors on.
       */
      private void updateThemeColor(Tab tab) {
