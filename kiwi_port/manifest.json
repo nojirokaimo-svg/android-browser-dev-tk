@@ -355,8 +355,8 @@
       "after_sha256": "0411ad4cdd1345f6b4a24e04a533f92a4552962b242e077f8923e2dab309987b"
     },
     "components/password_manager/core/browser/password_manager.cc": {
-      "before_sha256": "9276542fe598e044f4630b8dfb222d15c02139b7c6b3c3e19da7d6911701cfdb",
-      "after_sha256": "252d6b8ac73c95e430ea65a6f3011a0cc5f6dcd3c920d2f21547fb499d490231"
+      "before_sha256": "7e89168fc30827a1ac10b92fc36ce936de9757c3712d49e056b0857519a5db2e",
+      "after_sha256": "6c6b9d2c4ed53175f5ccc30e7829451ab9d55518e6f8d7fcae715589f6d0ef09"
     },
     "components/password_manager/core/common/password_manager_pref_names.h": {
       "before_sha256": "3f2281e067a1f4e645c97a7765e9c2feb55d4941f9b1e73a53b953b9e90c50a3",
@@ -437,22 +437,12 @@
     "chromium_version": "155.0.8059.39"
   },
   "source_verification": {
-    "version": "155.0.8059.39",
-    "source_run": 38053980595,
-    "source_artifact": 11669794988,
-    "source_zip_sha256": "7e90d238cbc3d398641efb908b188846e7f2ea8b2b797c9666d8ef4345e3c487",
-    "final_run": 38056044488,
-    "final_artifact": 11691803591,
-    "final_zip_sha256": "418479418ca037a02f65bde975010141821181633e4947a013272fc23a0abf15",
+    "version": "155.0.8059.79",
+    "source_run": 38572128056,
+    "source_artifact": 11899542218,
+    "source_zip_sha256": "1ebb8b1e4cc21eb6c84f6c98eba1201a34906b5c3156cb270140c40732fb99d6",
     "files": 99,
     "features": 25,
-    "status": "actual M155 before and final after archives match all manifest hashes; strict 25-patch reapplication, repeat idempotence and conflict diagnostics verified"
-  },
-  "pending_source_verification": {
-    "version": "155.0.8059.79",
-    "compile_permitted": false,
-    "reason": "Existing 99-file hashes are measured from 155.0.8059.39. Measure actual post-Titanium 155.0.8059.79 before/after sources and strictly reapply all 25 patches before production compilation.",
-    "previous_version": "155.0.8059.39",
-    "restore_key": "kiwi-incremental-155-afd27a5830a708ffa9e85d6d02c9fd6f32186bf7-38056044488-1-continue-3"
+    "status": "actual 99 before/after hashes, strict ordered 25-patch reapplication, repeat idempotence and conflict diagnostics verified"
   }
 }

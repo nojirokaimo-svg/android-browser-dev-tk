@@ -15,26 +15,138 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  audit-15579:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
     steps:
       - uses: actions/checkout@v5
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Restore the exact completed #176 checkpoint and return it untouched.
+          # Build #176 completed this exact M155 checkpoint. Keep Ninja history and
+          # object/generated files; a cache miss stops the build.
           restore-key: kiwi-incremental-155-afd27a5830a708ffa9e85d6d02c9fd6f32186bf7-38056044488-1-continue-3
           require-restore: "true"
-          audit-only: "true"
+          # One-time verified 155.39 to 155.79 source identity transition; preserve Ninja output.
           bootstrap-revision: ""
-          transition-from-identity: ""
-          save-key: kiwi-15579-audit-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
-          final-cache-key: ""
+          transition-from-identity: "c433018f78b54dea5573f2789ed086022c7ec6f1:c1892f4db7a828b9fcbca9ab6a6898b0a7396fae:3ff7ac5a9224be9156d7f8703a06e22890aafd34:validation"
+          save-key: kiwi-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
+          final-cache-key: kiwi-incremental-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           titanium-commit: 3f02ed2a05886655b875b21e7c273d8a54fe75ed
           vanadium-commit: 8a06a43a04074ab26fa4dc8f8aba915285d56839
           chromium-commit: a49e2e3d4addfd84e765b52afe230bedb81096db
           chromium-version: 155.0.8059.79
-          # Diagnostic-only; unresolved conflicts are never compiled.
-          patch-mode: best-effort
+          patch-mode: strict
           build-budget-minutes: "270"
+
+  continue-1:
+    needs: build
+    if: needs.build.outputs.done != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: build
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
+          require-restore: "true"
+          save-key: kiwi-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
+          final-cache-key: kiwi-incremental-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
+          titanium-commit: 3f02ed2a05886655b875b21e7c273d8a54fe75ed
+          vanadium-commit: 8a06a43a04074ab26fa4dc8f8aba915285d56839
+          chromium-commit: a49e2e3d4addfd84e765b52afe230bedb81096db
+          chromium-version: 155.0.8059.79
+          patch-mode: strict
+          build-budget-minutes: "270"
+
+  continue-2:
+    needs: continue-1
+    if: needs.continue-1.outputs.done != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: build
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
+          require-restore: "true"
+          save-key: kiwi-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
+          final-cache-key: kiwi-incremental-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
+          titanium-commit: 3f02ed2a05886655b875b21e7c273d8a54fe75ed
+          vanadium-commit: 8a06a43a04074ab26fa4dc8f8aba915285d56839
+          chromium-commit: a49e2e3d4addfd84e765b52afe230bedb81096db
+          chromium-version: 155.0.8059.79
+          patch-mode: strict
+          build-budget-minutes: "270"
+
+  continue-3:
+    needs: continue-2
+    if: needs.continue-2.outputs.done != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: build
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
+          require-restore: "true"
+          save-key: kiwi-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
+          final-cache-key: kiwi-incremental-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
+          titanium-commit: 3f02ed2a05886655b875b21e7c273d8a54fe75ed
+          vanadium-commit: 8a06a43a04074ab26fa4dc8f8aba915285d56839
+          chromium-commit: a49e2e3d4addfd84e765b52afe230bedb81096db
+          chromium-version: 155.0.8059.79
+          patch-mode: strict
+          build-budget-minutes: "270"
+
+  continue-4:
+    needs: continue-3
+    if: needs.continue-3.outputs.done != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    outputs:
+      done: ${{ steps.build.outputs.done }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: build
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
+          require-restore: "true"
+          save-key: kiwi-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
+          final-cache-key: kiwi-incremental-15579-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
+          titanium-commit: 3f02ed2a05886655b875b21e7c273d8a54fe75ed
+          vanadium-commit: 8a06a43a04074ab26fa4dc8f8aba915285d56839
+          chromium-commit: a49e2e3d4addfd84e765b52afe230bedb81096db
+          chromium-version: 155.0.8059.79
+          patch-mode: strict
+          build-budget-minutes: "270"
+
+  require-apk:
+    needs: [build, continue-1, continue-2, continue-3, continue-4]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require one stage to finish the APK
+        env:
+          S11: ${{ needs.build.outputs.done }}
+          S12: ${{ needs.continue-1.outputs.done }}
+          S13: ${{ needs.continue-2.outputs.done }}
+          S14: ${{ needs.continue-3.outputs.done }}
+          S15: ${{ needs.continue-4.outputs.done }}
+        run: |
+          if [[ "$S11" != true && "$S12" != true && "$S13" != true && "$S14" != true && "$S15" != true ]]; then
+            echo "Build and exact-cache continuations ended without producing an APK." >&2
+            exit 1
+          fi
