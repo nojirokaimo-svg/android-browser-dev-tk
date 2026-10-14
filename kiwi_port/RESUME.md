@@ -1,3 +1,13 @@
+## 2026-10-14 — Titanium 155.0.8059.79 update in progress
+
+Formal upstream release [v155.0.8059.79](https://github.com/jqssun/android-titanium-browser/releases/tag/v155.0.8059.79) was published at 2026-10-14T10:36:50Z. Fixed pins: Titanium `3f02ed2a05886655b875b21e7c273d8a54fe75ed`, Vanadium `8a06a43a04074ab26fa4dc8f8aba915285d56839`, Chromium `a49e2e3d4addfd84e765b52afe230bedb81096db`.
+
+The protected audit stage restores literal completed #176 cache `kiwi-incremental-155-afd27a5830a708ffa9e85d6d02c9fd6f32186bf7-38056044488-1-continue-3`, verifies cache-hit=true and matched key equals the requested key, hides the checkpoint during source preparation, then returns it untouched. It compiles nothing and saves no cache. Old measured 155.39 hashes remain explicitly pending; compile_permitted=false until actual 155.79 before/after archive measurements, ordered strict 25-patch reapplication, all 99 hashes and second-run idempotence are verified.
+
+After audit, continue automatically to the normal signed APK build; do not wait for another user request or describe audit success as APK completion. Restore the normal workflow from parent `f9c4887d37620a05167ae45144a89d02f2c1bd13`, with these new pins, literal #176 cache, one-time transition `c433018f78b54dea5573f2789ed086022c7ec6f1:c1892f4db7a828b9fcbca9ab6a6898b0a7396fae:3ff7ac5a9224be9156d7f8703a06e22890aafd34:validation`, empty transitions on continuations, unique kiwi-15579 / kiwi-incremental-15579 keys, 350-minute jobs, 270-minute Ninja maximum and 45-minute finalization reserve. No clean, cache deletion, overwrite or fallback.
+
+Preserve all 25 existing features, saved settings and Photopea JIT exception; removed 220/225 remain removed. Deliver only after signed APK/hash/certificate/source/tests/completed-cache verification and completion records. Physical-device behavior remains unmeasured.
+
 ## 2026-10-11 — Titanium 155.0.8059.39 signed APK completed
 
 Build [#176](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/38056044488), commit `afd27a5830a708ffa9e85d6d02c9fd6f32186bf7`, completed successfully at 2026-10-11T05:17:01Z. The build restored only exact immutable checkpoints; build, continue-1 and continue-2 stopped normally at their Ninja budgets and saved their states, and continue-3 produced and signed the APK. No cold/clean build, output deletion, cache overwrite or fallback was used.
