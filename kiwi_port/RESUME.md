@@ -1,3 +1,19 @@
+## 2026-10-15 — Titanium 155.0.8059.79 signed APK completed
+
+Build [#178](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/38576318413), commit `4d72ba1aa77606a63f6f57022c2416ffc27cc31b`, completed successfully at **2026-10-15T02:43:29Z**. Build and continue-1 stopped normally at their Ninja budgets and saved exact immutable checkpoints; continue-2 finished all APK build steps and signed the APK. require-apk passed; continue-3/4 were skipped. No cold/clean build, output/cache deletion, overwrite or fallback was used.
+
+- [APK artifact](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/38576318413/artifacts/11945395037): `Titanium-Kiwi-core-155.0.8059.79-arm64-v8a.apk`, **331,229,458 bytes**.
+- APK SHA-256: `ee0eb88a5ff4613e39111e3bb3496c5f82f6fda3b93af658e57629eaa7cbadba`.
+- Artifact ZIP SHA-256: `dbb0ac79869bcbf3cde6b31f84ce8edfbd1fd855bc088da35093a70671211518` (**145,812,217 bytes**); downloaded bytes match Actions' digest and the APK matches CI SHA256SUMS.
+- Android APK Signature Scheme v2: CI apksigner passed, one signer. Independent verification of the downloaded APK passed its RSA signature, certificate/public-key match, and all protected-content digests. Certificate SHA-256 remains `32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0`.
+- Final [source audit artifact](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/38576318413/artifacts/11938428426), ZIP SHA-256 `ca2b2e4b9738156db2293d7001879842d1503f1b31dd72f443e89359738f5ea3`: all **99 before and 99 after** hashes match actual tar bytes and the manifest. Strict ordered reapplication of the 25 patches to the final runner's before archive yields all 99 after hashes; repeat application is idempotent.
+- All 25 patch checksums/registrations/file lists verify; verification scripts, tests and all patches/series match production Git blobs. Fresh local discovery: **49 tests, 48 passed, 1 real-Ninja fixture skipped locally**. The real-Ninja fixture ran in CI: each of the three executed stages passed its selected **43-test suite, no skips**. Conflict tests cover feature/file reporting, independent clean hunks, atomic strict failure and unknown-source rejection.
+- Completed cache saved at **2026-10-15T02:43:08.2993435Z**, job `116171785375`: `kiwi-incremental-15579-4d72ba1aa77606a63f6f57022c2416ffc27cc31b-38576318413-1-continue-2`. Main/update-upstream initial defaults now use this literal completed key, with empty transition identity; update-upstream defaults to `v155.0.8059.79`. Misses must still stop without fallback.
+
+Pins: Titanium `3f02ed2a05886655b875b21e7c273d8a54fe75ed`, Vanadium `8a06a43a04074ab26fa4dc8f8aba915285d56839`, Chromium `a49e2e3d4addfd84e765b52afe230bedb81096db`. Existing 25 features and saved settings, including the user's Photopea JavaScript JIT exception, remain retained. Removed 220 power-saving and 225 Hameln injection remain removed. `build_kiwi_ui_arm64.sh` retains Git mode 100755. **This APK has not been tested on a physical device.**
+
+This completion record and cache-default update use `[skip ci]`; no extra APK build is requested. Earlier launch/audit/checkpoint records below are historical and are not fallback cache candidates.
+
 ## 2026-10-14 — Titanium 155.0.8059.79 strict source verification; signed APK production
 
 Target pins: Titanium `3f02ed2a05886655b875b21e7c273d8a54fe75ed`, Vanadium `8a06a43a04074ab26fa4dc8f8aba915285d56839`, Chromium `a49e2e3d4addfd84e765b52afe230bedb81096db`, version `155.0.8059.79`.
