@@ -11,8 +11,8 @@
       "after_sha256": "91a65571de599830024175f44b8d78f9e22f564ff4080ab1094c5e111f515f7e"
     },
     "chrome/android/BUILD.gn": {
-      "before_sha256": "06b5896f006c200bfd8a9b3ae7c0561a6c818c25732c0551aa0452aace96e8a3",
-      "after_sha256": "33ff67985649c0c03c455db05b07db4ad2ca35f835cc8d5a9c0a8453880a0a49"
+      "before_sha256": "99eb5972d11a052a1f25daa1ab512d7058c066ebf0b6651a64217cfdc23bbabb",
+      "after_sha256": "61eea190a5fcf235334ffe9dd3a55b91ace4a99515f01cbac616822ee64ac559"
     },
     "chrome/android/chrome_java_resources.gni": {
       "before_sha256": "057de39c3a30299c211e86082f7182c3157130ca7b9ea4c3dff5d2a6fc871a15",
@@ -437,20 +437,12 @@
     "chromium_version": "155.0.8059.79"
   },
   "source_verification": {
-    "version": "155.0.8059.79",
-    "source_run": 38572128056,
-    "source_artifact": 11899542218,
-    "source_zip_sha256": "1ebb8b1e4cc21eb6c84f6c98eba1201a34906b5c3156cb270140c40732fb99d6",
+    "version": "155.0.8059.84",
+    "source_run": 39039364741,
+    "source_artifact": 12104226111,
+    "source_zip_sha256": "2332bdb37d389c42c2ba7126f0ffba65bf10bc53749bf8ae83917555349415a0",
     "files": 99,
     "features": 25,
-    "status": "actual 99 before/after hashes, strict ordered 25-patch reapplication, repeat idempotence and conflict diagnostics verified",
-    "final_source_artifact": 11938428426,
-    "final_source_zip_sha256": "ca2b2e4b9738156db2293d7001879842d1503f1b31dd72f443e89359738f5ea3"
-  },
-  "pending_source_verification": {
-    "version": "155.0.8059.84",
-    "compile_permitted": false,
-    "hashes_currently_from_version": "155.0.8059.79",
-    "reason": "Await actual post-Titanium 155.84 runner before/after source archives; retained hashes are prior measured 155.79 values, not new measurements."
+    "status": "actual 99 before/after hashes, strict ordered 25-patch reapplication, repeat idempotence and conflict diagnostics verified"
   }
 }
