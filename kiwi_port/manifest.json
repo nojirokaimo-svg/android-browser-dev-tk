@@ -1,8 +1,8 @@
 {
-  "titanium_commit": "3f02ed2a05886655b875b21e7c273d8a54fe75ed",
-  "chromium_commit": "a49e2e3d4addfd84e765b52afe230bedb81096db",
-  "vanadium_commit": "8a06a43a04074ab26fa4dc8f8aba915285d56839",
-  "chromium_version": "155.0.8059.79",
+  "titanium_commit": "e59e03dc83bc940d73cf29a7683286fca390b393",
+  "chromium_commit": "5869fe313571d75152b77813cf0a4ee26a4e6df0",
+  "vanadium_commit": "20526e052e304b62cf3e80114b423934e2d1c540",
+  "chromium_version": "155.0.8059.84",
   "scope": "M155 rebase of the existing Kiwi UI, extensions, migration, full backups, credentials, Night mode, copied-link row, active-tab preservation, default-hidden tab search and independent page/card/menu dark colors. Extra power-saving menu/settings/runtime and Hameln injection remain removed.",
   "complete_kiwi_ui_port": true,
   "files": {
@@ -446,5 +446,11 @@
     "status": "actual 99 before/after hashes, strict ordered 25-patch reapplication, repeat idempotence and conflict diagnostics verified",
     "final_source_artifact": 11938428426,
     "final_source_zip_sha256": "ca2b2e4b9738156db2293d7001879842d1503f1b31dd72f443e89359738f5ea3"
+  },
+  "pending_source_verification": {
+    "version": "155.0.8059.84",
+    "compile_permitted": false,
+    "hashes_currently_from_version": "155.0.8059.79",
+    "reason": "Await actual post-Titanium 155.84 runner before/after source archives; retained hashes are prior measured 155.79 values, not new measurements."
   }
 }

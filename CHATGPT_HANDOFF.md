@@ -1,3 +1,15 @@
+## 2026-10-17 — Titanium 155.0.8059.84 update in preparation
+
+Formal release v155.0.8059.84 was published 2026-10-16T14:08:32Z. Pins: Titanium `e59e03dc83bc940d73cf29a7683286fca390b393`, Vanadium `20526e052e304b62cf3e80114b423934e2d1c540`, Chromium `5869fe313571d75152b77813cf0a4ee26a4e6df0`.
+
+The protected audit-only workflow restores literal completed #178 cache `kiwi-incremental-15579-4d72ba1aa77606a63f6f57022c2416ffc27cc31b-38576318413-1-continue-2`. Its save was confirmed again at 2026-10-15T02:43:08.2993435Z, job 116171785375. Current existence must be proved by the new exact restore logs. Require cache-hit=true AND matched-key=requested literal. An exact miss stops; no cold/clean build, out/Default deletion, gn clean, cache deletion/overwrite or fallback is permitted.
+
+**This is preparation, not a completed .84 APK.** Compile and cache save are disabled in the audit stage; its restored checkpoint is protected and returned unchanged. The 99 hashes and series baseline remain their prior measured .79 values, explicitly recorded in pending_source_verification with compile_permitted=false. Actual .84 before/after tar/hash reports must be obtained, measured and strict ordered 25-patch reapplication/idempotence verified before compilation. Do not describe old measurements as new measurements.
+
+After audit, continue without waiting for another user instruction: restore normal production from `ffc8df14cb0c359a1594b4e6c0d4d8762ddd7749`, update pins/version/unique keys, use the verified .79 source identity for the first transition and empty continuation transitions. Preserve 350-minute jobs, max 270-minute Ninja and 45-minute finalization reserve. Only normal budget interruption auto-continues. Do not push or start another workflow while production is active.
+
+Preserve all 25 features and saved settings including Photopea JavaScript JIT exception; removed 220/225 stay removed. Final completion requires actual signed APK/ZIP hashes, v2 signature and same certificate, source/patch/tests verification, saved completed cache and [skip ci] documentation/default updates. Physical device behavior is not yet tested. The .79 completion below is historical, not .84 completion.
+
 ## 2026-10-15 — Titanium 155.0.8059.79 signed APK completed
 
 Build [#178](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/38576318413), commit `4d72ba1aa77606a63f6f57022c2416ffc27cc31b`, completed successfully at **2026-10-15T02:43:29Z**. Build and continue-1 stopped normally at their Ninja budgets and saved exact immutable checkpoints; continue-2 finished all APK build steps and signed the APK. require-apk passed; continue-3/4 were skipped. No cold/clean build, output/cache deletion, overwrite or fallback was used.
