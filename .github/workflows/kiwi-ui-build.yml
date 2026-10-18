@@ -25,13 +25,13 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Build #178 completed this exact M155.79 checkpoint. Keep Ninja history and
+          # Build #180 completed this exact M155.84 checkpoint. Keep Ninja history and
           # object/generated files; a cache miss stops the build.
-          restore-key: kiwi-incremental-15579-4d72ba1aa77606a63f6f57022c2416ffc27cc31b-38576318413-1-continue-2
+          restore-key: kiwi-incremental-15584-acdde2860b6a4ee2f777920fbabaafa571cf909c-39044652662-1-continue-2
           require-restore: "true"
-          # Verified one-time 155.79 to 155.84 identity transition; retain Ninja history.
+          # This completed checkpoint already has the pinned identity; retain Ninja history.
           bootstrap-revision: ""
-          transition-from-identity: "3f02ed2a05886655b875b21e7c273d8a54fe75ed:8a06a43a04074ab26fa4dc8f8aba915285d56839:a49e2e3d4addfd84e765b52afe230bedb81096db:validation"
+          transition-from-identity: ""
           save-key: kiwi-15584-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           final-cache-key: kiwi-incremental-15584-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           titanium-commit: e59e03dc83bc940d73cf29a7683286fca390b393

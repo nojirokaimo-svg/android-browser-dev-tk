@@ -404,26 +404,26 @@
     }
   },
   "completed_build": {
-    "run_number": 178,
-    "run_id": 38576318413,
-    "commit": "4d72ba1aa77606a63f6f57022c2416ffc27cc31b",
-    "completed_at": "2026-10-15T02:43:29Z",
-    "artifact_id": 11945395037,
-    "artifact_zip_sha256": "dbb0ac79869bcbf3cde6b31f84ce8edfbd1fd855bc088da35093a70671211518",
-    "artifact_zip_size_bytes": 145812217,
-    "apk_sha256": "ee0eb88a5ff4613e39111e3bb3496c5f82f6fda3b93af658e57629eaa7cbadba",
-    "apk_size_bytes": 331229458,
+    "run_number": 180,
+    "run_id": 39044652662,
+    "commit": "acdde2860b6a4ee2f777920fbabaafa571cf909c",
+    "completed_at": "2026-10-18T01:51:38Z",
+    "artifact_id": 12121033331,
+    "artifact_zip_sha256": "bc30dd842c7ac9299da334a2c91a881568cf595dd4513de7bb7ba5a9957df36c",
+    "artifact_zip_size_bytes": 145819907,
+    "apk_sha256": "6da83515c7b61947a861b3b5026cce9d633e2851cdec3cc2ba6279fa5d184821",
+    "apk_size_bytes": 331229675,
     "android_v2_signature_verified": true,
     "android_v2_independently_verified": true,
     "signer_certificate_sha256": "32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0",
     "signer_certificate_independently_extracted": true,
-    "completed_cache_key": "kiwi-incremental-15579-4d72ba1aa77606a63f6f57022c2416ffc27cc31b-38576318413-1-continue-2",
-    "cache_saved_at": "2026-10-15T02:43:08.2993435Z",
-    "cache_saved_job_id": 116171785375,
-    "source_audit_artifact_id": 11938428426,
-    "source_audit_zip_sha256": "ca2b2e4b9738156db2293d7001879842d1503f1b31dd72f443e89359738f5ea3",
-    "source_before_artifact_id": 11899542218,
-    "source_before_zip_sha256": "1ebb8b1e4cc21eb6c84f6c98eba1201a34906b5c3156cb270140c40732fb99d6",
+    "completed_cache_key": "kiwi-incremental-15584-acdde2860b6a4ee2f777920fbabaafa571cf909c-39044652662-1-continue-2",
+    "cache_saved_at": "2026-10-18T01:51:17.0600666Z",
+    "cache_saved_job_id": 117549797275,
+    "source_audit_artifact_id": 12121111539,
+    "source_audit_zip_sha256": "98156ad5cdb2fc101d2e0a9c496de810344565f5966190ce1a3ceb8d0f83004f",
+    "source_before_artifact_id": 12121111539,
+    "source_before_zip_sha256": "98156ad5cdb2fc101d2e0a9c496de810344565f5966190ce1a3ceb8d0f83004f",
     "verified_feature_patches": 25,
     "verified_source_files": 99,
     "strict_reapplication_verified": true,
@@ -434,7 +434,7 @@
     "local_tests_passed": 48,
     "local_tests_skipped": 1,
     "physical_device_tested": false,
-    "chromium_version": "155.0.8059.79"
+    "chromium_version": "155.0.8059.84"
   },
   "source_verification": {
     "version": "155.0.8059.84",
@@ -443,6 +443,9 @@
     "source_zip_sha256": "2332bdb37d389c42c2ba7126f0ffba65bf10bc53749bf8ae83917555349415a0",
     "files": 99,
     "features": 25,
-    "status": "actual 99 before/after hashes, strict ordered 25-patch reapplication, repeat idempotence and conflict diagnostics verified"
+    "status": "actual 99 before/after hashes, strict ordered 25-patch reapplication, repeat idempotence and conflict diagnostics verified",
+    "final_source_run": 39044652662,
+    "final_source_artifact": 12121111539,
+    "final_source_zip_sha256": "98156ad5cdb2fc101d2e0a9c496de810344565f5966190ce1a3ceb8d0f83004f"
   }
 }
