@@ -1,4 +1,4 @@
-name: Build Titanium-Kiwi core M156.47 (Java dependency repair)
+name: Build Titanium-Kiwi core M156.47 (GN syntax corrected)
 
 on:
   workflow_dispatch:
