@@ -27,6 +27,8 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
           df -h
+          sudo apt-get update -qq
+          sudo apt-get install -y ninja-build
       - name: Restore exact failed M156 checkpoint, read-only investigation
         uses: actions/cache/restore@v4
         with:
@@ -83,6 +85,10 @@ jobs:
           print("\n".join(report[-50:]))
           PY
           cat output/kiwi156-cycle/ninja-query.log
+          /usr/bin/ninja -C "$out" -t deps obj/base/build_info_java.turbine.jar > output/kiwi156-cycle/build-info-deps.log 2>&1 || true
+          /usr/bin/ninja -C "$out" -t deps obj/base/version_info/android/version_constants_java.turbine.jar > output/kiwi156-cycle/version-constants-deps.log 2>&1 || true
+          /usr/bin/ninja -C "$out" -t deps obj/base/base_java.turbine.jar > output/kiwi156-cycle/base-java-deps.log 2>&1 || true
+          /usr/bin/ninja -C "$out" -t graph obj/base/build_info_java.turbine.jar > output/kiwi156-cycle/build-info-graph.dot 2>&1 || true
           # Reproduce without rebuilding. Fails normally when cycle remains.
           timeout 120 /usr/bin/ninja -C "$out" -n chrome_public_apk > output/kiwi156-cycle/ninja-dryrun.log 2>&1 || true
           tail -30 output/kiwi156-cycle/ninja-dryrun.log
