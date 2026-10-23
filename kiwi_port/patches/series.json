@@ -280,7 +280,7 @@
         "chrome/browser/ui/android/omnibox/java/res/values/kiwi_clipboard.xml",
         "chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml"
       ],
-      "sha256": "8f7d5be8ca09637a55dce95ef53022794202333cd522a22130b30497123a3e18"
+      "sha256": "4f5cf79118ca67a72936ed5f96c635a17796efa31a8b32fc93c3993de120627a"
     },
     {
       "id": "tab-search-setting",

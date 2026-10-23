@@ -30,7 +30,7 @@ jobs:
         with:
           # Resume the immutable M156 partial checkpoint saved by run 39929691990.
           # Preserve Ninja history and objects; an exact cache miss stops the build.
-          restore-key: kiwi-15647-8da132ee646ba6e06707c1c66d70c690f6eb5ecb-39929691990-1-build
+          restore-key: kiwi-15647-91268738ee5a74e4f0110cfd15efb8aa7cdd5bca-39944202267-1-build
           require-restore: "true"
           # M156 continuation from failed build checkpoint. No fallback, preserve original 155.84.
           bootstrap-revision: ""

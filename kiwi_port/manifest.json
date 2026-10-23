@@ -336,7 +336,7 @@
     },
     "components/omnibox/browser/autocomplete_controller.cc": {
       "before_sha256": "19b4729af56339b7da5f13b102af188149c9d0852a3fd1d318044884bcebdd23",
-      "after_sha256": "389c44af6a2c26234332a7acf5d350ac836b8d129a0b936c60388ce51ab27b09"
+      "after_sha256": "10ffa7137cfae451f329a2d22ece8ff5b674cd067314f7e8c5ec57fce33a25d8"
     },
     "components/omnibox/browser/clipboard_provider.cc": {
       "before_sha256": "f36d1bb1fcbfc8d3cf3785ab48b9b7fb4a8afa4280f868c3af0acc5418aaec3b",

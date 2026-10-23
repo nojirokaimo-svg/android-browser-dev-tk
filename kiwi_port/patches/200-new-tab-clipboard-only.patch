@@ -426,7 +426,7 @@ index ab735de16e1eae0c6e15765f2638a6357302eeb7..8e93e45306ca70ec6ac268a584e9ccc3
          if (TextUtils.isEmpty(postContentType)) {
              mExtraHeaders.remove("Content-Type");
 diff --git a/components/omnibox/browser/autocomplete_controller.cc b/components/omnibox/browser/autocomplete_controller.cc
-index e978d4b3f1aec72be1c8604a152628f080b4ffec..9ad4b2a5b4cbaec3df2d283180699b7907478b6c 100644
+index e978d4b3f1aec72be1c8604a152628f080b4ffec..f718cafb1a3421821e14a4a966e3c053c2875763 100644
 --- a/components/omnibox/browser/autocomplete_controller.cc
 +++ b/components/omnibox/browser/autocomplete_controller.cc
 @@ -1154,6 +1154,15 @@ bool AutocompleteController::ShouldRunProvider(
@@ -438,7 +438,7 @@ index e978d4b3f1aec72be1c8604a152628f080b4ffec..9ad4b2a5b4cbaec3df2d283180699b79
 +  // Keep the existing ClipboardProvider so URLs navigate and text searches work.
 +  if (input_.IsZeroSuggest() &&
 +      omnibox::IsNTPPage(input_.current_page_classification())) {
-+    return provider->type() == AutocompleteProvider::TYPE_CLIPBOARD;
++    return provider->type() == AutocompleteProvider::Type::kClipboard;
 +  }
 +#endif
 +
