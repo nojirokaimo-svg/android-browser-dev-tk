@@ -157,6 +157,110 @@ def repair_upstream_native_theme_target(feature_id, rejected):
     (SRC/(relative+".rej")).unlink(missing_ok=True)
     return True
 
+def repair_m156_clipboard_enum_transition(feature_id, rejected):
+    """Adapt the two rejected Android NTP clipboard hunks to the M156 scoped enum."""
+    cc="components/omnibox/browser/clipboard_provider.cc"
+    test="components/omnibox/browser/clipboard_provider_unittest.cc"
+    if feature_id!="new-tab-clipboard-only" or set(rejected)!={cc+".rej",test+".rej"}:
+        return False
+    ccp=SRC/cc
+    data=ccp.read_text(encoding="utf-8")
+    anchor = ("void ClipboardProvider::UpdateClipboardMatchWithContent(\n"
+              "    base::WeakPtr<AutocompleteMatch> match,\n"
+              "    ClipboardMatchCallback callback) {\n  DCHECK(match);\n")
+    code = """#if BUILDFLAG(IS_ANDROID)
+  if (ntp_clipboard_mode_ &&
+      match->type == omnibox::AutocompleteMatchType::kClipboardUrl) {
+    // Use the current clipboard item at selection time to support both links
+    // and text without displaying clipboard contents in the NTP suggestion.
+    ui::DataTransferEndpoint data_dst(
+        ui::EndpointType::kDefault, {.notify_if_restricted = false});
+    ui::Clipboard::GetForCurrentThread()->ReadText(
+        ui::ClipboardBuffer::kCopyPaste, data_dst,
+        base::BindOnce(
+            [](base::WeakPtr<ClipboardProvider> provider,
+               base::WeakPtr<AutocompleteMatch> match,
+               ClipboardMatchCallback callback, std::u16string text) {
+              if (provider && match && !text.empty()) {
+                provider->UpdateClipboardTextContent(text, match.get());
+              }
+              std::move(callback).Run();
+            },
+            callback_weak_ptr_factory_.GetWeakPtr(), std::move(match),
+            std::move(callback)));
+    return;
+  }
+#endif
+"""
+    if data.count(anchor)!=1:
+        raise RuntimeError("M156 clipboard callback signature changed")
+    if "if (ntp_clipboard_mode_ &&" in data[data.index(anchor):data.index(anchor)+500]:
+        raise RuntimeError("clipboard handler already modified or ambiguous")
+    data=data.replace(anchor,anchor+code,1)
+    ccp.write_text(data,encoding="utf-8")
+    tp=SRC/test
+    td=tp.read_text(encoding="utf-8")
+    start="TEST_F(ClipboardProviderTest, Android_NTPClipboardLinkWithUnknownTimestamp) {"
+    if td.count(start)!=1:
+        raise RuntimeError("M156 clipboard test rename hunk not applied uniquely")
+    after="TEST_F(ClipboardProviderTest, Android_StandaloneSuggestionOnSearchActivity) {"
+    if td.count(after)!=1:
+        raise RuntimeError("M156 clipboard next test marker ambiguous")
+    idx=td.index(start)
+    end=td.index(after,idx)
+    replacement = """TEST_F(ClipboardProviderTest, Android_NTPClipboardLinkWithUnknownTimestamp) {
+  // Verify NTP obtains a real link even when Android has not reported age.
+  auto* system_clipboard = ui::TestClipboard::CreateForCurrentThread();
+  system_clipboard->WriteText(kClipboardURL);
+  system_clipboard->SetLastModifiedTime(base::Time());
+  client_->set_template_url_service(
+      search_engines_test_environment_.template_url_service());
+
+  AutocompleteInput input(std::u16string(), metrics::OmniboxEventProto::NTP,
+                          classifier_);
+  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
+  provider_->Start(input, false);
+
+  ASSERT_EQ(provider_->matches().size(), 1U);
+  auto& match = provider_->matches().back();
+  EXPECT_EQ(omnibox::AutocompleteMatchType::kClipboardUrl, match.type);
+  EXPECT_EQ(omnibox::GROUP_MOBILE_CLIPBOARD, match.suggestion_group_id);
+  EXPECT_TRUE(match.destination_url.is_empty());
+
+  system_clipboard->WriteText("https://example.org/latest");
+  CreateMatchWithContentCallbackWaiter waiter(provider_, &match);
+  waiter.WaitForMatchUpdated();
+  EXPECT_EQ(GURL("https://example.org/latest"), match.destination_url);
+  ui::Clipboard::DestroyClipboardForCurrentThread();
+}
+
+TEST_F(ClipboardProviderTest, Android_NTPClipboardTextSearchesWhenSelected) {
+  auto* system_clipboard = ui::TestClipboard::CreateForCurrentThread();
+  system_clipboard->WriteText("Search for me");
+  system_clipboard->SetLastModifiedTime(base::Time());
+  client_->set_template_url_service(
+      search_engines_test_environment_.template_url_service());
+
+  AutocompleteInput input(std::u16string(), metrics::OmniboxEventProto::NTP,
+                          classifier_);
+  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
+  provider_->Start(input, false);
+  ASSERT_EQ(provider_->matches().size(), 1U);
+  auto& match = provider_->matches().back();
+  CreateMatchWithContentCallbackWaiter waiter(provider_, &match);
+  waiter.WaitForMatchUpdated();
+  EXPECT_EQ(omnibox::AutocompleteMatchType::kClipboardText, match.type);
+  EXPECT_TRUE(match.destination_url.is_valid());
+  ui::Clipboard::DestroyClipboardForCurrentThread();
+}
+
+"""
+    td=td[:idx]+replacement+td[end:]
+    tp.write_text(td,encoding="utf-8")
+    for rel in (cc,test):
+        (SRC/(rel+".rej")).unlink(missing_ok=True)
+    return True
+
 def main():
     rawhash = json.loads((AUDIT/"kiwi-source-hashes-before.json").read_text())
     if len(rawhash["files"]) != 99:
@@ -195,6 +299,10 @@ def main():
                 if not rejects:
                     trial.returncode = 0
             if rejects and repair_upstream_native_theme_target(feature["id"], rejects):
+                rejects = [str(p.relative_to(SRC)) for p in SRC.rglob("*.rej")]
+                if not rejects:
+                    trial.returncode = 0
+            if rejects and repair_m156_clipboard_enum_transition(feature["id"], rejects):
                 rejects = [str(p.relative_to(SRC)) for p in SRC.rglob("*.rej")]
                 if not rejects:
                     trial.returncode = 0
