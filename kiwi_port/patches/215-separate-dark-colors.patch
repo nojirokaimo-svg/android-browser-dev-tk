@@ -15,7 +15,7 @@ index 490416cb649cc934f103398cc5854cc52739f666..735ada7371db7779250e48ba53ba2ab0
  
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-index a090ce3459d9f0df69cde6d5ac3ec2639a730dae..8d0df6cbb417ff20aa2068d6289fbdb799713e27 100644
+index bd269cc923e0598feb9cd4c9c7f06e0611a3752a..c5c3bc1b43d01c685cb5e5dcf6dd166acec1bc38 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 @@ -78,21 +78,34 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment

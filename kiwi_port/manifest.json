@@ -88,7 +88,7 @@
     },
     "chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java": {
       "before_sha256": "b6953ff89442d978fb34967c5f546e3769c1812b0bb2b437278650269d7bc500",
-      "after_sha256": "c351dbd8f38f22c7b37e6dcafc13a9fa8bc7c7a75bb9e8af4e6beb580fff6d12"
+      "after_sha256": "5ae9cbe86f968222521f4f1e4cf84f34410747c3f7e96ce4785317eec67a5640"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java": {
       "before_sha256": null,

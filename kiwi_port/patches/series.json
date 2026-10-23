@@ -307,7 +307,7 @@
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
       ],
-      "sha256": "74a592e06ed19dfb687fa68c0368fe98c785c37e430272c657ceba24de211449"
+      "sha256": "8c5e5618f0c5308912b5237b6037429777e125c6277ed4e56433d26c339c6705"
     },
     {
       "id": "independent-dark-ui-colors",
@@ -319,7 +319,7 @@
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
       ],
-      "sha256": "54f2df024eb668c0cddf7f6f2f0859d1227f829832923639a67105a6b54f511e"
+      "sha256": "a96f0bb5e4a66bc255e94b848201a657b6c3d182e0d0027b5f1366a2ca364933"
     }
   ]
 }

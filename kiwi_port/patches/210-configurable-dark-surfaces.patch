@@ -12,7 +12,7 @@ index d89b76290c5ccc3de6b07bc1cf2d43861adda34a..490416cb649cc934f103398cc5854cc5
 +
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-index 774fe010ad73acd858a3bb4902ddd55d703fea71..a090ce3459d9f0df69cde6d5ac3ec2639a730dae 100644
+index 774fe010ad73acd858a3bb4902ddd55d703fea71..bd269cc923e0598feb9cd4c9c7f06e0611a3752a 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 @@ -4,9 +4,12 @@
@@ -37,7 +37,7 @@ index 774fe010ad73acd858a3bb4902ddd55d703fea71..a090ce3459d9f0df69cde6d5ac3ec263
  /** Fragment to manage appearance settings. */
  @NullMarked
  public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
-@@ -72,8 +77,106 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -72,8 +77,107 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
          initBookmarkBarPref();
          initToolbarShortcutPref();
          initTabPositionPref();
@@ -140,6 +140,7 @@ index 774fe010ad73acd858a3bb4902ddd55d703fea71..a090ce3459d9f0df69cde6d5ac3ec263
 +                                            dialog.dismiss();
 +                                        }));
 +        dialog.show();
++    }
 +
      @Override
      @SuppressWarnings("UseSharedPreferencesManagerFromChromeCheck")
