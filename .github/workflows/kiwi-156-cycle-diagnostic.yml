@@ -30,26 +30,51 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y ninja-build
       - name: Restore exact failed M156 checkpoint, read-only investigation
+        id: restore
         uses: actions/cache/restore@v4
         with:
           path: work/titanium/chromium/src/out/Default
-          key: kiwi-15647-24ff4e5578c8a92b27090def9635dd24e3bb7d09-39898069048-1-build
+          key: kiwi-15647-4d47ccd21cfd7c46a7935826fc6fd84ace12cd9a-39908296313-1-build
           fail-on-cache-miss: true
       - name: Read GN and Ninja cycle nodes, do not modify or compile
         shell: bash
         run: |
           set -Eeuo pipefail
+          test '${{ steps.restore.outputs.cache-hit }}' = true
+          test '${{ steps.restore.outputs.cache-matched-key }}' = 'kiwi-15647-4d47ccd21cfd7c46a7935826fc6fd84ace12cd9a-39908296313-1-build'
           out=work/titanium/chromium/src/out/Default
           test -s "$out/build.ninja"
           test -s "$out/.ninja_log"
           test -s "$out/.ninja_deps"
           test -s "$out/kiwi-source-state.json"
           mkdir -p output/kiwi156-cycle
+          # Capture the depfiles missing from the previous diagnosis. GN edges
+          # already use channel_enum_java; Java actions load text depfiles separately.
+          python3 - <<'PY_CAPTURE'
+          import hashlib, json, shutil
+          from pathlib import Path
+          out=Path("work/titanium/chromium/src/out/Default")
+          dest=Path("output/kiwi156-cycle/checkpoint-files")
+          paths=["toolchain.ninja", "args.gn", "kiwi-source-state.json"]
+          for target in ("base/build_info_java", "base/base_java", "base/version_info/android/version_constants_java"):
+              for suffix in ("__header.d", "__compile_java.d", ".turbine.build_config.json", ".javac.build_config.json", ".build_config.json"):
+                  paths.append("gen/"+target+suffix)
+          hashes={}
+          for relative in paths:
+              p=out/relative
+              if p.is_file():
+                  target=dest/relative
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(p,target)
+                  hashes[relative]=hashlib.sha256(p.read_bytes()).hexdigest()
+          (dest/"SHA256.json").write_text(json.dumps(hashes,indent=2)+"\n")
+          print(json.dumps(hashes,indent=2))
+          PY_CAPTURE
           cp "$out/kiwi-source-state.json" output/kiwi156-cycle/
           cp "$out/kiwi-incremental-plan.json" output/kiwi156-cycle/
           sha256sum "$out/build.ninja" "$out/.ninja_log" "$out/.ninja_deps" > output/kiwi156-cycle/checkpoint-hashes.txt
           (
-          printf '%s\n' 'M156 Ninja graph, exact cache 39898069048'
+          printf '%s\n' 'M156 Ninja graph, exact cache 39908296313'
           /usr/bin/ninja -C "$out" -t query \
             obj/base/build_info_java.turbine.jar \
             obj/base/version_info/android/version_constants_java.turbine.jar \
@@ -100,3 +125,4 @@ jobs:
           path: output/kiwi156-cycle/
           retention-days: 14
           if-no-files-found: warn
+
