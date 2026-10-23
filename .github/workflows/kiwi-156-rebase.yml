@@ -6,6 +6,7 @@ on:
       - codex/kiwi-ui-port
     paths:
       - .github/workflows/kiwi-156-rebase.yml
+      - kiwi_port/rebase_156_audit.py
 
 permissions:
   contents: read

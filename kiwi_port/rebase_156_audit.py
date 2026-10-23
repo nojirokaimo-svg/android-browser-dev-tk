@@ -88,6 +88,9 @@ def main():
                 events.append({"id":feature["id"],"result":"conflict","details":detail,"rejects":rejects})
                 problems.append(feature["id"])
                 break
+        # GNU patch preserves disposable .orig backup files; they are not feature changes.
+        for disposable_backup in SRC.rglob("*.orig"):
+            disposable_backup.unlink()
         run(["git","add","-A"],cwd=SRC)
         changed=run(["git","diff","--cached","--name-only"],cwd=SRC).stdout.splitlines()
         if set(changed)!=set(feature["files"]):
