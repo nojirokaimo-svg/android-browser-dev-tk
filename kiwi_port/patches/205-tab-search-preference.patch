@@ -49,10 +49,10 @@ index 21b8404320dfdca555e9bc9a09ff146973b09f8c..781af1355aa5c6c7d91c48179d8e6600
          removeDelayedCallbacks();
  
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-index cb6e6cd06d982530f45aeecd501058ca54177a90..53ca8f5930593b67ba502157f67042a6e40fdd48 100644
+index 96216cab4882839197c136584dc8230b344a5718..76b8612930c38d6099dfba4039867cf61e8a8ddd 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-@@ -1235,7 +1235,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
+@@ -1246,7 +1246,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
      private void maybeMakeSpaceForSearchBar() {
          Configuration config = mActivity.getResources().getConfiguration();
          boolean isTabletOrLandscape = HubUtils.isScreenWidthTablet(config.screenWidthDp);

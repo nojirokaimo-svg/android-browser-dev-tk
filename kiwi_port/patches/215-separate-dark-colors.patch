@@ -1,8 +1,8 @@
 diff --git a/chrome/android/java/res/xml/appearance_preferences.xml b/chrome/android/java/res/xml/appearance_preferences.xml
-index a35194f3b581978500531b8d5e56f46d74372e6a..d9a576746434e2df594a2123cdbba044760d84cf 100644
+index 490416cb649cc934f103398cc5854cc52739f666..735ada7371db7779250e48ba53ba2ab070268046 100644
 --- a/chrome/android/java/res/xml/appearance_preferences.xml
 +++ b/chrome/android/java/res/xml/appearance_preferences.xml
-@@ -37,5 +37,11 @@ exclusive options. -->
+@@ -43,5 +43,11 @@ exclusive options. -->
      <Preference
          android:key="kiwi_dark_surface_color"
          android:order="3" />
@@ -15,12 +15,12 @@ index a35194f3b581978500531b8d5e56f46d74372e6a..d9a576746434e2df594a2123cdbba044
  
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-index 5d740431e2ecb48743c2c683cbcbd05fac7deba0..4f41954814452e30c8b9f07fb49939206d068d99 100644
+index a090ce3459d9f0df69cde6d5ac3ec2639a730dae..8d0df6cbb417ff20aa2068d6289fbdb799713e27 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-@@ -76,21 +76,34 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -78,21 +78,34 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
          initToolbarShortcutPref();
-         initUiThemePref();
+         initTabPositionPref();
          initDarkSurfaceColorPref();
 +        initDarkSurfaceColorPref(
 +                "kiwi_dark_container_color", "dark_container_hex",
@@ -57,7 +57,7 @@ index 5d740431e2ecb48743c2c683cbcbd05fac7deba0..4f41954814452e30c8b9f07fb4993920
                          : chosen);
          preference.setOnPreferenceClickListener(
                  ignored -> {
-@@ -112,45 +125,48 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -114,45 +127,48 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
                                                          ? null
                                                          : new String[] {"#000000", "#16171B", "#202124"}[
                                                                  which - 1];
@@ -114,7 +114,7 @@ index 5d740431e2ecb48743c2c683cbcbd05fac7deba0..4f41954814452e30c8b9f07fb4993920
                          .setView(input)
                          .setPositiveButton(ja ? "適用" : "Apply", null)
                          .setNegativeButton(ja ? "キャンセル" : "Cancel", null)
-@@ -170,7 +186,7 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -172,7 +188,7 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
                                                                  : "Enter a dark #RRGGBB color");
                                                  return;
                                              }
@@ -137,7 +137,7 @@ index 72d2a3454aefa27189efd3d90082a4cc6a57040e..0dee1da546e8f1a8a1beea55764e357d
          int menuBgColor = SemanticColorUtils.getMenuBgColor(context);
          boolean isDark =
 diff --git a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
-index 087864d06a8de8d85e64d94bee192ef72a97fa4c..59339371a376f74fabdc7cd82c3f0e95bfe4fb74 100644
+index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed10f20aa5 100644
 --- a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 +++ b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 @@ -27,13 +27,27 @@ import org.chromium.ui.util.ColorUtils;

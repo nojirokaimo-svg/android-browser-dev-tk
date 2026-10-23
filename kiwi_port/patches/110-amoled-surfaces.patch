@@ -29,7 +29,7 @@ index d74e28a02e23a60618d3ef2598f2f5d7203e4a4d..846490cfd362bdbbff532ba45038a10b
                  ? ContextCompat.getColor(context, R.color.default_bg_color_dark)
                  : SemanticColorUtils.getDefaultBgColor(context);
 diff --git a/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java b/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
-index 67c1474707f38dfcc2f82e3cdfc276afa396b04b..398d7bfec01a9910a0daf439c6a1840a76095243 100644
+index c2c9bf043fbc4e5f593cc537d0d34e0314b38514..9a4149474cac37ec27003c01406bdc6b3155820d 100644
 --- a/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
 +++ b/chrome/browser/composeplate/android/java/src/org/chromium/chrome/browser/composeplate/ComposeplateUtils.java
 @@ -25,6 +25,7 @@ import org.chromium.chrome.browser.ntp.NewTabPageUtils;
@@ -40,7 +40,7 @@ index 67c1474707f38dfcc2f82e3cdfc276afa396b04b..398d7bfec01a9910a0daf439c6a1840a
  
  /** Utility class for the composeplate view. */
  @NullMarked
-@@ -68,6 +69,16 @@ public class ComposeplateUtils {
+@@ -85,6 +86,16 @@ public class ComposeplateUtils {
       */
      public static void applySearchBoxBackground(
              Context context, View view, boolean applyWhiteBackground) {
@@ -148,7 +148,7 @@ index 5802fb20c25cc1e075a54798c9b00487779f6202..dbc54f509e10f33dceb8afcf2c1b3ad0
      }
  
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
-index d93d4a620ed1519d88e3240586f232f8cd26e096..d252492935733290f57b0ad186b8bbe52ce731ac 100644
+index df784833bd73496f889d47fa67bfd66e36781e41..7da513708581cee126ba08c64defb845339a6ee4 100644
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
 @@ -12,6 +12,7 @@ import android.content.res.ColorStateList;
@@ -159,7 +159,7 @@ index d93d4a620ed1519d88e3240586f232f8cd26e096..d252492935733290f57b0ad186b8bbe5
  import android.graphics.drawable.ColorDrawable;
  import android.graphics.drawable.Drawable;
  import android.graphics.drawable.Drawable.ConstantState;
-@@ -1038,6 +1039,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
+@@ -1052,6 +1053,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
      /** Returns the background color for suggestions in the given color scheme and context. */
      public static @ColorInt int getStandardSuggestionBackgroundColor(
              Context context, @BrandedColorScheme int colorScheme) {
@@ -169,7 +169,7 @@ index d93d4a620ed1519d88e3240586f232f8cd26e096..d252492935733290f57b0ad186b8bbe5
          return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
                  ? context.getColor(R.color.search_suggestion_bg_color_incognito)
                  : ContextCompat.getColor(context, R.color.search_suggestion_bg_color);
-@@ -1049,6 +1053,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
+@@ -1063,6 +1067,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
       */
      public static @ColorInt int getPopoverSuggestionBackgroundColor(
              Context context, @BrandedColorScheme int colorScheme) {
@@ -179,7 +179,7 @@ index d93d4a620ed1519d88e3240586f232f8cd26e096..d252492935733290f57b0ad186b8bbe5
          return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
                  ? context.getColor(R.color.gm3_baseline_surface_container_dark)
                  : ContextCompat.getColor(context, R.color.omnibox_popover_suggestion_bg_color);
-@@ -1099,6 +1106,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
+@@ -1113,6 +1120,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
       */
      public static @ColorInt int getSuggestionsDropdownBackgroundColor(
              Context context, @BrandedColorScheme int brandedColorScheme) {
@@ -212,10 +212,10 @@ index 256284aa3630ac838bb51c617774719213d42b9e..3ea014fd6636293de8c9a60a7a834849
              if (ColorUtils.inNightMode(context)) {
                  return SemanticColorUtils.getColorSurface(context);
 diff --git a/components/browser_ui/widget/android/BUILD.gn b/components/browser_ui/widget/android/BUILD.gn
-index 2cb303a3907c0aee125542742e7b006b6fe058d2..1e7ae7dab43f91a24a707cda52383f8c68cf94ff 100644
+index cb6d0390e4dcab63400185b8dabed11b5f85cf4d..57861de82606cb7ee69247f913b484fc5f54008e 100644
 --- a/components/browser_ui/widget/android/BUILD.gn
 +++ b/components/browser_ui/widget/android/BUILD.gn
-@@ -219,6 +219,7 @@ android_resources("java_resources") {
+@@ -220,6 +220,7 @@ android_resources("java_resources") {
      "java/res/color/tab_resumption_module_icon_background_color.xml",
      "java/res/color/tile_view_icon_background_color.xml",
      "java/res/color/toolbar_text_box_bg_color.xml",

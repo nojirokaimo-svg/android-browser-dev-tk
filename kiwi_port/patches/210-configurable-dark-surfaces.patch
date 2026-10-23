@@ -1,10 +1,10 @@
 diff --git a/chrome/android/java/res/xml/appearance_preferences.xml b/chrome/android/java/res/xml/appearance_preferences.xml
-index de61fd03bda5b77cec13c74e0557d70a9a57038a..a35194f3b581978500531b8d5e56f46d74372e6a 100644
+index d89b76290c5ccc3de6b07bc1cf2d43861adda34a..490416cb649cc934f103398cc5854cc52739f666 100644
 --- a/chrome/android/java/res/xml/appearance_preferences.xml
 +++ b/chrome/android/java/res/xml/appearance_preferences.xml
-@@ -34,4 +34,8 @@ exclusive options. -->
-         android:title="@string/bookmark_bar_setting"
-         android:summary="@string/bookmark_bar_setting_subtitle" />
+@@ -40,4 +40,8 @@ exclusive options. -->
+         android:order="3"
+         android:title="@string/tab_position_settings_title" />
  
 +    <Preference
 +        android:key="kiwi_dark_surface_color"
@@ -12,7 +12,7 @@ index de61fd03bda5b77cec13c74e0557d70a9a57038a..a35194f3b581978500531b8d5e56f46d
 +
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-index 25d834b49e43932cb1c7e20f87810d7464bf8aef..5d740431e2ecb48743c2c683cbcbd05fac7deba0 100644
+index 774fe010ad73acd858a3bb4902ddd55d703fea71..a090ce3459d9f0df69cde6d5ac3ec2639a730dae 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 @@ -4,9 +4,12 @@
@@ -37,13 +37,13 @@ index 25d834b49e43932cb1c7e20f87810d7464bf8aef..5d740431e2ecb48743c2c683cbcbd05f
  /** Fragment to manage appearance settings. */
  @NullMarked
  public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
-@@ -70,6 +75,105 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -72,8 +77,106 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
          initBookmarkBarPref();
          initToolbarShortcutPref();
-         initUiThemePref();
+         initTabPositionPref();
 +        initDarkSurfaceColorPref();
-+    }
-+
+     }
+ 
 +    private void initDarkSurfaceColorPref() {
 +        Preference preference = findPreference("kiwi_dark_surface_color");
 +        assert preference != null;
@@ -140,11 +140,12 @@ index 25d834b49e43932cb1c7e20f87810d7464bf8aef..5d740431e2ecb48743c2c683cbcbd05f
 +                                            dialog.dismiss();
 +                                        }));
 +        dialog.show();
-     }
- 
++
      @Override
+     @SuppressWarnings("UseSharedPreferencesManagerFromChromeCheck")
+     public void onDestroy() {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
-index bfb46e079a573ad000539a541fc3c1dd4759235a..0d2753d2958f4f9a6987f6c7bb6d8649a2dc8c4e 100644
+index 9ef13d839dfad4bac55f7cf9b5560dab83969af5..f30161aff3365a808753c303cd175f97e32c5ae0 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
 @@ -44,6 +44,7 @@ import org.chromium.chrome.browser.ui.messages.snackbar.Snackbar;
@@ -199,7 +200,7 @@ index a4c85d1db93f3c3756d47ad0e015e88488d55cac..72d2a3454aefa27189efd3d90082a4cc
          boolean isDark =
                  Color.red(menuBgColor) * 299
 diff --git a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
-index 92657928590d171b20c2cdf5c1a4d3f53f16fc9f..087864d06a8de8d85e64d94bee192ef72a97fa4c 100644
+index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b2cd98596 100644
 --- a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 +++ b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 @@ -27,6 +27,19 @@ import org.chromium.ui.util.ColorUtils;

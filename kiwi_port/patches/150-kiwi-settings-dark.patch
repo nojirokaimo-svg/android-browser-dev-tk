@@ -1,5 +1,5 @@
 diff --git a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
-index a766a70c7c28186f1bc4d36cb791410eb3b19466..92657928590d171b20c2cdf5c1a4d3f53f16fc9f 100644
+index 57cdea3eae8187abdae4a3e7f0d723914a2122e7..164dd615fec9b06db81f6ffaa8ed902e2b99d954 100644
 --- a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 +++ b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 @@ -6,6 +6,7 @@ package org.chromium.components.browser_ui.styles;

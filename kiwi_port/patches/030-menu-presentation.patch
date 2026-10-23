@@ -61,10 +61,10 @@ index 5456f0963343c0d6db1b2c8b3b08e0e30214bdc0..a4c85d1db93f3c3756d47ad0e015e884
          // Ensure the inner shape has standard padding, and conditionally add visual menu top
          // padding.
 diff --git a/components/browser_ui/styles/android/java/res/values/styles.xml b/components/browser_ui/styles/android/java/res/values/styles.xml
-index ef76cf812a5d56f663b24d139c9ebe6e281f7a16..2ec9d17a72b60c50745b445d3ddbf6b232508aab 100644
+index 9473be261f379709840b55feced7ff013a99ccfe..90dbc0e72ae9f4f658eb024cd52f1cf7f83b2511 100644
 --- a/components/browser_ui/styles/android/java/res/values/styles.xml
 +++ b/components/browser_ui/styles/android/java/res/values/styles.xml
-@@ -136,7 +136,7 @@ found in the LICENSE file.
+@@ -139,7 +139,7 @@ found in the LICENSE file.
      <!-- Expressive styling for an icon in an overflow menu icon row. -->
      <style name="OverflowMenuButton" parent="Widget.Material3Expressive.Button.IconButton.Tonal">
          <item name="materialSizeOverlay">?attr/iconRowButtonSizeOverlay</item>

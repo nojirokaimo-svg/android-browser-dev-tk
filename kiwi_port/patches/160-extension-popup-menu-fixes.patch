@@ -1,8 +1,8 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index 9bd9d01d36b196820a20935efd186ea37710b030..44c58cc2b6c6c8d150cb11b3c6474cca80d3de74 100644
+index 0f291748327635bff3c57de081eed2c466e51887..b7eea46a517569837c76bb8c0db145a251aa5c08 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-@@ -799,6 +799,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -798,6 +798,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
          // Divider Line
          AppMenuItemUtils.maybeAddDividerLine(modelList, R.id.divider_line_id);
  
@@ -13,10 +13,10 @@ index 9bd9d01d36b196820a20935efd186ea37710b030..44c58cc2b6c6c8d150cb11b3c6474cca
          modelList.add(buildSettingsItem());
  
 diff --git a/chrome/browser/ui/android/extensions/BUILD.gn b/chrome/browser/ui/android/extensions/BUILD.gn
-index 8522cd8ba02dcf692e73b0f55b2905f5c34e51f8..4852660a49d28fd43fc56b71003190bfcf4fce7a 100644
+index 9df3612a0ba5ce9db626eb0a5787c05f1101fe72..efc76ebe5464c2444f8303505f1aef8338195719 100644
 --- a/chrome/browser/ui/android/extensions/BUILD.gn
 +++ b/chrome/browser/ui/android/extensions/BUILD.gn
-@@ -47,6 +47,7 @@ if (enable_extensions_core) {
+@@ -50,6 +50,7 @@ if (enable_extensions_core) {
      deps = [
        "//base",
        "//chrome/app:generated_resources",
@@ -25,7 +25,7 @@ index 8522cd8ba02dcf692e73b0f55b2905f5c34e51f8..4852660a49d28fd43fc56b71003190bf
        "//chrome/browser/extensions",
        "//chrome/browser/extensions/api/omnibox",
 diff --git a/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc b/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc
-index 873977bba9206a60f10007a22fbd74bf71b2e7f6..530c1423bcc6e43b02af42c8f6a4062eb4d171d0 100644
+index 131e4d31be902fc9c6dc6316637023a90ebb3109..35a617e615c2809564cfe6a08415c8dad7f01d34 100644
 --- a/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc
 +++ b/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc
 @@ -5,6 +5,7 @@
@@ -36,7 +36,7 @@ index 873977bba9206a60f10007a22fbd74bf71b2e7f6..530c1423bcc6e43b02af42c8f6a4062e
  #include "ui/base/device_form_factor.h"
  #include "chrome/browser/devtools/devtools_toggle_action.h"
  #include "chrome/browser/devtools/devtools_window.h"
-@@ -47,6 +48,9 @@ ExtensionActionPopupContents::ExtensionActionPopupContents(
+@@ -46,6 +47,9 @@ ExtensionActionPopupContents::ExtensionActionPopupContents(
      : host_(std::move(host)),
        inspect_with_devtools_(inspect_with_devtools),
        shown_callback_(std::move(callback)) {

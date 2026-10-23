@@ -1,8 +1,8 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryContentManager.java b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryContentManager.java
-index 2814ad9f7cf38c507e5f3abce2e3a3e187a2e04d..892da2fa8f0cee6fb907b183e3fa18de97951111 100644
+index 53cf7d81e578c73a4aea4e34ae167fe63b4716ef..e628e12c8507e400fef298711226160232e58e25 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryContentManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryContentManager.java
-@@ -613,7 +613,9 @@ public class HistoryContentManager implements SignInStateObserver, PrefObserver
+@@ -667,7 +667,9 @@ public class HistoryContentManager implements SignInStateObserver, PrefObserver
       * Note that this may return true even if there are currently no privacy disclaimers.
       */
      boolean getShouldShowPrivacyDisclaimersIfAvailable() {
@@ -13,8 +13,8 @@ index 2814ad9f7cf38c507e5f3abce2e3a3e187a2e04d..892da2fa8f0cee6fb907b183e3fa18de
      }
  
      /** Called to notify when the privacy disclaimer visibility has changed. */
-@@ -640,11 +642,9 @@ public class HistoryContentManager implements SignInStateObserver, PrefObserver
-         return HistoryManager.isAppSpecificHistoryEnabled() && mShowAppFilter;
+@@ -708,11 +710,9 @@ public class HistoryContentManager implements SignInStateObserver, PrefObserver
+         return showAppFilter() || showHostFilter();
      }
  
 -    /** returns whether the info header will be available for user upon request. */
@@ -28,10 +28,10 @@ index 2814ad9f7cf38c507e5f3abce2e3a3e187a2e04d..892da2fa8f0cee6fb907b183e3fa18de
  
      /** Called after a user clicks the privacy disclaimer link. */
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
-index 34e76fe0c4a0ab8ed374cf4b97bf044b5f349d13..6be9ebfbb0d7b6c8e55d77cac1a3669848fceefb 100644
+index 2bd53f0ba184ccba42c373ec7107a1bb9a4d9b2e..2815a76fce0b9c2c9165f8d2fa6b0c9bcc0a4cee 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
-@@ -273,7 +273,9 @@ public class NewTabPage
+@@ -272,7 +272,9 @@ public class NewTabPage
          @Override
          public boolean isLocationBarShownInNtp() {
              if (mIsDestroyed) return false;
@@ -43,10 +43,10 @@ index 34e76fe0c4a0ab8ed374cf4b97bf044b5f349d13..6be9ebfbb0d7b6c8e55d77cac1a36698
  
          @Override
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
-index b44a8bf83282c15bee50d6ca01fb05394fa790cc..b71e01dc17b5645f0a7ab8f2be22486d3a5a74af 100644
+index 158eae27d6c8e866d6b31a38548d9cb64c12c457..f169fef7c4ad79a2f9fae708fbd0a90f9e30cd4c 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
-@@ -417,6 +417,10 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
+@@ -420,6 +420,10 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
                          mProfile,
                          mBackPressManager);
          mModel.set(NewTabPageLayoutProperties.SEARCH_BOX_VIEW, mNtpSearchBox.getView());
@@ -58,10 +58,10 @@ index b44a8bf83282c15bee50d6ca01fb05394fa790cc..b71e01dc17b5645f0a7ab8f2be22486d
          updateSearchBoxTwoSideMargin();
          initializeLogoCoordinator();
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
-index 50b5c58f788d6304356667029b54672cb54ef1ea..c60131b39b349b5f197f7bb8aca2b61b98e5852f 100644
+index 3aeba066a2382a07e51c1cf2bbeea031a4f8a611..0188fc29fec3106eb9949f1b00a806e226942531 100644
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java
-@@ -191,6 +191,7 @@ public class AutocompleteCoordinator implements OmniboxSuggestionsVisualState {
+@@ -200,6 +200,7 @@ public class AutocompleteCoordinator implements OmniboxSuggestionsVisualState {
                  (holder) -> {
                      mContainer = holder.container;
                      mDropdown = holder.dropdown;

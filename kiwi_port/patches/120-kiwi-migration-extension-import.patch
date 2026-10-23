@@ -1,8 +1,8 @@
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
-index 10464dd92cd19682f34eefee00c054566f91b8b8..d08651704842eebab6f0a6650eb35ab872733eb7 100644
+index 28c39cf5c2f0dd8f402a690eb52347a8ed45ab23..900de4b50ab6d41bf866cb35829ef5a411553915 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
-@@ -3091,6 +3091,7 @@ if (_is_default_toolchain) {
+@@ -3089,6 +3089,7 @@ if (_is_default_toolchain) {
        "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
@@ -11,10 +11,10 @@ index 10464dd92cd19682f34eefee00c054566f91b8b8..d08651704842eebab6f0a6650eb35ab8
        "java/src/org/chromium/chrome/browser/browserservices/digitalgoods/SiteIsolator.java",
        "java/src/org/chromium/chrome/browser/browserservices/permissiondelegation/InstalledWebappBridge.java",
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index f7f33cf8cdc575c5ec4e23771041475cc9100bdb..c82cfbdf52fdbe0b261d04d109ce775a8f1fda71 100644
+index 4fd3f1d58c6c5db65d4e7daa04006e625d6f9d30..91a34a42c9423086ea59b93ca87015799c92fa91 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -247,6 +247,7 @@ chrome_java_sources = [
+@@ -248,6 +248,7 @@ chrome_java_sources = [
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
    "java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
@@ -23,7 +23,7 @@ index f7f33cf8cdc575c5ec4e23771041475cc9100bdb..c82cfbdf52fdbe0b261d04d109ce775a
    "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
    "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
-index eff915dd1003fa08db4b4ffced6f7531aae64712..80b7a8ede1015ef987c7016311525f0c8961e974 100644
+index 5b16ce7c3abfcddc131aed235aa90904f8f09940..359c0e27b244b29882fb6bccc817dce5482fd53e 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
 @@ -270,6 +270,11 @@ by a child template that "extends" this file.
@@ -521,7 +521,7 @@ index 0000000000000000000000000000000000000000..7c57d830bd61361bc730936269c5fe0c
 +    }
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 4fafd9797922dd363dfe974d6be0d8b80b0b7daf..31d6613e8f9b31a0a257d8b91983d0fafc163dec 100644
+index 7bf97b8c5d2b268a3f6d0c5fe11109d586a6f524..958ec2aef8ef92461898822262798aa3ac34e73d 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 @@ -39,6 +39,7 @@ import org.chromium.chrome.R;
@@ -555,10 +555,10 @@ index 4fafd9797922dd363dfe974d6be0d8b80b0b7daf..31d6613e8f9b31a0a257d8b91983d0fa
          IdentityManager identityManager =
                  IdentityServicesProvider.get().getIdentityManager(getProfile());
 diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
-index 45fb90af79c31c77a7e008c27afe53768d747df9..aae8c158816290e769918e795c1a6c24ba6d5c7f 100644
+index b60a5031c66b75f85ac2530ebbf01ccd75450361..aef8f64fd535ad8f0faa89fa3a0a07b3775c4e65 100644
 --- a/chrome/browser/android/BUILD.gn
 +++ b/chrome/browser/android/BUILD.gn
-@@ -149,6 +149,7 @@ if (is_android) {
+@@ -247,6 +247,7 @@ if (is_android) {
        "background_task_scheduler/proxy_native_task.cc",
        "background_task_scheduler/proxy_native_task.h",
        "backup/chrome_backup_agent.cc",
@@ -818,7 +818,7 @@ index 178a09a2e5a81510b548a2d01930d3b3d473a4f0..22a234233107b02eab172c20d020deef
      this.delegate.loadUnpacked()
          .then((success) => {
 diff --git a/chrome/browser/ui/webui/extensions/extensions_ui.cc b/chrome/browser/ui/webui/extensions/extensions_ui.cc
-index 68db74e12838e64d7414e08377cbad45b69b0476..ac7a32d568d84cbec7c84b208c7dff6bd6ac0bc1 100644
+index 0513e23fd14fd65f45c0949ebaecd9a456b971a8..e6ceaccdc3ddd0fc53ec31c305889f131d45a5c7 100644
 --- a/chrome/browser/ui/webui/extensions/extensions_ui.cc
 +++ b/chrome/browser/ui/webui/extensions/extensions_ui.cc
 @@ -54,6 +54,8 @@
@@ -830,7 +830,7 @@ index 68db74e12838e64d7414e08377cbad45b69b0476..ac7a32d568d84cbec7c84b208c7dff6b
  #include "chrome/browser/ui/webui/current_channel_logo.h"
  #endif  // BUILDFLAG(IS_ANDROID)
  
-@@ -517,6 +519,11 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
+@@ -519,6 +521,11 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
  #if BUILDFLAG(IS_ANDROID)
    source->AddResourcePath("images/product_logo.png",
                            webui::CurrentChannelLogoResourceId());
@@ -842,7 +842,7 @@ index 68db74e12838e64d7414e08377cbad45b69b0476..ac7a32d568d84cbec7c84b208c7dff6b
  #endif  // BUILDFLAG(IS_ANDROID)
  
  #if BUILDFLAG(IS_CHROMEOS)
-@@ -564,6 +571,15 @@ ExtensionsUI::ExtensionsUI(content::WebUI* web_ui)
+@@ -566,6 +573,15 @@ ExtensionsUI::ExtensionsUI(content::WebUI* web_ui)
    source = CreateAndAddExtensionsSource(profile, *in_dev_mode_);
    ManagedUIHandler::Initialize(web_ui, source);
  

@@ -1,40 +1,12 @@
 diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
-index aae8c158816290e769918e795c1a6c24ba6d5c7f..86730ca71c097db1371c2719e77c2bf7215836f3 100644
+index aef8f64fd535ad8f0faa89fa3a0a07b3775c4e65..a50eac7da9ba972281ed791138757b0839461b86 100644
 --- a/chrome/browser/android/BUILD.gn
 +++ b/chrome/browser/android/BUILD.gn
-@@ -138,6 +138,18 @@ if (is_android) {
+@@ -224,6 +224,7 @@ if (is_android) {
      ]
    }
  
-+  # A leaf target so extension popup WebContents can opt into the Android
-+  # app theme without depending on the monolithic :android target.
-+  source_set("web_contents_theme_client") {
-+    sources = [ "web_contents_theme_client.cc" ]
-+    public = [ "web_contents_theme_client.h" ]
-+    public_deps = [ "//content/public/browser" ]
-+    deps = [
-+      "//base",
-+      "//chrome/browser/ui/android/night_mode:jni_headers",
-+    ]
-+  }
-+
-   source_set("android") {
-     sources = [
-       "background_sync_launcher_android.cc",
-@@ -428,8 +440,6 @@ if (is_android) {
-       "usage_stats/usage_stats_database.h",
-       "warmup_manager.cc",
-       "web_contents_printer.cc",
--      "web_contents_theme_client.cc",
--      "web_contents_theme_client.h",
-       "webapk/pwa_restore_bottom_sheet_mediator.cc",
-       "webapk/pwa_restore_bottom_sheet_mediator.h",
-       "webapk/webapk_install_service.cc",
-@@ -473,6 +483,7 @@ if (is_android) {
-       ":tabs_impl",
-       ":tabs_public",
-       ":usage_stats_proto",
-+      ":web_contents_theme_client",
-       "//cc/slim",
-       "//chrome/android:jni_headers",
-       "//chrome/app:command_ids",
++  # Kiwi extension popup: reuse the upstream-provided standalone WebContents theme target.
+   # A leaf target so that it can be used by targets that ":android" itself
+   # depends on (see //chrome/browser/android/thin_webview:initializer).
+   source_set("web_contents_theme_client") {

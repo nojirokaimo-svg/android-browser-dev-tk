@@ -1,8 +1,8 @@
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 7d93bddb1ba2c067d9337372b9bc288fedd8bb6f..b74f42d79c2b2528fa2f0814f0b94435b0b1d86f 100644
+index d1da6861f08f2faf0e84206c94154f40fd60a0c8..3862eaa97eec03fbce416207b70c5d1ccf6fb952 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -246,6 +246,7 @@ chrome_java_sources = [
+@@ -247,6 +247,7 @@ chrome_java_sources = [
    "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
@@ -11,7 +11,7 @@ index 7d93bddb1ba2c067d9337372b9bc288fedd8bb6f..b74f42d79c2b2528fa2f0814f0b94435
    "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
    "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
-index a3694f0a26052daebcb257c1f719bcb258b46b78..eff915dd1003fa08db4b4ffced6f7531aae64712 100644
+index 986ca2fc76740ecc1eafb5bafb20730b497c9702..5b16ce7c3abfcddc131aed235aa90904f8f09940 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
 @@ -265,6 +265,11 @@ by a child template that "extends" this file.
@@ -540,7 +540,7 @@ index 0000000000000000000000000000000000000000..d0b19c161e83eefff9ef8c770d412dd1
 +    }
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 22c553316f31940985474f117a58ee07dafaa612..4fafd9797922dd363dfe974d6be0d8b80b0b7daf 100644
+index 1e3be2e6f7364d9405f32744c9a4a7bb456f1477..7bf97b8c5d2b268a3f6d0c5fe11109d586a6f524 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 @@ -38,6 +38,7 @@ import org.chromium.build.annotations.Nullable;

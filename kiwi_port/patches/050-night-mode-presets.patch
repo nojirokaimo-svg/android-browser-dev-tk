@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java b/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
-index 7356bc646f72edd9e1c746179cd62a355300ebdc..7e0367cd5b80e0700bbb48d8e4e59fed7de8660c 100644
+index d40b3603a4b50610d35583ed53d06a2ba23d7bc6..cd581e9ea14aa7399a45ccc498c1552bd2864018 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/init/ProcessInitializationHandler.java
 @@ -31,6 +31,7 @@ import org.chromium.base.TraceEvent;
@@ -10,7 +10,7 @@ index 7356bc646f72edd9e1c746179cd62a355300ebdc..7e0367cd5b80e0700bbb48d8e4e59fed
  import org.chromium.base.task.AsyncTask;
  import org.chromium.base.task.ChainedTasks;
  import org.chromium.base.task.PostTask;
-@@ -277,6 +278,10 @@ public class ProcessInitializationHandler {
+@@ -272,6 +273,10 @@ public class ProcessInitializationHandler {
          if (BuildConfig.ENABLE_ASSERTS) {
              AllPreferenceKeyRegistries.initializeKnownRegistries();
          }
@@ -22,7 +22,7 @@ index 7356bc646f72edd9e1c746179cd62a355300ebdc..7e0367cd5b80e0700bbb48d8e4e59fed
          // - Pixel 2: ~10 ms
          // - Nokia 1 (Android Go): 20-200 ms
 diff --git a/chrome/browser/ui/android/night_mode/BUILD.gn b/chrome/browser/ui/android/night_mode/BUILD.gn
-index 38e6ff91fdbee80e296c874545316a0739a2616d..3ad8273330e3f6822adf37dd91b119876cf33dcf 100644
+index 86b0c1e133518085afcb34336a0e6a3964332186..92f42e6e5481ebe693695f44a261b672f40f83e9 100644
 --- a/chrome/browser/ui/android/night_mode/BUILD.gn
 +++ b/chrome/browser/ui/android/night_mode/BUILD.gn
 @@ -32,6 +32,7 @@ android_library("java") {
@@ -33,7 +33,7 @@ index 38e6ff91fdbee80e296c874545316a0739a2616d..3ad8273330e3f6822adf37dd91b11987
      "//chrome/browser/preferences:java",
      "//chrome/browser/profiles/android:java",
      "//chrome/browser/settings:java",
-@@ -66,6 +67,8 @@ generate_jni("jni_headers") {
+@@ -63,6 +64,8 @@ generate_jni("jni_headers") {
  android_resources("java_resources") {
    sources = [
      "java/res/layout/radio_button_group_theme_preference.xml",
@@ -114,7 +114,7 @@ index 8f0ff05bb21cd46d009be17a2cedfe736d7d9365..5940d08e10f5381b6daf4294c3f22c6b
  </PreferenceScreen>
 \ No newline at end of file
 diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java
-index a8690622a9fc9438ea92f4bc50a6145592ee8c7d..76d8acc1cf7eefb2987bb0f79762de2b944318ab 100644
+index ab08ce4bad1fa998e66aea3e8f57cc9b1a3402c8..c134c815ead614d60500904156f73d3efc4725b6 100644
 --- a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java
 +++ b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java
 @@ -9,13 +9,19 @@ import static org.chromium.chrome.browser.preferences.ChromePreferenceKeys.UI_TH
@@ -124,8 +124,8 @@ index a8690622a9fc9438ea92f4bc50a6145592ee8c7d..76d8acc1cf7eefb2987bb0f79762de2b
 +import androidx.preference.ListPreference;
 +import androidx.preference.Preference;
 +
-+import org.chromium.base.CommandLine;
  import org.chromium.base.shared_preferences.SharedPreferencesManager;
++import org.chromium.base.CommandLine;
 +import org.chromium.base.shared_preferences.SharedPrefsUtils;
  import org.chromium.base.supplier.MonotonicObservableSupplier;
  import org.chromium.base.supplier.ObservableSuppliers;
@@ -134,10 +134,10 @@ index a8690622a9fc9438ea92f4bc50a6145592ee8c7d..76d8acc1cf7eefb2987bb0f79762de2b
  import org.chromium.build.annotations.Nullable;
  import org.chromium.chrome.browser.flags.ChromeFeatureList;
 +import org.chromium.chrome.browser.lifetime.ApplicationLifetime;
- import org.chromium.chrome.browser.night_mode.NightModeMetrics;
- import org.chromium.chrome.browser.night_mode.NightModeMetrics.ThemeSettingsEntry;
  import org.chromium.chrome.browser.night_mode.NightModeUtils;
-@@ -35,6 +41,7 @@ import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
+ import org.chromium.chrome.browser.night_mode.R;
+ import org.chromium.chrome.browser.night_mode.ThemeType;
+@@ -33,6 +39,7 @@ import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
  public class ThemeSettingsFragment extends ChromeBaseSettingsFragment
          implements CustomDividerFragment {
      static final String PREF_UI_THEME_PREF = "ui_theme_pref";
@@ -145,10 +145,11 @@ index a8690622a9fc9438ea92f4bc50a6145592ee8c7d..76d8acc1cf7eefb2987bb0f79762de2b
      private static final String PREF_UI_THEME_PREF_LIGHT = "ui_theme_pref_light";
      private static final String PREF_UI_THEME_PREF_DARK = "ui_theme_pref_dark";
  
-@@ -75,6 +82,39 @@ public class ThemeSettingsFragment extends ChromeBaseSettingsFragment
+@@ -71,6 +78,40 @@ public class ThemeSettingsFragment extends ChromeBaseSettingsFragment
                      return true;
                  });
  
++
 +        ListPreference nightModePreset = findPreference(PREF_KIWI_NIGHT_MODE_PRESET);
 +        assert nightModePreset != null;
 +        nightModePreset.setPersistent(false);
@@ -182,9 +183,9 @@ index a8690622a9fc9438ea92f4bc50a6145592ee8c7d..76d8acc1cf7eefb2987bb0f79762de2b
 +                    return true;
 +                });
 +
-         // TODO(crbug.com/40198953): Notify feature engagement system that settings were opened.
-         // Record entry point metrics if this fragment is freshly created.
-         if (savedInstanceState == null) {
+         if (ChromeFeatureList.isEnabled(
+                 ChromeFeatureList.DARKEN_WEBSITES_CHECKBOX_IN_THEMES_SETTING)) {
+             WebContentsDarkModeMessageController.notifyEventSettingsOpened(getProfile());
 diff --git a/third_party/blink/renderer/platform/graphics/dark_mode_color_filter.cc b/third_party/blink/renderer/platform/graphics/dark_mode_color_filter.cc
 index 273317b2480e070dd75eabcf5428f10034187a39..fd03014b21004c6f33d7d4d5750184600fc26182 100644
 --- a/third_party/blink/renderer/platform/graphics/dark_mode_color_filter.cc

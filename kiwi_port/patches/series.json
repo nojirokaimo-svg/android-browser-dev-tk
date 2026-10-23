@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "base": "post-Titanium e59e03dc83bc940d73cf29a7683286fca390b393",
+  "base": "post-Titanium a3e4b86339a8db237d95d8e8e78248c8f6a1df68",
   "features": [
     {
       "id": "resources",
@@ -11,7 +11,7 @@
         "chrome/android/java/res/values/kiwi_ui.xml",
         "chrome/android/java/res/values-ja/kiwi_ui.xml"
       ],
-      "sha256": "dbba127f929c5b1198bf1e7821c51000188e40a67d94643ed131b7786507932f"
+      "sha256": "0540c9f4271dc24a8c4c1a9dc08abc9bbe80c24f42ba662edec84c846292123d"
     },
     {
       "id": "app-menu-actions",
@@ -23,7 +23,7 @@
         "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinator.java",
         "chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionsToolbarCoordinatorImpl.java"
       ],
-      "sha256": "2aecb692dcecac241f465692ba0cc84f14eb1f2e2690d7deaf4e242e0b65b7c2"
+      "sha256": "88012850e452db23f0ba1d20de6a8717ae17223812474f8f318a44dfaf36e77b"
     },
     {
       "id": "menu-presentation",
@@ -33,7 +33,7 @@
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/res/values/styles.xml"
       ],
-      "sha256": "a92edf82ab19159d8771c024838fd4ff9d43820aab73065a07712a51726aec28"
+      "sha256": "58007e65b6026c87df24182723079c2936c78d89162bf64f53f68476f3f5ff70"
     },
     {
       "id": "preference-registry",
@@ -65,7 +65,7 @@
         "third_party/blink/renderer/platform/graphics/dark_mode_settings_builder.h",
         "third_party/blink/renderer/platform/graphics/dark_mode_filter_test.cc"
       ],
-      "sha256": "efe961f93307bc44bfbc83a101335191d262c395a91d5135da27445223dd9db7"
+      "sha256": "d2e9e7e1661efa2877cdae68461e141fca3be5188ccd4d49ea031b3720402cdc"
     },
     {
       "id": "runtime-night-mode",
@@ -111,7 +111,7 @@
         "ui/edge_to_edge/android/java/src/org/chromium/ui/edge_to_edge/BaseSystemBarColorHelper.java",
         "ui/edge_to_edge/android/java/src/org/chromium/ui/edge_to_edge/EdgeToEdgeSystemBarColorHelper.java"
       ],
-      "sha256": "d610e0b21235bb6c7edbea2c2abd55a7c92661ef93f2e3e19107483b28bf902c"
+      "sha256": "86013f9277fcec85862e62f492b28bd75d089437fd955f049b1c91a6bf413674"
     },
     {
       "id": "kiwi-tab-switcher",
@@ -131,7 +131,7 @@
         "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java",
         "titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java"
       ],
-      "sha256": "32858616a88bc15a1ae6dbf2e7bec5fbe729cccd3efb23d1156fd5c6151b2f6f"
+      "sha256": "248e67e74d1be810404dc8a624c8b2aeef8bf53a9b57dd6fe50c33bec9f3500e"
     },
     {
       "id": "amoled-surfaces",
@@ -148,7 +148,7 @@
         "chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubColors.java",
         "chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java"
       ],
-      "sha256": "44df74790fb57f5025e77567d9b207e875ba8242a3a057c12aa55c0f6e97e955"
+      "sha256": "a1748f0d03d48d2339d69e996309ec575964fe13d57392f03cfd5325f0f2c924"
     },
     {
       "id": "kiwi-migration-extension-import",
@@ -166,7 +166,7 @@
         "chrome/browser/resources/extensions/toolbar.ts",
         "chrome/browser/ui/webui/extensions/extensions_ui.cc"
       ],
-      "sha256": "76c1ec1f28f81bebf9806157d29000f125c8987b84e1377e00604348c7e0464b"
+      "sha256": "a69f2cea61efaa86e4d9c3d288d5e4c4df290ca3279568d874bd8d7bdb821237"
     },
     {
       "id": "credentials-security",
@@ -178,7 +178,7 @@
         "components/password_manager/core/browser/password_manager.cc",
         "components/password_manager/core/common/password_manager_pref_names.h"
       ],
-      "sha256": "38115405905dadc1a1cc8a7e6f6fb754a5347b5faab599a751c5bb82d68f880c"
+      "sha256": "5dee573fc57bbd3e3b777d6049d3bdc5036f82920797cb2808497f0af0eb49de"
     },
     {
       "id": "kiwi-settings-dark",
@@ -187,7 +187,7 @@
       "files": [
         "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
       ],
-      "sha256": "16ec13c1c5e45682fd4abd7d7f583bc4446988314daebdc05e61850920626be2"
+      "sha256": "e3d9d46edd9745e38876749efb648b07191aeca68b62b9785d7dffa01fb8bd8b"
     },
     {
       "id": "extension-popup-menu-fixes",
@@ -199,7 +199,7 @@
         "chrome/browser/ui/android/extensions/BUILD.gn",
         "chrome/browser/ui/android/extensions/extension_action_popup_contents.cc"
       ],
-      "sha256": "4a45034d393f232b37139e4b983e181a3a27a43bbbeb60be4575f3db1f189b8e"
+      "sha256": "41f8438a64309cd67e53006188dd9b56b3d449c3b7d9d18e795b6c53d6ea0094"
     },
     {
       "id": "web-contents-theme-target",
@@ -208,7 +208,7 @@
       "files": [
         "chrome/browser/android/BUILD.gn"
       ],
-      "sha256": "492eee02971525225814ace0372683cd9eae51ce2a22da437e918ded689ae368"
+      "sha256": "d4af64190f090a41fc33c7159fe28d58419cbbd31c66c67024ee9ecf76d76bcb"
     },
     {
       "id": "context-menu-shape",
@@ -231,7 +231,7 @@
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/OmniboxSuggestionsContainer.java",
         "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteCoordinator.java"
       ],
-      "sha256": "79f0218b358bed7d9393373a52b27c9f462af2a3dd8112063b92ad9a44f10e1d"
+      "sha256": "a7ed752b2ace1dde21cc9d0c03f415ac3486b32a330c61df63eae1810a78665f"
     },
     {
       "id": "portable-full-backup",
@@ -260,7 +260,7 @@
       "files": [
         "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java"
       ],
-      "sha256": "e38645383988fb50b10bd57d1d7285797c395c8ed15df56399af5133864dfe8d"
+      "sha256": "ed3c8e9497141a5d16631e25b963ceb98314b1eed6575a4d2e1c1a05ea257ce9"
     },
     {
       "id": "new-tab-clipboard-only",
@@ -280,7 +280,7 @@
         "chrome/browser/ui/android/omnibox/java/res/values/kiwi_clipboard.xml",
         "chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml"
       ],
-      "sha256": "56f5bf155a91231bfdd1fc6009d69f3bc617f276dac01db49a8a40b91cef5b63"
+      "sha256": "3c08fb154c7550045a3faff9a64ee5621522bb5c62140dd14f0c524da8b87697"
     },
     {
       "id": "tab-search-setting",
@@ -294,7 +294,7 @@
         "chrome/android/java/src/org/chromium/chrome/browser/settings/TabSwitcherSettings.java",
         "chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/HubToolbarMediator.java"
       ],
-      "sha256": "7824951d046a876a76a1062005edfdad22cba86505c4f3837ddbe57179064e4f"
+      "sha256": "89d6bd51a8fbc1fcf61fe54b78f1d0a5d308f71122f512198d61a370a4234a88"
     },
     {
       "id": "dark-ui-surface-color",
@@ -307,7 +307,7 @@
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
       ],
-      "sha256": "20bb8f0cc19a5aa2d7904fc39f4ca82990c712c51e3ddb6531c7f5803d5d05bf"
+      "sha256": "74a592e06ed19dfb687fa68c0368fe98c785c37e430272c657ceba24de211449"
     },
     {
       "id": "independent-dark-ui-colors",
@@ -319,7 +319,7 @@
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
       ],
-      "sha256": "36fd19007b513f43a07160e56a6324397157a8d1f724df85fa44bf54c5a4e79f"
+      "sha256": "54f2df024eb668c0cddf7f6f2f0859d1227f829832923639a67105a6b54f511e"
     }
   ]
 }
