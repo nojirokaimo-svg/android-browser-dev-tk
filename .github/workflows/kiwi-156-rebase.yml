@@ -9,7 +9,7 @@ on:
       - kiwi_port/rebase_156_audit.py
 
 permissions:
-  contents: read
+  contents: write
   actions: read
 
 concurrency:
@@ -36,6 +36,30 @@ jobs:
       - name: Rebase candidate patches from verified actual M156 files (no compile or cache writes)
         shell: bash
         run: python3 kiwi_port/rebase_156_audit.py
+      - name: Commit audited M156 candidate patches on success only
+        if: success()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path('output/kiwi156-rebase-candidate/results.json').read_text())
+          if status['status'] != 'pass' or len(status['events']) != 25:
+              raise SystemExit('M156 audit did not certify all 25 patches')
+          PY
+          python3 kiwi_port/verify_series.py
+          git diff --check
+          git add kiwi_port/manifest.json kiwi_port/patches/
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Rebase and verify all 25 Kiwi UI patches for Chromium 156 [skip ci]"
+          git push origin HEAD:codex/kiwi-ui-port
       - name: Upload rebase candidate and diagnostics even on failure
         if: always()
         uses: actions/upload-artifact@v4
