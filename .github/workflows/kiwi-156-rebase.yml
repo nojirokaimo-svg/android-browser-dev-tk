@@ -1,0 +1,45 @@
+name: Prepare Chromium 156 Kiwi rebase candidate
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/kiwi-ui-port
+    paths:
+      - .github/workflows/kiwi-156-rebase.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: kiwi-156-rebase-candidate
+  cancel-in-progress: false
+
+jobs:
+  rebase-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Fetch previous M156 actual-source audit artifact, no new Chromium checkout
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "$RUNNER_TEMP/kiwi156-audit"
+          gh run download 39891910191 --repo "$GITHUB_REPOSITORY" --name kiwi-ui-source-audit-kiwi-15647-audit-301e00c707284b58b73c4c407ead776fd58e885a-39891910191-1 --dir "$RUNNER_TEMP/kiwi156-audit"
+          test -s "$RUNNER_TEMP/kiwi156-audit/kiwi-sources-before.tar.gz"
+          test -s "$RUNNER_TEMP/kiwi156-audit/kiwi-source-hashes-before.json"
+          test -s "$RUNNER_TEMP/kiwi156-audit/kiwi-patch-report.json"
+      - name: Rebase candidate patches from verified actual M156 files (no compile or cache writes)
+        shell: bash
+        run: python3 kiwi_port/rebase_156_audit.py
+      - name: Upload rebase candidate and diagnostics even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kiwi-156-rebase-candidate-${{ github.run_id }}
+          path: output/kiwi156-rebase-candidate/
+          if-no-files-found: error
+          retention-days: 14
