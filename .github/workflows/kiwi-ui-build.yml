@@ -7,6 +7,7 @@ on:
       - codex/kiwi-ui-port
     paths:
       - .github/workflows/kiwi-ui-build.yml
+      - .github/actions/kiwi-build-stage/action.yml
 
 permissions:
   contents: read

@@ -156,7 +156,7 @@ runs:
         VANADIUM_COMMIT: ${{ inputs.vanadium-commit }}
         CHROMIUM_COMMIT: ${{ inputs.chromium-commit }}
         CHROMIUM_VERSION: ${{ inputs.chromium-version }}
-      run: ./build_kiwi_ui_arm64.sh
+      run: bash ./build_kiwi_ui_arm64.sh
 
     - name: Preserve the prepared UI source for exact manifest verification
       if: always() && hashFiles('output/kiwi-sources-before.tar.gz') != ''
@@ -289,7 +289,7 @@ runs:
           --elapsed-seconds "$elapsed" \
           --requested-minutes "$KIWI_BUILD_BUDGET_MINUTES")
         echo "Ninja budget: ${KIWI_BUILD_BUDGET_SECONDS}s; 45 minutes reserved for checkpoint/signing/upload."
-        ./build_kiwi_ui_arm64.sh 2>&1 | tee output/build.log
+        bash ./build_kiwi_ui_arm64.sh 2>&1 | tee output/build.log
 
     - name: Record result and checkpoint size
       id: result
