@@ -51,6 +51,74 @@ def write_status(reason, done=False):
         "reason": reason, "events": events
     }, indent=2, ensure_ascii=False)+"\n")
 
+def repair_known_m156_theme_reject(feature_id, rejected):
+    """Only repair a confirmed M156 layout change without discarding existing settings."""
+    relative = "chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java"
+    if feature_id != "night-mode-presets" or rejected != [relative]:
+        return False
+    path = SRC / relative
+    data = path.read_text(encoding="utf-8")
+    if data.count('    static final String PREF_KIWI_NIGHT_MODE_PRESET = "kiwi_night_mode_preset";') != 1:
+        return False
+    def add_once(anchor, addition):
+        nonlocal data
+        if addition.strip() in data:
+            return
+        if data.count(anchor) != 1:
+            raise RuntimeError("unsafe M156 night-mode anchor: " + anchor)
+        data = data.replace(anchor, anchor + addition, 1)
+    add_once("import android.os.Bundle;\n",
+             "\nimport androidx.preference.ListPreference;\nimport androidx.preference.Preference;\n")
+    add_once("import org.chromium.base.shared_preferences.SharedPreferencesManager;\n",
+             "import org.chromium.base.CommandLine;\nimport org.chromium.base.shared_preferences.SharedPrefsUtils;\n")
+    add_once("import org.chromium.chrome.browser.flags.ChromeFeatureList;\n",
+             "import org.chromium.chrome.browser.lifetime.ApplicationLifetime;\n")
+    block = """
+        ListPreference nightModePreset = findPreference(PREF_KIWI_NIGHT_MODE_PRESET);
+        assert nightModePreset != null;
+        nightModePreset.setPersistent(false);
+        nightModePreset.setValue(
+                Integer.toString(SharedPrefsUtils.SharedPrefsExt.NIGHT_MODE_PRESET.get()));
+        Preference restart = findPreference("kiwi_night_mode_restart");
+        assert restart != null;
+        restart.setVisible(!SharedPrefsUtils.getNightModeSettingsSwitchValue().equals(
+                CommandLine.getInstance().getSwitchValue("dark-mode-settings")));
+        restart.setOnPreferenceClickListener(preference -> {
+            ApplicationLifetime.terminate(true);
+            return true;
+        });
+        nightModePreset.setOnPreferenceChangeListener(
+                (preference, newValue) -> {
+                    if (!(newValue instanceof String)) return false;
+                    final int preset;
+                    try {
+                        preset = Integer.parseInt((String) newValue);
+                    } catch (NumberFormatException exception) {
+                        return false;
+                    }
+                    if (!SharedPrefsUtils.SharedPrefsExt.NIGHT_MODE_PRESET.validateValue(preset)) {
+                        return false;
+                    }
+                    if (!SharedPrefsUtils.SharedPrefsExt.NIGHT_MODE_PRESET.putSync(preset)) {
+                        return false;
+                    }
+                    restart.setVisible(!SharedPrefsUtils.getNightModeSettingsSwitchValue().equals(
+                            CommandLine.getInstance().getSwitchValue("dark-mode-settings")));
+                    return true;
+                });
+
+"""
+    if 'ListPreference nightModePreset = findPreference(PREF_KIWI_NIGHT_MODE_PRESET);' not in data:
+        anchor = ("        if (ChromeFeatureList.isEnabled(\n"
+                  "                ChromeFeatureList.DARKEN_WEBSITES_CHECKBOX_IN_THEMES_SETTING)) {\n"
+                  "            WebContentsDarkModeMessageController.notifyEventSettingsOpened(getProfile());\n")
+        if data.count(anchor) != 1:
+            raise RuntimeError("M156 night-mode settings method layout changed; stop")
+        data = data.replace(anchor, block + anchor, 1)
+    path.write_text(data, encoding="utf-8")
+    (SRC / (relative + ".rej")).unlink(missing_ok=True)
+    return True
+
 def main():
     rawhash = json.loads((AUDIT/"kiwi-source-hashes-before.json").read_text())
     if len(rawhash["files"]) != 99:
@@ -84,6 +152,10 @@ def main():
             how="context-repair-attempt"
             detail=(trial.stdout+trial.stderr)[-9000:]
             rejects=[str(p.relative_to(SRC)) for p in SRC.rglob("*.rej")]
+            if rejects and repair_known_m156_theme_reject(feature["id"], rejects):
+                rejects = [str(p.relative_to(SRC)) for p in SRC.rglob("*.rej")]
+                if not rejects:
+                    trial.returncode = 0
             if trial.returncode!=0 or rejects:
                 events.append({"id":feature["id"],"result":"conflict","details":detail,"rejects":rejects})
                 problems.append(feature["id"])
