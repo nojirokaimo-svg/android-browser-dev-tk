@@ -54,7 +54,7 @@ def write_status(reason, done=False):
 def repair_known_m156_theme_reject(feature_id, rejected):
     """Only repair a confirmed M156 layout change without discarding existing settings."""
     relative = "chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java"
-    if feature_id != "night-mode-presets" or rejected != [relative]:
+    if feature_id != "night-mode-presets" or rejected != [relative + ".rej"]:
         return False
     path = SRC / relative
     data = path.read_text(encoding="utf-8")
