@@ -1,0 +1,96 @@
+name: Diagnose Titanium 156 Ninja graph without rebuilding
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/kiwi-ui-port
+    paths:
+      - .github/workflows/kiwi-156-cycle-diagnostic.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: titanium-kiwi-156-cycle-diagnostic
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - name: Free hosted runner space outside the checkpoint
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          df -h
+      - name: Restore exact failed M156 checkpoint, read-only investigation
+        uses: actions/cache/restore@v4
+        with:
+          path: work/titanium/chromium/src/out/Default
+          key: kiwi-15647-24ff4e5578c8a92b27090def9635dd24e3bb7d09-39898069048-1-build
+          fail-on-cache-miss: true
+      - name: Read GN and Ninja cycle nodes, do not modify or compile
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          out=work/titanium/chromium/src/out/Default
+          test -s "$out/build.ninja"
+          test -s "$out/.ninja_log"
+          test -s "$out/.ninja_deps"
+          test -s "$out/kiwi-source-state.json"
+          mkdir -p output/kiwi156-cycle
+          cp "$out/kiwi-source-state.json" output/kiwi156-cycle/
+          cp "$out/kiwi-incremental-plan.json" output/kiwi156-cycle/
+          sha256sum "$out/build.ninja" "$out/.ninja_log" "$out/.ninja_deps" > output/kiwi156-cycle/checkpoint-hashes.txt
+          (
+          printf '%s\n' 'M156 Ninja graph, exact cache 39898069048'
+          /usr/bin/ninja -C "$out" -t query \
+            obj/base/build_info_java.turbine.jar \
+            obj/base/version_info/android/version_constants_java.turbine.jar \
+            phony/base/version_info/android/version_constants_java__header.harddeps \
+            phony/base/base_java__header \
+            obj/base/base_java.turbine.jar \
+            phony/base/base_java__header.harddeps \
+            phony/base/build_info_java__header
+          ) > output/kiwi156-cycle/ninja-query.log 2>&1 || true
+          python3 - <<'PY'
+          from pathlib import Path
+          out=Path("work/titanium/chromium/src/out/Default")
+          tokens=[
+           "build_info_java.turbine.jar",
+           "version_constants_java.turbine.jar",
+           "version_constants_java__header.harddeps",
+           "base_java__header",
+           "base_java.turbine.jar",
+           "base_java__header.harddeps",
+           "build_info_java__header",
+          ]
+          report=[]
+          for p in sorted(out.rglob("*.ninja")):
+            if len(p.parts)>20: continue
+            try:
+              with p.open(encoding="utf-8",errors="replace") as f:
+                for n,line in enumerate(f,1):
+                  if any(t in line for t in tokens):
+                    report.append(f"{p.relative_to(out)}:{n}: {line.rstrip()[:1600]}")
+            except (OSError,UnicodeError):
+              continue
+          Path("output/kiwi156-cycle/ninja-rule-links.txt").write_text("\n".join(report)+"\n")
+          print("\n".join(report[-50:]))
+          PY
+          cat output/kiwi156-cycle/ninja-query.log
+          # Reproduce without rebuilding. Fails normally when cycle remains.
+          timeout 120 /usr/bin/ninja -C "$out" -n chrome_public_apk > output/kiwi156-cycle/ninja-dryrun.log 2>&1 || true
+          tail -30 output/kiwi156-cycle/ninja-dryrun.log
+      - name: Upload diagnostic files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kiwi-156-ninja-cycle-diagnostic-${{ github.run_id }}
+          path: output/kiwi156-cycle/
+          retention-days: 14
+          if-no-files-found: warn
