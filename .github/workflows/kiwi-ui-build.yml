@@ -28,9 +28,9 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Build #180 completed this exact M155.84 checkpoint. Keep Ninja history and
-          # object/generated files; a cache miss stops the build.
-          restore-key: kiwi-15647-24ff4e5578c8a92b27090def9635dd24e3bb7d09-39898069048-1-build
+          # Resume the immutable M156 partial checkpoint saved by run 39918146274.
+          # Preserve Ninja history and objects; an exact cache miss stops the build.
+          restore-key: kiwi-15647-6d7400552b1c924116236420c87a626cda694146-39918146274-1-build
           require-restore: "true"
           # M156 continuation from failed build checkpoint. No fallback, preserve original 155.84.
           bootstrap-revision: ""

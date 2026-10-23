@@ -355,7 +355,7 @@ index 8193992e69746ba4a152d6a921fe22fc26647ecc..47b3c556dd2b891a170af145cb22d333
              super.onSuggestionClicked(suggestion, position, modifiers);
              return;
 diff --git a/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java b/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
-index ab735de16e1eae0c6e15765f2638a6357302eeb7..1108b63a991ddb69ce7a78260be17d6cd2b25618 100644
+index ab735de16e1eae0c6e15765f2638a6357302eeb7..8e93e45306ca70ec6ac268a584e9ccc309777bfc 100644
 --- a/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
 +++ b/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
 @@ -74,6 +74,8 @@ public class AutocompleteMatch {
@@ -367,7 +367,7 @@ index ab735de16e1eae0c6e15765f2638a6357302eeb7..1108b63a991ddb69ce7a78260be17d6c
      private final Set<Integer> mSubtypes;
      private final boolean mIsSearchType;
      private final @OmniboxSuggestionKind int mSuggestionKind;
-@@ -209,6 +211,56 @@ public class AutocompleteMatch {
+@@ -209,6 +211,57 @@ public class AutocompleteMatch {
          updatePostContentType(postContentType);
      }
  
@@ -411,7 +411,8 @@ index ab735de16e1eae0c6e15765f2638a6357302eeb7..1108b63a991ddb69ce7a78260be17d6c
 +                        null,
 +                        null,
 +                        null,
-+                        DocumentType.NONE);
++                        DocumentType.NONE,
++                        false);
 +        match.mKiwiClipboardCandidate = true;
 +        return match;
 +    }
