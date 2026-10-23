@@ -78,7 +78,8 @@ runs:
           kiwi_port.test_night_mode_patch \
           kiwi_port.test_credentials_patch \
           kiwi_port.test_checkpoint_restore \
-          kiwi_port.test_job_budget
+          kiwi_port.test_job_budget \
+          kiwi_port.test_m156_java_cycle_fix
 
     - name: Enforce checkpoint-only resume
       if: inputs.require-restore == 'true' && inputs.restore-key == ''
@@ -231,8 +232,21 @@ runs:
           --identity '${{ inputs.titanium-commit }}:${{ inputs.vanadium-commit }}:${{ inputs.chromium-commit }}:validation' \
           "${bootstrap_args[@]}" \
           "${transition_args[@]}"
-        if [[ -n '${{ inputs.transition-from-identity }}' ]]; then
+        # M156 targeted GN dependency correction requires regenerating this
+        # stage's Ninja build graph even when reusing an M156 partial checkpoint.
+        # This is gn gen, NEVER gn clean; objects and Ninja histories are preserved.
+        if [[ -n '${{ inputs.transition-from-identity }}' || '${{ inputs.chromium-version }}' == '156.0.8078.47' ]]; then
           export PATH="$GITHUB_WORKSPACE/work/depot_tools:$PATH"
+          if [[ '${{ inputs.chromium-version }}' == '156.0.8078.47' ]]; then
+            test -s output/m156-java-cycle-fix.json
+            python3 - <<'PY_VERIFY'
+import json
+from pathlib import Path
+p=json.loads(Path('output/m156-java-cycle-fix.json').read_text())
+assert p['status']=='fixed' and p['version']=='156.0.8078.47'
+assert p['before_sha256'] != p['after_sha256']
+PY_VERIFY
+          fi
           (cd work/titanium/chromium/src && gn gen out/Default)
         fi
 

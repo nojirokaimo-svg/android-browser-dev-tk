@@ -128,6 +128,13 @@ version_lt() {
   [[ "$1" != "$2" ]] && [[ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1)" == "$1" ]]
 }
 source "$TITANIUM_DIR/patch.sh"
+
+# Chromium M156 / Titanium build compatibility: targeted GN edge repair.
+# Verify all three dependency nodes first; never touch restored out/Default.
+if [[ "$VERSION" == "156.0.8078.47" ]]; then
+  python3 "$KIT_ROOT/kiwi_port/m156_java_cycle_fix.py" "$PWD" \
+    "$KIT_ROOT/output/m156-java-cycle-fix.json"
+fi
 audit_kiwi_sources() {
   python3 - "$KIT_ROOT" "$PWD" "$1" <<'PY_AUDIT'
 import hashlib, json, sys, tarfile

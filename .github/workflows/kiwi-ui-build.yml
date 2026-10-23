@@ -1,4 +1,4 @@
-name: Build Titanium-Kiwi core M156.47
+name: Build Titanium-Kiwi core M156.47 (Java dependency repair)
 
 on:
   workflow_dispatch:
@@ -29,11 +29,11 @@ jobs:
         with:
           # Build #180 completed this exact M155.84 checkpoint. Keep Ninja history and
           # object/generated files; a cache miss stops the build.
-          restore-key: kiwi-incremental-15584-acdde2860b6a4ee2f777920fbabaafa571cf909c-39044652662-1-continue-2
+          restore-key: kiwi-15647-24ff4e5578c8a92b27090def9635dd24e3bb7d09-39898069048-1-build
           require-restore: "true"
-          # Explicit verified M155.84 -> M156 source transition. Preserve original out/Default Ninja history.
+          # M156 continuation from failed build checkpoint. No fallback, preserve original 155.84.
           bootstrap-revision: ""
-          transition-from-identity: "e59e03dc83bc940d73cf29a7683286fca390b393:20526e052e304b62cf3e80114b423934e2d1c540:5869fe313571d75152b77813cf0a4ee26a4e6df0:validation"
+          transition-from-identity: ""
           save-key: kiwi-15647-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           final-cache-key: kiwi-incremental-15647-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           titanium-commit: a3e4b86339a8db237d95d8e8e78248c8f6a1df68
