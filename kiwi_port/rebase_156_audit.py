@@ -385,7 +385,7 @@ def main():
     for rel,v in manifest["files"].items():
         if sha(REPLAY/rel)!=v["after_sha256"]:
             raise RuntimeError("strict replay post hash mismatch: "+rel)
-    unit=run(["python3","-m","unittest",
+    unit=run(["env","PYTHONPATH=kiwi_port","python3","-m","unittest",
               "kiwi_port.test_reapply","kiwi_port.test_incremental_sources",
               "kiwi_port.test_checkpoint_compat","kiwi_port.test_night_mode_patch",
               "kiwi_port.test_credentials_patch","kiwi_port.test_checkpoint_restore",

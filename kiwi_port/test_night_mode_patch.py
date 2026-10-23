@@ -63,9 +63,16 @@ class NightModePatchTest(unittest.TestCase):
     def test_extension_theme_client_has_leaf_gn_target(self):
         patch = (ROOT / "patches/165-web-contents-theme-target.patch").read_text()
         self.assertIn('source_set("web_contents_theme_client")', patch)
-        self.assertIn('public = [ "web_contents_theme_client.h" ]', patch)
-        self.assertIn('":web_contents_theme_client"', patch)
-        self.assertNotIn('"web_contents_theme_client.cc",\n      "web_contents_theme_client.h"', patch)
+        manifest = json.loads((ROOT / "manifest.json").read_text())
+        if manifest["chromium_version"].startswith("156."):
+            # Chromium M156 already includes the GN leaf target. The isolated
+            # source rebase verifies the existing source/public/deps instead.
+            self.assertIn("Kiwi extension popup: reuse the upstream-provided", patch)
+            self.assertIn('source_set("web_contents_theme_client")', patch)
+        else:
+            self.assertIn('public = [ "web_contents_theme_client.h" ]', patch)
+            self.assertIn('":web_contents_theme_client"', patch)
+            self.assertNotIn('"web_contents_theme_client.cc",\\n      "web_contents_theme_client.h"', patch)
 
     def test_context_menu_matches_chrome_width_and_kiwi_dark_surface(self):
         patch = (ROOT / "patches/170-context-menu-shape.patch").read_text()
