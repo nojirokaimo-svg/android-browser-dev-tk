@@ -119,6 +119,44 @@ def repair_known_m156_theme_reject(feature_id, rejected):
     (SRC / (relative + ".rej")).unlink(missing_ok=True)
     return True
 
+def repair_upstream_native_theme_target(feature_id, rejected):
+    """M156 already supplies the standalone theme target; avoid redefining it."""
+    relative = "chrome/browser/android/BUILD.gn"
+    if feature_id != "web-contents-theme-target" or rejected != [relative + ".rej"]:
+        return False
+    path=SRC/relative
+    data=path.read_text(encoding="utf-8")
+    obsolete_added = """  # A leaf target so extension popup WebContents can opt into the Android
+  # app theme without depending on the monolithic :android target.
+  source_set("web_contents_theme_client") {
+    sources = [ "web_contents_theme_client.cc" ]
+    public = [ "web_contents_theme_client.h" ]
+    public_deps = [ "//content/public/browser" ]
+    deps = [
+      "//base",
+      "//chrome/browser/ui/android/night_mode:jni_headers",
+    ]
+  }
+
+"""
+    if data.count(obsolete_added)!=1:
+        raise RuntimeError("M156 theme target different from audited upstream; refuse guessed repair")
+    data=data.replace(obsolete_added,"",1)
+    if data.count('source_set("web_contents_theme_client")')!=1:
+        raise RuntimeError("M156 upstream theme target not unique")
+    if data.count('":web_contents_theme_client",')!=1:
+        raise RuntimeError("M156 upstream theme target dependency missing or duplicated")
+    if data.count('"web_contents_theme_client.cc"')!=1 or data.count('"web_contents_theme_client.h"')!=1:
+        raise RuntimeError("M156 upstream theme client source/public declaration unexpected")
+    upstream_anchor="  # A leaf target so that it can be used by targets that \":android\" itself\n"
+    mark="  # Kiwi extension popup: reuse the upstream-provided standalone WebContents theme target.\n"
+    if data.count(upstream_anchor)!=1 or mark in data:
+        raise RuntimeError("M156 theme target context unsafe for provenance marker")
+    data=data.replace(upstream_anchor,mark+upstream_anchor,1)
+    path.write_text(data,encoding="utf-8")
+    (SRC/(relative+".rej")).unlink(missing_ok=True)
+    return True
+
 def main():
     rawhash = json.loads((AUDIT/"kiwi-source-hashes-before.json").read_text())
     if len(rawhash["files"]) != 99:
@@ -153,6 +191,10 @@ def main():
             detail=(trial.stdout+trial.stderr)[-9000:]
             rejects=[str(p.relative_to(SRC)) for p in SRC.rglob("*.rej")]
             if rejects and repair_known_m156_theme_reject(feature["id"], rejects):
+                rejects = [str(p.relative_to(SRC)) for p in SRC.rglob("*.rej")]
+                if not rejects:
+                    trial.returncode = 0
+            if rejects and repair_upstream_native_theme_target(feature["id"], rejects):
                 rejects = [str(p.relative_to(SRC)) for p in SRC.rglob("*.rej")]
                 if not rejects:
                     trial.returncode = 0
