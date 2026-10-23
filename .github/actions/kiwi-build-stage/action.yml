@@ -240,12 +240,12 @@ runs:
           if [[ '${{ inputs.chromium-version }}' == '156.0.8078.47' ]]; then
             test -s output/m156-java-cycle-fix.json
             python3 - <<'PY_VERIFY'
-import json
-from pathlib import Path
-p=json.loads(Path('output/m156-java-cycle-fix.json').read_text())
-assert p['status']=='fixed' and p['version']=='156.0.8078.47'
-assert p['before_sha256'] != p['after_sha256']
-PY_VERIFY
+        import json
+        from pathlib import Path
+        p=json.loads(Path('output/m156-java-cycle-fix.json').read_text())
+        assert p['status']=='fixed' and p['version']=='156.0.8078.47'
+        assert p['before_sha256'] != p['after_sha256']
+        PY_VERIFY
           fi
           (cd work/titanium/chromium/src && gn gen out/Default)
         fi
