@@ -119,10 +119,126 @@ def invalidate_m154_auxiliary_search_cycle(out: Path) -> bool:
     return True
 
 
+
+# The exact M156 checkpoint's GN edge is already channel_enum_java. However,
+# M155-derived Java build-config JSON and text depfiles still reference
+# version_constants_java, creating build_info -> version_constants -> base_java
+# -> build_info. This is independently proven by diagnostic artifact 12485750919.
+def invalidate_m156_build_info_cycle(out: Path) -> bool:
+    import hashlib
+    import json
+    out = Path(out)
+    marker = out / ".kiwi-m156-build-info-generated-deps-fixed-v1"
+    for name in (".ninja_log", ".ninja_deps", "build.ninja", "args.gn", "toolchain.ninja"):
+        if not (out / name).is_file():
+            raise ValueError("Missing M156 checkpoint prerequisite: " + name)
+    gn = (out / "toolchain.ninja").read_text()
+    edges = (
+        ("phony/base/build_info_java__header.harddeps",
+         "phony/base/version_info/android/channel_enum_java__header",
+         "phony/base/version_info/android/version_constants_java__header"),
+        ("phony/base/version_info/android/version_constants_java__header.harddeps",
+         "phony/base/base_java__header", None),
+        ("phony/base/base_java__header.harddeps",
+         "phony/base/build_info_java__header", None),
+    )
+    for target, required, forbidden in edges:
+        matches = [line.split() for line in gn.splitlines()
+                   if line.startswith("build " + target + ": phony ")]
+        if len(matches) != 1 or required not in matches[0] or (
+            forbidden is not None and forbidden in matches[0]
+        ):
+            raise ValueError("Unverified M156 GN edge: " + target)
+
+    old_t = "obj/base/version_info/android/version_constants_java.turbine.jar"
+    new_t = "obj/base/version_info/android/channel_enum_java.turbine.jar"
+    old_j = "obj/base/version_info/android/version_constants_java.javac.jar"
+    new_j = "obj/base/version_info/android/channel_enum_java.javac.jar"
+    configs = (
+        ("gen/base/build_info_java.turbine.build_config.json",
+         "interface_classpath", old_t, new_t),
+        ("gen/base/build_info_java.javac.build_config.json",
+         "javac_full_interface_classpath", old_t, new_t),
+        ("gen/base/build_info_java.build_config.json",
+         "javac_full_classpath", old_j, new_j),
+    )
+    depfiles = (
+        ("gen/base/build_info_java__header.d",
+         "obj/base/build_info_java.turbine.jar"),
+        ("gen/base/build_info_java__compile_java.d",
+         "obj/base/build_info_java.javac.jar"),
+    )
+    if marker.exists():
+        for relative, key, old, new in configs:
+            values = __import__("json").loads((out / relative).read_text())[key]
+            if old in values or new not in values:
+                raise ValueError("M156 stale config returned: " + relative)
+        for relative, _ in depfiles:
+            raw = (out / relative).read_bytes()
+            if old_t.encode() in raw or new_t.encode() not in raw:
+                raise ValueError("M156 stale depfile returned: " + relative)
+        return False
+
+    changes = {}
+    for relative, key, old, new in configs:
+        raw = (out / relative).read_bytes()
+        data = json.loads(raw)
+        values = data.get(key)
+        if not isinstance(values, list) or values.count(old) != 1 or values.count(new) != 1:
+            raise ValueError("Unverified M156 generated config: " + relative)
+        data[key] = [value for value in values if value != old]
+        changes[relative] = (raw, (json.dumps(data, indent=2) + "\n").encode())
+    for relative, target in depfiles:
+        raw = (out / relative).read_bytes()
+        output, separator, inputs = raw.partition(b":")
+        if separator != b":" or output.strip() != target.encode():
+            raise ValueError("Unverified M156 depfile target: " + relative)
+        pattern = rb"[ \t]+" + re.escape(old_t.encode()) + rb"(?=\s|$)"
+        new_pattern = rb"[ \t]+" + re.escape(new_t.encode()) + rb"(?=\s|$)"
+        if len(re.findall(pattern, inputs)) != 1 or not re.search(new_pattern, inputs):
+            raise ValueError("Unverified M156 stale depfile edge: " + relative)
+        changes[relative] = (raw, output + separator + re.sub(pattern, b"", inputs, count=1))
+    for relative, (before, after) in changes.items():
+        backup = out / (relative + ".kiwi-m156-backup")
+        if before == after or (backup.exists() and backup.read_bytes() != before):
+            raise ValueError("M156 backup conflict: " + relative)
+    before_log = hashlib.sha256((out / ".ninja_log").read_bytes()).hexdigest()
+    before_deps = hashlib.sha256((out / ".ninja_deps").read_bytes()).hexdigest()
+    for relative, (before, after) in changes.items():
+        path = out / relative
+        backup = out / (relative + ".kiwi-m156-backup")
+        if not backup.exists():
+            with backup.open("xb") as stream:
+                stream.write(before)
+                stream.flush()
+                os.fsync(stream.fileno())
+        temporary = path.with_name(path.name + ".kiwi-m156-tmp")
+        with temporary.open("wb") as stream:
+            stream.write(after)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    for relative in ("obj/base/build_info_java.turbine.jar",
+                     "obj/base/build_info_java.javac.jar"):
+        target = out / relative
+        if target.is_file():
+            os.utime(target, ns=(AGE_NS, AGE_NS))
+    if (hashlib.sha256((out / ".ninja_log").read_bytes()).hexdigest() != before_log or
+        hashlib.sha256((out / ".ninja_deps").read_bytes()).hexdigest() != before_deps):
+        raise ValueError("Ninja history changed during M156 repair")
+    marker.write_text("Verified M156 generated Java dependency repair; five originals backed up\n")
+    print("M156 generated Java classpaths and depfiles repaired with backups; Ninja history preserved")
+    return True
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("out", type=Path)
+    parser.add_argument("--m156-build-info", action="store_true")
     args = parser.parse_args()
+    if args.m156_build_info:
+        changed = invalidate_m156_build_info_cycle(args.out)
+        print("M156 build_info generated dependency repair:", "repaired" if changed else "already fixed")
+        return 0
     changed = invalidate_m154_auxiliary_search_cycle(args.out)
     print(
         "Invalidated the stale M153 auxiliary_search turbine dependency."

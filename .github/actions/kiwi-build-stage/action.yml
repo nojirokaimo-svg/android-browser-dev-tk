@@ -79,7 +79,8 @@ runs:
           kiwi_port.test_credentials_patch \
           kiwi_port.test_checkpoint_restore \
           kiwi_port.test_job_budget \
-          kiwi_port.test_m156_java_cycle_fix
+          kiwi_port.test_m156_java_cycle_fix \
+          kiwi_port.test_m156_java_checkpoint_compat
 
     - name: Enforce checkpoint-only resume
       if: inputs.require-restore == 'true' && inputs.restore-key == ''
@@ -250,10 +251,22 @@ runs:
           fi
           (cd work/titanium/chromium/src && gn gen out/Default)
           if [[ '${{ inputs.chromium-version }}' == '156.0.8078.47' ]]; then
+            # Materialize GN's own build.ninja regeneration before checking
+            # Java depfiles; Ninja -n alone may only print regeneration.
+            /usr/bin/ninja -C work/titanium/chromium/src/out/Default build.ninja
+            # GN source edge is correct; the restored checkpoint still contains
+            # five stale generated Java classpath/depfile edges from M155.
+            # Backup each original and remove ONLY the proven obsolete edge.
+            python3 kiwi_port/checkpoint_compat.py \
+              work/titanium/chromium/src/out/Default --m156-build-info
             /usr/bin/ninja -C work/titanium/chromium/src/out/Default -n chrome_public_apk > output/m156-ninja-graph-check.log 2>&1 || {
               tail -n 100 output/m156-ninja-graph-check.log >&2
               exit 1
             }
+            if grep -q '^\[0/1\] Regenerating ninja files' output/m156-ninja-graph-check.log; then
+              echo 'Ninja -n checked only graph regeneration, not the APK graph; refusing false positive.' >&2
+              exit 1
+            fi
             echo 'M156 regenerated Ninja graph dry-run passed.'
           fi
         fi
