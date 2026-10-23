@@ -261,6 +261,30 @@ TEST_F(ClipboardProviderTest, Android_NTPClipboardTextSearchesWhenSelected) {
         (SRC/(rel+".rej")).unlink(missing_ok=True)
     return True
 
+def repair_m156_dark_surface_lifecycle(feature_id, rejected):
+    """M156 moved appearance theme setup; retain the new tab-position init."""
+    relative="chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java"
+    if feature_id!="dark-ui-surface-color" or rejected!=[relative+".rej"]:
+        return False
+    path=SRC/relative
+    data=path.read_text(encoding="utf-8")
+    anchor="        initTabPositionPref();\n    }\n\n    @Override\n"
+    if data.count(anchor)!=1 or "private void initDarkSurfaceColorPref()" in data:
+        raise RuntimeError("M156 appearance fragment differs from audited lifecycle")
+    patch_text=(PORT/"patches/210-configurable-dark-surfaces.patch").read_text()
+    section=patch_text.split(
+        "diff --git a/"+relative+" b/"+relative+"\n",1)[1].split("\ndiff --git ",1)[0]
+    hunk=section.split("@@ -70,6 +75,105 @@",1)[1]
+    additions="".join(x[1:] for x in hunk.splitlines(keepends=True) if x.startswith("+"))
+    if not additions.startswith("        initDarkSurfaceColorPref();\n"):
+        raise RuntimeError("unexpected baseline dark color patch content")
+    if "saveDarkSurfaceColor" not in additions or "showCustomDarkSurfaceColorDialog" not in additions:
+        raise RuntimeError("incomplete dark color feature")
+    data=data.replace(anchor,"        initTabPositionPref();\n"+additions+"\n    @Override\n",1)
+    path.write_text(data,encoding="utf-8")
+    (SRC/(relative+".rej")).unlink(missing_ok=True)
+    return True
+
 def main():
     rawhash = json.loads((AUDIT/"kiwi-source-hashes-before.json").read_text())
     if len(rawhash["files"]) != 99:
@@ -303,6 +327,10 @@ def main():
                 if not rejects:
                     trial.returncode = 0
             if rejects and repair_m156_clipboard_enum_transition(feature["id"], rejects):
+                rejects = [str(p.relative_to(SRC)) for p in SRC.rglob("*.rej")]
+                if not rejects:
+                    trial.returncode = 0
+            if rejects and repair_m156_dark_surface_lifecycle(feature["id"], rejects):
                 rejects = [str(p.relative_to(SRC)) for p in SRC.rglob("*.rej")]
                 if not rejects:
                     trial.returncode = 0
