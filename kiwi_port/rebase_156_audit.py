@@ -275,7 +275,7 @@ def repair_m156_dark_surface_lifecycle(feature_id, rejected):
     section=patch_text.split(
         "diff --git a/"+relative+" b/"+relative+"\n",1)[1].split("\ndiff --git ",1)[0]
     hunk=section.split("@@ -70,6 +75,105 @@",1)[1]
-    additions="".join(("\\n" if x[1:].strip()=="" else x[1:]) for x in hunk.splitlines(keepends=True) if x.startswith("+"))
+    additions="".join(x[1:] for x in hunk.splitlines(keepends=True) if x.startswith("+"))
     if not additions.startswith("        initDarkSurfaceColorPref();\n"):
         raise RuntimeError("unexpected baseline dark color patch content")
     if "saveDarkSurfaceColor" not in additions or "showCustomDarkSurfaceColorDialog" not in additions:

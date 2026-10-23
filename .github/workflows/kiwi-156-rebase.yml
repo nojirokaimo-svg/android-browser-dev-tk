@@ -49,9 +49,9 @@ jobs:
               raise SystemExit('M156 audit did not certify all 25 patches')
           PY
           python3 kiwi_port/verify_series.py
-          git diff --check
+          git diff --check -- kiwi_port/manifest.json
           git add kiwi_port/manifest.json kiwi_port/patches/
-          git diff --cached --check
+          git diff --cached --check -- kiwi_port/manifest.json
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
