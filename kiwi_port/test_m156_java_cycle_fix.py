@@ -38,11 +38,14 @@ class M156JavaCycleFixTest(unittest.TestCase):
             self.assertEqual(orig.replace(
                 '"//base/version_info/android:version_constants_java"',
                 '"//base/version_info/android:channel_enum_java"'),new)
-    def test_refuse_unknown_base(self):
+    def test_preserve_already_correct_source(self):
         tmp,root=self._setup(good=True)
         with tmp:
-            with self.assertRaisesRegex(RuntimeError,"another cause"):
-                repair(root)
+            before=(root/'base/BUILD.gn').read_bytes()
+            result=repair(root)
+            self.assertEqual("already-correct",result["status"])
+            self.assertEqual(result["before_sha256"],result["after_sha256"])
+            self.assertEqual(before,(root/'base/BUILD.gn').read_bytes())
     def test_no_mutation_on_missing_base_public_dep(self):
         tmp,root=self._setup()
         with tmp:

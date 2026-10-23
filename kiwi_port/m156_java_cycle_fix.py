@@ -48,8 +48,9 @@ def repair(tree: Path):
         base.write_bytes(fixed)
         status="fixed"
     elif build.count(good)==1 and bad not in build:
-        # Upstream already corrected it: do not silently apply an unrelated workaround.
-        raise RuntimeError("GN build_info_java already uses channel_enum_java; cycle has another cause")
+        # The pinned upstream already has the safe edge. Preserve source bytes.
+        fixed=original
+        status="already-correct"
     else:
         raise RuntimeError("Unknown build_info_java dependency state; refusing blind GN edit")
     return {
@@ -61,7 +62,8 @@ def repair(tree: Path):
       "version_info_build_sha256":sha(version.read_bytes()),
       "before_dependency":bad,
       "after_dependency":good,
-      "reason":"prevent build_info -> version_constants -> base_java -> build_info cycle"
+      "reason":("replace a cyclic GN edge" if status=="fixed" else
+                "safe GN edge already present; regenerate stale Ninja graph")
     }
 
 def main():
