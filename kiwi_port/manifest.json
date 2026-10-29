@@ -1,9 +1,9 @@
 {
-  "titanium_commit": "a3e4b86339a8db237d95d8e8e78248c8f6a1df68",
-  "chromium_commit": "1d17a2e2ee147bb7d6ae2ab6abdb3a2510c17775",
-  "vanadium_commit": "2ae4335402eabcc6e025f3400185fe25094d8521",
-  "chromium_version": "156.0.8078.47",
-  "scope": "M155 rebase of the existing Kiwi UI, extensions, migration, full backups, credentials, Night mode, copied-link row, active-tab preservation, default-hidden tab search and independent page/card/menu dark colors. Extra power-saving menu/settings/runtime and Hameln injection remain removed.",
+  "titanium_commit": "c21bc5ac921fd9da96c108b40afff202f6e8b0ba",
+  "chromium_commit": "2f9a11097447f226133bc1a31c787291a5eeab98",
+  "vanadium_commit": "8ae4b1b8b014862146ff9a09dc8c6fc6e9a0a978",
+  "chromium_version": "156.0.8078.73",
+  "scope": "M156.73 source update with the existing Kiwi features plus locally selected ZIP/CRX extension installation fix; extra power-saving and Hameln injection remain removed.",
   "complete_kiwi_ui_port": true,
   "files": {
     "base/android/java/src/org/chromium/base/shared_preferences/StrictPreferenceKeyChecker.java": {
@@ -20,7 +20,7 @@
     },
     "chrome/android/chrome_java_sources.gni": {
       "before_sha256": "b08daedc8703c8037c8663e510e9b8a214744fa1a6ec72c2f9f9292ee322892b",
-      "after_sha256": "f0668c6e5eb8dacf184056754a8cf3af4ce21d3a41722937adf95fb61d787b7b"
+      "after_sha256": "3b505b7d288783d19f8b159c55cb00d3a5b96cd55f2ec3a2fd22e51369b07a85"
     },
     "chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabGridViewBinder.java": {
       "before_sha256": "25dad5805ad69a08f1964caa06027c795e35ed1260b3e5ac6848d26da75a809c",
@@ -90,13 +90,17 @@
       "before_sha256": "b6953ff89442d978fb34967c5f546e3769c1812b0bb2b437278650269d7bc500",
       "after_sha256": "5ae9cbe86f968222521f4f1e4cf84f34410747c3f7e96ce4785317eec67a5640"
     },
+    "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiCrxPacker.java": {
+      "before_sha256": null,
+      "after_sha256": "92a2eda916ba142e9969e2107ea489b154175f76c3bcc0a0bf96b710f02b3c66"
+    },
     "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java": {
       "before_sha256": null,
       "after_sha256": "2b7d1cfab18c095608eaa509e009d4a70dbb62b159d7effdfcfad7ffa9175593"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java": {
       "before_sha256": null,
-      "after_sha256": "928ad34c5b1e4d39dcaa6cb30964e54d6963066dbb32f0670094feaea1629b19"
+      "after_sha256": "e34e049a7462401954b6adfda616803ed1e3ce1d88b7907f321930befee487e4"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ContextMenuListView.java": {
       "before_sha256": "7e07e08aee5b1ed2f23c777f74eb6d5e6a9b32b225c0a6f050421b2a2e9ee3ce",
@@ -148,7 +152,7 @@
     },
     "chrome/browser/android/backup/kiwi_migration_bridge.cc": {
       "before_sha256": null,
-      "after_sha256": "e2daaf1d685f2fd0e139ddf1329f22a5b94c8288383ad8755e266d74b15183f6"
+      "after_sha256": "a2a41d2ff3b1dacfb24510b469284862b26561944c54fcaeed9364068c4cade3"
     },
     "chrome/browser/android/cookies/cookies_fetcher_restore_util.cc": {
       "before_sha256": "84c8cba146811fd390bdcc578d952e51eb1842cad1621d0d921a52926d181fb8",
@@ -404,6 +408,31 @@
     }
   },
   "completed_build": {
+    "chromium_version": "156.0.8078.47",
+    "run_id": 39969342350,
+    "commit": "9f808f2686105ca9a2e35078a8d23d737b9e90de",
+    "artifact_id": 12539097874,
+    "apk_sha256": "822689a01de2f54e787d1da8b0be7c836ff07c7f213a0784f0067e9d8971f457",
+    "signer_certificate_sha256": "32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0",
+    "completed_cache_key": "kiwi-incremental-15647-9f808f2686105ca9a2e35078a8d23d737b9e90de-39969342350-1-continue-1",
+    "physical_device_tested": false,
+    "status": "Previous completed release; .73 APK not yet produced."
+  },
+  "source_verification": {
+    "version": "156.0.8078.73",
+    "source_run": 40823974137,
+    "source_artifact": 12877086119,
+    "source_zip_sha256": "cbce58301805be5c174fed27306379baa15a19c3e16875c206d9372bd62ba515",
+    "audited_files": 99,
+    "existing_patches_applied": 25,
+    "zip_fix_applied_locally": true,
+    "total_tracked_files": 100,
+    "total_feature_patches": 26,
+    "status": "All 99 audited .73 sources match their reported hashes; 25 original patches applied; the new ZIP patch and all 100 after hashes were checked in strict ordered replay and a repeat run.",
+    "strict_reapplication_verified": true,
+    "idempotence_verified": true
+  },
+  "historical_completed_build_155": {
     "run_number": 180,
     "run_id": 39044652662,
     "commit": "acdde2860b6a4ee2f777920fbabaafa571cf909c",
@@ -435,17 +464,5 @@
     "local_tests_skipped": 1,
     "physical_device_tested": false,
     "chromium_version": "155.0.8059.84"
-  },
-  "source_verification": {
-    "version": "155.0.8059.84",
-    "source_run": 39039364741,
-    "source_artifact": 12104226111,
-    "source_zip_sha256": "2332bdb37d389c42c2ba7126f0ffba65bf10bc53749bf8ae83917555349415a0",
-    "files": 99,
-    "features": 25,
-    "status": "actual 99 before/after hashes, strict ordered 25-patch reapplication, repeat idempotence and conflict diagnostics verified",
-    "final_source_run": 39044652662,
-    "final_source_artifact": 12121111539,
-    "final_source_zip_sha256": "98156ad5cdb2fc101d2e0a9c496de810344565f5966190ce1a3ceb8d0f83004f"
   }
 }

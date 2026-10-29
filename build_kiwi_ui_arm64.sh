@@ -137,7 +137,7 @@ if [[ "$VERSION" == "156.0.8078.47" ]]; then
 fi
 audit_kiwi_sources() {
   python3 - "$KIT_ROOT" "$PWD" "$1" <<'PY_AUDIT'
-import hashlib, json, sys, tarfile
+import hashlib, json, os, sys, tarfile
 from pathlib import Path
 kit, source, phase = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
 manifest = json.loads((kit / "kiwi_port/manifest.json").read_text())
@@ -153,9 +153,9 @@ with tarfile.open(output / f"kiwi-sources-{phase}.tar.gz", "w:gz") as archive:
         if path.is_file():
             archive.add(path, arcname=relative, recursive=False)
 (output / f"kiwi-source-hashes-{phase}.json").write_text(
-    json.dumps({"titanium_commit": manifest["titanium_commit"],
-                "vanadium_commit": manifest["vanadium_commit"],
-                "chromium_commit": manifest["chromium_commit"],
+    json.dumps({"titanium_commit": os.environ.get("TITANIUM_COMMIT", manifest["titanium_commit"]),
+                "vanadium_commit": os.environ.get("VANADIUM_COMMIT", manifest["vanadium_commit"]),
+                "chromium_commit": os.environ.get("CHROMIUM_COMMIT", manifest["chromium_commit"]),
                 "phase": phase, "files": hashes}, indent=2) + "\n")
 PY_AUDIT
 }
@@ -306,7 +306,8 @@ PY
 
 APKSIGNER="$(find third_party/android_sdk/public/build-tools -type f -name apksigner | sort | tail -n 1)"
 test -x "$APKSIGNER"
-"$APKSIGNER" verify --verbose "$OUTPUT_APK" | tee "$KIT_ROOT/output/apk-signature.txt"
+"$APKSIGNER" verify --verbose --print-certs "$OUTPUT_APK" | tee "$KIT_ROOT/output/apk-signature.txt"
 grep -Fq "Verified using v2 scheme (APK Signature Scheme v2): true" "$KIT_ROOT/output/apk-signature.txt"
+grep -Fiq "Signer #1 certificate SHA-256 digest: 32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0" "$KIT_ROOT/output/apk-signature.txt"
 sha256sum "$OUTPUT_APK" > "$KIT_ROOT/output/SHA256SUMS.txt"
 touch "$KIT_ROOT/output/BUILD_COMPLETE"

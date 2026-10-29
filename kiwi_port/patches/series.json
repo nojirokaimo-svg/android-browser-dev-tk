@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "base": "post-Titanium a3e4b86339a8db237d95d8e8e78248c8f6a1df68",
+  "base": "post-Titanium c21bc5ac921fd9da96c108b40afff202f6e8b0ba",
   "features": [
     {
       "id": "resources",
@@ -320,6 +320,18 @@
         "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
       ],
       "sha256": "a96f0bb5e4a66bc255e94b848201a657b6c3d182e0d0027b5f1366a2ca364933"
+    },
+    {
+      "id": "extension-zip-crx-install",
+      "name": "Normalize and locally sign selected ZIP extensions; report completed install results",
+      "patch": "230-extension-zip-crx-install.patch",
+      "files": [
+        "chrome/android/chrome_java_sources.gni",
+        "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiCrxPacker.java",
+        "chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java",
+        "chrome/browser/android/backup/kiwi_migration_bridge.cc"
+      ],
+      "sha256": "48c4c9e0bc0fbf2530e2375c163990f5add29c03c610882590c339b220c36f10"
     }
   ]
 }

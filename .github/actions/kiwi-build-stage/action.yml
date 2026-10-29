@@ -77,6 +77,7 @@ runs:
           kiwi_port.test_checkpoint_compat \
           kiwi_port.test_night_mode_patch \
           kiwi_port.test_credentials_patch \
+          kiwi_port.test_extension_zip_install \
           kiwi_port.test_checkpoint_restore \
           kiwi_port.test_job_budget \
           kiwi_port.test_m156_java_cycle_fix \

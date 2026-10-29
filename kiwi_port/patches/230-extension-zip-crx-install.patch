@@ -1,0 +1,497 @@
+diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
+index 91a34a4..69e0df6 100644
+--- a/chrome/android/chrome_java_sources.gni
++++ b/chrome/android/chrome_java_sources.gni
+@@ -247,6 +247,7 @@ chrome_java_sources = [
+   "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
+   "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
+   "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
++  "java/src/org/chromium/chrome/browser/backup/KiwiCrxPacker.java",
+   "java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
+   "java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java",
+   "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiCrxPacker.java b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiCrxPacker.java
+new file mode 100644
+index 0000000..d973e21
+--- /dev/null
++++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiCrxPacker.java
+@@ -0,0 +1,261 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.backup;
++
++import java.io.BufferedInputStream;
++import java.io.BufferedOutputStream;
++import java.io.ByteArrayOutputStream;
++import java.io.File;
++import java.io.FileInputStream;
++import java.io.FileOutputStream;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.nio.charset.Charset;
++import java.nio.charset.StandardCharsets;
++import java.security.GeneralSecurityException;
++import java.security.KeyPair;
++import java.security.KeyPairGenerator;
++import java.security.MessageDigest;
++import java.security.Signature;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Enumeration;
++import java.util.HashSet;
++import java.util.List;
++import java.util.Set;
++import java.util.zip.CRC32;
++import java.util.zip.ZipEntry;
++import java.util.zip.ZipFile;
++import java.util.zip.ZipException;
++import java.util.zip.ZipOutputStream;
++
++/** Packages a locally selected extension ZIP as a locally signed CRX3. */
++final class KiwiCrxPacker {
++    private static final int MAX_ENTRIES = 10000;
++    private static final long MAX_EXPANDED_BYTES = 256L * 1024L * 1024L;
++    private static final byte[] SIGNATURE_CONTEXT =
++            "CRX3 SignedData\0".getBytes(StandardCharsets.US_ASCII);
++
++    private KiwiCrxPacker() {}
++
++    static boolean hasCrxMagic(File file) throws IOException {
++        try (InputStream input = new FileInputStream(file)) {
++            return input.read() == 'C' && input.read() == 'r'
++                    && input.read() == '2' && input.read() == '4';
++        }
++    }
++
++    static boolean hasZipMagic(File file) throws IOException {
++        try (InputStream input = new FileInputStream(file)) {
++            int a = input.read();
++            int b = input.read();
++            int c = input.read();
++            int d = input.read();
++            return a == 'P' && b == 'K' && ((c == 3 && d == 4) || (c == 5 && d == 6));
++        }
++    }
++
++    /** The caller owns the returned file; failed operations remove their temporary output. */
++    static File pack(File source, File temporaryDirectory) throws IOException {
++        File normalized = File.createTempFile("kiwi-extension-normalized-", ".zip", temporaryDirectory);
++        File result = null;
++        boolean success = false;
++        try {
++            normalize(source, normalized);
++            result = File.createTempFile("kiwi-extension-package-", ".crx", temporaryDirectory);
++            writeCrx(normalized, result);
++            success = true;
++            return result;
++        } catch (GeneralSecurityException e) {
++            throw new IOException("Could not sign the extension package", e);
++        } finally {
++            normalized.delete();
++            if (!success && result != null) result.delete();
++        }
++    }
++
++    private static void validateName(String name) throws IOException {
++        if (name.isEmpty() || name.startsWith("/") || name.indexOf('\\') >= 0
++                || name.indexOf('\0') >= 0 || name.length() > 4096) {
++            throw new IOException("Unsafe ZIP entry name");
++        }
++        String[] components = name.split("/", -1);
++        for (int i = 0; i < components.length; i++) {
++            String part = components[i];
++            if (part.equals(".") || part.equals("..")
++                    || (part.isEmpty() && i != components.length - 1)
++                    || (i == 0 && part.indexOf(':') >= 0)) {
++                throw new IOException("Unsafe ZIP entry path");
++            }
++        }
++    }
++
++    private static String canonicalName(ZipEntry entry) {
++        String name = entry.getName();
++        while (name.startsWith("./")) name = name.substring(2);
++        return name;
++    }
++
++    private static void normalize(File source, File destination) throws IOException {
++        try (ZipFile zip = openZip(source)) {
++            List<? extends ZipEntry> entries = listEntries(zip);
++            String prefix = extensionPrefix(entries);
++            long total = 0;
++            try (ZipOutputStream out =
++                    new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destination)))) {
++                byte[] buffer = new byte[64 * 1024];
++                for (ZipEntry entry : entries) {
++                    String name = canonicalName(entry);
++                    if (!name.startsWith(prefix) || name.length() == prefix.length()) continue;
++                    String relative = name.substring(prefix.length());
++                    if (relative.startsWith("__MACOSX/")) continue;
++                    ZipEntry copy = new ZipEntry(relative);
++                    out.putNextEntry(copy);
++                    if (entry.isDirectory()) {
++                        out.closeEntry();
++                        continue;
++                    }
++                    CRC32 crc = new CRC32();
++                    long entrySize = 0;
++                    try (InputStream input = new BufferedInputStream(zip.getInputStream(entry))) {
++                        int read;
++                        while ((read = input.read(buffer)) != -1) {
++                            entrySize += read;
++                            total += read;
++                            if (total > MAX_EXPANDED_BYTES) {
++                                throw new IOException("Extension ZIP expands beyond 256 MB");
++                            }
++                            crc.update(buffer, 0, read);
++                            out.write(buffer, 0, read);
++                        }
++                    }
++                    if ((entry.getSize() >= 0 && entrySize != entry.getSize())
++                            || (entry.getCrc() >= 0 && crc.getValue() != entry.getCrc())) {
++                        throw new IOException("Extension ZIP is damaged");
++                    }
++                    out.closeEntry();
++                }
++            }
++        }
++    }
++
++    private static ZipFile openZip(File source) throws IOException {
++        try {
++            return new ZipFile(source, StandardCharsets.UTF_8);
++        } catch (ZipException | IllegalArgumentException utf8Error) {
++            // Older Windows ZIP tools may use Japanese Windows-31J filenames
++            // without setting the UTF-8 flag. ZipFile still honors that flag
++            // for archives that explicitly declare UTF-8.
++            try {
++                return new ZipFile(source, Charset.forName("windows-31j"));
++            } catch (IllegalArgumentException legacyError) {
++                throw new IOException("Invalid ZIP filename encoding", legacyError);
++            }
++        }
++    }
++
++    private static List<? extends ZipEntry> listEntries(ZipFile zip) throws IOException {
++        List<ZipEntry> entries = new ArrayList<>();
++        Set<String> names = new HashSet<>();
++        Enumeration<? extends ZipEntry> iterator = zip.entries();
++        while (iterator.hasMoreElements()) {
++            ZipEntry entry = iterator.nextElement();
++            String name = canonicalName(entry);
++            if (name.isEmpty() && entry.isDirectory()) continue;
++            validateName(name);
++            if (!names.add(name)) throw new IOException("Duplicate ZIP entry");
++            entries.add(entry);
++            if (entries.size() > MAX_ENTRIES) throw new IOException("Too many ZIP entries");
++        }
++        return entries;
++    }
++
++    private static String extensionPrefix(List<? extends ZipEntry> entries) throws IOException {
++        String prefix = null;
++        int depth = Integer.MAX_VALUE;
++        boolean ambiguous = false;
++        for (ZipEntry entry : entries) {
++            String name = canonicalName(entry);
++            if (entry.isDirectory() || name.startsWith("__MACOSX/")) continue;
++            if (!name.equals("manifest.json") && !name.endsWith("/manifest.json")) continue;
++            String candidate = name.substring(0, name.length() - "manifest.json".length());
++            int candidateDepth = 0;
++            for (int i = 0; i < candidate.length(); i++) {
++                if (candidate.charAt(i) == '/') candidateDepth++;
++            }
++            if (candidateDepth < depth) {
++                prefix = candidate;
++                depth = candidateDepth;
++                ambiguous = false;
++            } else if (candidateDepth == depth && !candidate.equals(prefix)) {
++                ambiguous = true;
++            }
++        }
++        if (prefix == null) throw new IOException("manifest.json was not found in the ZIP");
++        if (ambiguous) throw new IOException("ZIP contains multiple extension folders");
++        return prefix;
++    }
++
++    private static void writeCrx(File zip, File destination)
++            throws IOException, GeneralSecurityException {
++        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
++        generator.initialize(2048);
++        KeyPair pair = generator.generateKeyPair();
++        byte[] publicKey = pair.getPublic().getEncoded();
++        byte[] id = Arrays.copyOf(MessageDigest.getInstance("SHA-256").digest(publicKey), 16);
++        byte[] signedHeader = field(1, id);
++        Signature signer = Signature.getInstance("SHA256withRSA");
++        signer.initSign(pair.getPrivate());
++        signer.update(SIGNATURE_CONTEXT);
++        signer.update(littleEndian(signedHeader.length));
++        signer.update(signedHeader);
++        try (InputStream input = new BufferedInputStream(new FileInputStream(zip))) {
++            byte[] buffer = new byte[64 * 1024];
++            int count;
++            while ((count = input.read(buffer)) != -1) signer.update(buffer, 0, count);
++        }
++        byte[] proof = concat(field(1, publicKey), field(2, signer.sign()));
++        byte[] header = concat(field(2, proof), field(10000, signedHeader));
++        try (OutputStream output = new BufferedOutputStream(new FileOutputStream(destination));
++                InputStream input = new BufferedInputStream(new FileInputStream(zip))) {
++            output.write(new byte[] {'C', 'r', '2', '4'});
++            output.write(littleEndian(3));
++            output.write(littleEndian(header.length));
++            output.write(header);
++            byte[] buffer = new byte[64 * 1024];
++            int count;
++            while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
++        }
++    }
++
++    private static byte[] littleEndian(int value) {
++        return new byte[] {(byte) value, (byte) (value >>> 8), (byte) (value >>> 16),
++                (byte) (value >>> 24)};
++    }
++
++    private static void writeVarint(OutputStream out, int value) throws IOException {
++        while ((value & ~0x7f) != 0) {
++            out.write((value & 0x7f) | 0x80);
++            value >>>= 7;
++        }
++        out.write(value);
++    }
++
++    private static byte[] field(int number, byte[] data) throws IOException {
++        ByteArrayOutputStream out = new ByteArrayOutputStream();
++        writeVarint(out, (number << 3) | 2);
++        writeVarint(out, data.length);
++        out.write(data);
++        return out.toByteArray();
++    }
++
++    private static byte[] concat(byte[] first, byte[] second) throws IOException {
++        ByteArrayOutputStream out = new ByteArrayOutputStream();
++        out.write(first);
++        out.write(second);
++        return out.toByteArray();
++    }
++}
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
+index 7c57d83..0f40f24 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
+@@ -6,11 +6,9 @@ package org.chromium.chrome.browser.backup;
+ 
+ import android.app.Activity;
+ import android.content.Intent;
+-import android.database.Cursor;
+ import android.graphics.Color;
+ import android.net.Uri;
+ import android.os.Bundle;
+-import android.provider.OpenableColumns;
+ import android.view.Gravity;
+ import android.view.View;
+ import android.widget.Button;
+@@ -24,6 +22,7 @@ import org.json.JSONException;
+ import org.json.JSONObject;
+ 
+ import org.chromium.base.ApplicationStatus;
++import org.chromium.base.ContextUtils;
+ import org.chromium.build.annotations.NullMarked;
+ import org.chromium.build.annotations.Nullable;
+ import org.chromium.chrome.browser.ChromeTabbedActivity;
+@@ -95,6 +94,18 @@ public final class KiwiMigrationActivity extends Activity {
+         root.setBackgroundColor(Color.BLACK);
+         scroll.addView(root);
+ 
++        if (mDirectPackagePicker) {
++            TextView title = text(isJapanese() ? "ZIP / CRX を読み込む" : "Load ZIP / CRX", 24);
++            title.setTextColor(Color.WHITE);
++            root.addView(title);
++            root.addView(button(isJapanese() ? "ファイルを選択" : "Choose file", v -> chooseExtensionPackage()));
++            mStatus = text(isJapanese() ? "ファイルを選択してください" : "Select a file", 14);
++            mStatus.setTextColor(0xff9aa0a6);
++            mStatus.setPadding(0, dp(20), 0, 0);
++            root.addView(mStatus);
++            return scroll;
++        }
++
+         TextView title = text(isJapanese() ? "Kiwi Browserから移行" : "Migrate from Kiwi Browser", 24);
+         title.setTextColor(Color.WHITE);
+         root.addView(title);
+@@ -163,10 +174,9 @@ public final class KiwiMigrationActivity extends Activity {
+     private void chooseExtensionPackage() {
+         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+         intent.addCategory(Intent.CATEGORY_OPENABLE);
+-        intent.setType("application/octet-stream");
+-        intent.putExtra(
+-                Intent.EXTRA_MIME_TYPES,
+-                new String[] {"application/zip", "application/x-chrome-extension", "application/octet-stream"});
++        // Android providers use several ZIP MIME types and some do not report
++        // one at all. Validate the file contents after selection instead.
++        intent.setType("*/*");
+         startActivityForResult(intent, OPEN_EXTENSION_PACKAGE);
+     }
+ 
+@@ -330,26 +340,33 @@ public final class KiwiMigrationActivity extends Activity {
+         new Thread(
+                         () -> {
+                             File temporary = null;
++                            File prepared = null;
+                             try {
+-                                String name = displayName(uri).toLowerCase(Locale.ROOT);
+-                                String suffix;
+-                                if (name.endsWith(".zip")) suffix = ".zip";
+-                                else if (name.endsWith(".crx")) suffix = ".crx";
+-                                else throw new IOException("Select a .zip or .crx file");
+-                                temporary = File.createTempFile("kiwi-extension-", suffix, getCacheDir());
++                                temporary = File.createTempFile("kiwi-extension-", ".crx", getCacheDir());
+                                 copyUri(uri, temporary, MAX_MIGRATION_BYTES);
+-                                File packageFile = temporary;
++                                if (KiwiCrxPacker.hasZipMagic(temporary)) {
++                                    prepared = KiwiCrxPacker.pack(temporary, getCacheDir());
++                                    temporary.delete();
++                                    temporary = null;
++                                } else if (KiwiCrxPacker.hasCrxMagic(temporary)) {
++                                    prepared = temporary;
++                                    temporary = null;
++                                } else {
++                                    throw new IOException("Select a valid ZIP or CRX file");
++                                }
++                                File packageFile = prepared;
+                                 runOnUiThread(
+                                         () -> {
+                                             boolean started =
+                                                     KiwiMigrationActivityJni.get()
+                                                             .installExtensionFile(
+                                                                     profile(), packageFile.getAbsolutePath());
++                                            if (!started) packageFile.delete();
+                                             String message =
+                                                     started
+                                                             ? (isJapanese()
+-                                                                    ? "拡張機能のインストールを開始しました"
+-                                                                    : "Extension installation started")
++                                                                    ? "拡張機能をインストール中…"
++                                                                    : "Installing extension…")
+                                                             : (isJapanese()
+                                                                     ? "インストーラがパッケージを拒否しました"
+                                                                     : "Installer rejected the package");
+@@ -368,24 +385,32 @@ public final class KiwiMigrationActivity extends Activity {
+                                         });
+                             } catch (IOException exception) {
+                                 if (temporary != null) temporary.delete();
+-                                setStatus((isJapanese() ? "読み込み失敗: " : "Load failed: ") + exception.getMessage());
++                                if (prepared != null) prepared.delete();
++                                String message =
++                                        (isJapanese() ? "読み込み失敗: " : "Load failed: ")
++                                                + exception.getMessage();
++                                setStatus(message);
++                                runOnUiThread(
++                                        () -> Toast.makeText(this, message, Toast.LENGTH_LONG).show());
+                             }
+                         },
+                         "KiwiExtensionInstall")
+                 .start();
+     }
+ 
+-    private Profile profile() {
+-        return ProfileManager.getLastUsedRegularProfile().getOriginalProfile();
++    @CalledByNative
++    private static void onExtensionInstallFinished(boolean success, String error) {
++        String detail = error.isEmpty()
++                ? (isJapanese() ? "詳細は取得できませんでした" : "No details available")
++                : error;
++        String message = success
++                ? (isJapanese() ? "拡張機能をインストールしました" : "Extension installed")
++                : (isJapanese() ? "インストール失敗: " : "Installation failed: ") + detail;
++        Toast.makeText(ContextUtils.getApplicationContext(), message, Toast.LENGTH_LONG).show();
+     }
+ 
+-    private String displayName(Uri uri) {
+-        try (Cursor cursor =
+-                getContentResolver().query(uri, new String[] {OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+-            if (cursor != null && cursor.moveToFirst()) return cursor.getString(0);
+-        }
+-        String segment = uri.getLastPathSegment();
+-        return segment == null ? "" : segment;
++    private Profile profile() {
++        return ProfileManager.getLastUsedRegularProfile().getOriginalProfile();
+     }
+ 
+     private String readUtf8(Uri uri, long limit) throws IOException {
+@@ -440,7 +465,7 @@ public final class KiwiMigrationActivity extends Activity {
+         runOnUiThread(() -> mStatus.setText(message));
+     }
+ 
+-    private boolean isJapanese() {
++    private static boolean isJapanese() {
+         return Locale.getDefault().getLanguage().equals("ja");
+     }
+ 
+diff --git a/chrome/browser/android/backup/kiwi_migration_bridge.cc b/chrome/browser/android/backup/kiwi_migration_bridge.cc
+index 87b1b73..092adfd 100644
+--- a/chrome/browser/android/backup/kiwi_migration_bridge.cc
++++ b/chrome/browser/android/backup/kiwi_migration_bridge.cc
+@@ -7,16 +7,17 @@
+ #include <optional>
+ #include <string>
+ 
++#include "base/android/jni_android.h"
+ #include "base/android/jni_string.h"
+ #include "base/files/file_path.h"
+ #include "base/files/file_util.h"
++#include "base/functional/bind.h"
+ #include "base/json/json_reader.h"
+ #include "base/strings/string_number_conversions.h"
+ #include "base/strings/utf_string_conversions.h"
+ #include "base/time/time.h"
+ #include "chrome/android/chrome_jni_headers/KiwiMigrationActivity_jni.h"
+ #include "chrome/browser/bookmarks/bookmark_model_factory.h"
+-#include "chrome/browser/extensions/chrome_zipfile_installer.h"
+ #include "chrome/browser/history/history_service_factory.h"
+ #include "chrome/browser/profiles/profile.h"
+ #include "components/bookmarks/browser/bookmark_model.h"
+@@ -25,8 +26,7 @@
+ #include "components/history/core/browser/history_types.h"
+ #include "components/keyed_service/core/service_access_type.h"
+ #include "extensions/browser/crx_installer.h"
+-#include "extensions/browser/extension_file_task_runner.h"
+-#include "extensions/browser/extension_registrar.h"
++#include "extensions/browser/install/crx_install_error.h"
+ #include "extensions/browser/unpacked_installer.h"
+ #include "url/gurl.h"
+ 
+@@ -165,23 +165,22 @@ static jboolean JNI_KiwiMigrationActivity_InstallExtensionFile(
+   if (!base::PathExists(path)) {
+     return false;
+   }
+-  if (path.MatchesExtension(FILE_PATH_LITERAL(".zip"))) {
+-    extensions::ExtensionRegistrar* registrar =
+-        extensions::ExtensionRegistrar::Get(profile);
+-    extensions::ZipFileInstaller::Create(
+-        extensions::GetExtensionFileTaskRunner(),
+-        extensions::MakeRegisterInExtensionServiceCallback(profile))
+-        ->InstallZipFileToUnpackedExtensionsDir(
+-            path, registrar->unpacked_install_directory());
+-    return true;
+-  }
+   if (path.MatchesExtension(FILE_PATH_LITERAL(".crx"))) {
+     scoped_refptr<extensions::CrxInstaller> installer =
+         extensions::CrxInstaller::CreateSilent(profile);
+     installer->set_error_on_unsupported_requirements(true);
++    installer->set_delete_source(true);
+     installer->set_off_store_install_allow_reason(
+         extensions::CrxInstaller::OffStoreInstallAllowedFromSettingsPage);
+     installer->set_install_immediately(true);
++    installer->AddInstallerCallback(base::BindOnce(
++        [](const std::optional<extensions::CrxInstallError>& error) {
++          JNIEnv* env = base::android::AttachCurrentThread();
++          jni_zero_internal::Java_KiwiMigrationActivity_onExtensionInstallFinished(
++              env, !error.has_value(),
++              base::android::ConvertUTF16ToJavaString(
++                  env, error ? error->message() : std::u16string()));
++        }));
+     installer->InstallCrx(path);
+     return true;
+   }
