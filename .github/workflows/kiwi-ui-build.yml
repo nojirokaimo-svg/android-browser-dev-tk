@@ -28,13 +28,14 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Resume the exact completed M156.47 checkpoint saved by run 39969342350.
+          # Resume the exact M156.73 checkpoint saved after run 40826954225
+          # completed the APK but rejected apksigner 37's changed label.
           # Preserve Ninja history and objects; an exact cache miss stops the build.
-          restore-key: kiwi-incremental-15647-9f808f2686105ca9a2e35078a8d23d737b9e90de-39969342350-1-continue-1
+          restore-key: kiwi-15673-e76be77c0f22b3ffc2d53ea674a82b9ac669a5f5-40826954225-1-continue-2
           require-restore: "true"
-          # One explicit source transition; no fallback or checkpoint overwrite.
+          # The source transition already completed in the restored checkpoint.
           bootstrap-revision: ""
-          transition-from-identity: "a3e4b86339a8db237d95d8e8e78248c8f6a1df68:2ae4335402eabcc6e025f3400185fe25094d8521:1d17a2e2ee147bb7d6ae2ab6abdb3a2510c17775:validation"
+          transition-from-identity: ""
           save-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           final-cache-key: kiwi-incremental-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           titanium-commit: c21bc5ac921fd9da96c108b40afff202f6e8b0ba

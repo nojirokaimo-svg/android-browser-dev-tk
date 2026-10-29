@@ -308,6 +308,11 @@ APKSIGNER="$(find third_party/android_sdk/public/build-tools -type f -name apksi
 test -x "$APKSIGNER"
 "$APKSIGNER" verify --verbose --print-certs "$OUTPUT_APK" | tee "$KIT_ROOT/output/apk-signature.txt"
 grep -Fq "Verified using v2 scheme (APK Signature Scheme v2): true" "$KIT_ROOT/output/apk-signature.txt"
-grep -Fiq "Signer #1 certificate SHA-256 digest: 32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0" "$KIT_ROOT/output/apk-signature.txt"
+grep -Fq "Number of signers: 1" "$KIT_ROOT/output/apk-signature.txt"
+# apksigner 37 labels the same v2 certificate as "V2 Signer" instead of the
+# older "Signer #1". Accept only those two known labels and the exact release
+# certificate digest.
+grep -Eiq "^(Signer #1|V2 Signer): certificate SHA-256 digest: 32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0$" \
+  "$KIT_ROOT/output/apk-signature.txt"
 sha256sum "$OUTPUT_APK" > "$KIT_ROOT/output/SHA256SUMS.txt"
 touch "$KIT_ROOT/output/BUILD_COMPLETE"
