@@ -408,29 +408,40 @@
     }
   },
   "completed_build": {
-    "chromium_version": "156.0.8078.47",
-    "run_id": 39969342350,
-    "commit": "9f808f2686105ca9a2e35078a8d23d737b9e90de",
-    "artifact_id": 12539097874,
-    "apk_sha256": "822689a01de2f54e787d1da8b0be7c836ff07c7f213a0784f0067e9d8971f457",
+    "chromium_version": "156.0.8078.73",
+    "run_id": 40938011373,
+    "commit": "ac6acd28b9f9dd3ad323b53269a7046216eec498",
+    "artifact_id": 12926744920,
+    "artifact_zip_sha256": "0df4c7aca4fbebdc65e0e21dceca3363ad067b590da727ebe34652801bda8ba7",
+    "apk_sha256": "684b57895cd9b2fa30cf00e75e1b39a2b7c6b3c3ea609b6b8a5c97c9eecc8c00",
+    "package": "io.github.nojirokaimo.titaniumkiwi",
+    "version_name": "156.0.8078.73",
+    "version_code": 807807374,
     "signer_certificate_sha256": "32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0",
-    "completed_cache_key": "kiwi-incremental-15647-9f808f2686105ca9a2e35078a8d23d737b9e90de-39969342350-1-continue-1",
+    "apk_signature_scheme_v2_verified": true,
+    "completed_cache_key": "kiwi-incremental-15673-ac6acd28b9f9dd3ad323b53269a7046216eec498-40938011373-1-build",
     "physical_device_tested": false,
-    "status": "Previous completed release; .73 APK not yet produced."
+    "status": "Completed and independently verified."
   },
   "source_verification": {
     "version": "156.0.8078.73",
-    "source_run": 40823974137,
-    "source_artifact": 12877086119,
-    "source_zip_sha256": "cbce58301805be5c174fed27306379baa15a19c3e16875c206d9372bd62ba515",
-    "audited_files": 99,
-    "existing_patches_applied": 25,
-    "zip_fix_applied_locally": true,
-    "total_tracked_files": 100,
+    "source_run": 40938011373,
+    "source_artifact": 12927766801,
+    "source_zip_sha256": "c2f5928b9b01aba91131271873283200fd23ec19cde2ec17a1cd06384260af58",
+    "audited_files": 100,
+    "before_existing_files": 85,
+    "before_expected_absences": 15,
+    "after_existing_files": 100,
+    "existing_patches_retained": 25,
+    "zip_fix_retained": true,
     "total_feature_patches": 26,
-    "status": "All 99 audited .73 sources match their reported hashes; 25 original patches applied; the new ZIP patch and all 100 after hashes were checked in strict ordered replay and a repeat run.",
+    "removed_features_absent": [
+      220,
+      225
+    ],
     "strict_reapplication_verified": true,
-    "idempotence_verified": true
+    "idempotence_verified": true,
+    "status": "All 100 reported source states match downloaded archive bytes and the manifest; strict ordered replay and idempotence passed."
   },
   "historical_completed_build_155": {
     "run_number": 180,
