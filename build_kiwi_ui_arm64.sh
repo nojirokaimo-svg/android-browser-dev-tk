@@ -216,6 +216,9 @@ if 'is_debug = false' not in s or 'is_official_build = true' not in s:
 p.write_text(s, encoding="utf-8")
 PY
 
+# Keep this package installable over the currently deployed build in either
+# direction when future Titanium versions are built with the same certificate.
+python3 "$KIT_ROOT/kiwi_port/pin_version_code.py" --args-gn out/Default/args.gn
 gn gen out/Default
 fi
 
@@ -283,6 +286,17 @@ fi
 mkdir -p "$KIT_ROOT/output"
 OUTPUT_APK="$KIT_ROOT/output/Titanium-Kiwi-core-$VERSION-arm64-v8a.apk"
 cp "$APK" "$OUTPUT_APK"
+
+# Refuse to publish an APK whose package, visible version or internal version
+# code would break over-installation of the currently deployed build.
+AAPT2="third_party/android_build_tools/aapt2/cipd/aapt2"
+if [[ ! -x "$AAPT2" ]]; then
+  AAPT2="$(find third_party/android_sdk/public/build-tools -type f -name aapt2 | sort | tail -n 1)"
+fi
+test -x "$AAPT2"
+"$AAPT2" dump badging "$OUTPUT_APK" > "$KIT_ROOT/output/apk-badging.txt"
+python3 "$KIT_ROOT/kiwi_port/pin_version_code.py" \
+  --badging "$KIT_ROOT/output/apk-badging.txt" --version "$VERSION"
 
 # Upstream Titanium 153 arm64 is 324,215,805 bytes. Kiwi UI patches should only
 # add a small amount; reject a debug-style ~400 MB regression automatically.

@@ -81,7 +81,8 @@ runs:
           kiwi_port.test_checkpoint_restore \
           kiwi_port.test_job_budget \
           kiwi_port.test_m156_java_cycle_fix \
-          kiwi_port.test_m156_java_checkpoint_compat
+          kiwi_port.test_m156_java_checkpoint_compat \
+          kiwi_port.test_pin_version_code
 
     - name: Enforce checkpoint-only resume
       if: inputs.require-restore == 'true' && inputs.restore-key == ''
@@ -234,10 +235,16 @@ runs:
           --identity '${{ inputs.titanium-commit }}:${{ inputs.vanadium-commit }}:${{ inputs.chromium-commit }}:validation' \
           "${bootstrap_args[@]}" \
           "${transition_args[@]}"
+        # Modify only the version-code argument in the restored copy. This
+        # leaves the immutable source cache and all Ninja histories intact.
+        version_pin_status="$(python3 kiwi_port/pin_version_code.py --args-gn \
+          work/titanium/chromium/src/out/Default/args.gn)"
+        [[ "$version_pin_status" == changed || "$version_pin_status" == unchanged ]]
+        echo "Version-code override: $version_pin_status"
         # M156 targeted GN dependency correction requires regenerating this
         # stage's Ninja build graph even when reusing an M156 partial checkpoint.
         # This is gn gen, NEVER gn clean; objects and Ninja histories are preserved.
-        if [[ -n '${{ inputs.transition-from-identity }}' || '${{ inputs.chromium-version }}' == '156.0.8078.47' ]]; then
+        if [[ -n '${{ inputs.transition-from-identity }}' || '${{ inputs.chromium-version }}' == '156.0.8078.47' || "$version_pin_status" == changed ]]; then
           export PATH="$GITHUB_WORKSPACE/work/depot_tools:$PATH"
           if [[ '${{ inputs.chromium-version }}' == '156.0.8078.47' ]]; then
             test -s output/m156-java-cycle-fix.json
