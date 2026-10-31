@@ -1,0 +1,36 @@
+name: Audit Titanium-Kiwi 156.0.8078.79 sources
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/kiwi-ui-port
+    paths:
+      - .github/workflows/kiwi-15679-audit.yml
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: titanium-kiwi-core-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v5
+      - name: Audit upstream and patches with the exact completed checkpoint
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-incremental-15673-ac6acd28b9f9dd3ad323b53269a7046216eec498-40938011373-1-build
+          require-restore: "true"
+          audit-only: "true"
+          save-key: kiwi-15679-audit-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          titanium-commit: 5e9070a98b48f6b6cb239bf90b8718b91795b7c5
+          vanadium-commit: 0202b7badff99434822ba5e32e0d738792868455
+          chromium-commit: a21ce95c24ce3964416f09ae1862f53f319eb4d0
+          chromium-version: 156.0.8078.79
+          patch-mode: best-effort
