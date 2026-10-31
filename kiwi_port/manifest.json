@@ -1,9 +1,9 @@
 {
-  "titanium_commit": "c21bc5ac921fd9da96c108b40afff202f6e8b0ba",
-  "chromium_commit": "2f9a11097447f226133bc1a31c787291a5eeab98",
-  "vanadium_commit": "8ae4b1b8b014862146ff9a09dc8c6fc6e9a0a978",
-  "chromium_version": "156.0.8078.73",
-  "scope": "M156.73 source update with the existing Kiwi features plus locally selected ZIP/CRX extension installation fix; extra power-saving and Hameln injection remain removed.",
+  "titanium_commit": "5e9070a98b48f6b6cb239bf90b8718b91795b7c5",
+  "chromium_commit": "a21ce95c24ce3964416f09ae1862f53f319eb4d0",
+  "vanadium_commit": "0202b7badff99434822ba5e32e0d738792868455",
+  "chromium_version": "156.0.8078.79",
+  "scope": "M156.79 source update with the existing Kiwi features plus locally selected ZIP/CRX extension installation fix; extra power-saving and Hameln injection remain removed.",
   "complete_kiwi_ui_port": true,
   "files": {
     "base/android/java/src/org/chromium/base/shared_preferences/StrictPreferenceKeyChecker.java": {

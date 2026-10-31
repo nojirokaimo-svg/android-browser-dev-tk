@@ -1,4 +1,4 @@
-name: Build Titanium-Kiwi 156.0.8078.73 with ZIP install fix
+name: Build Titanium-Kiwi 156.0.8078.79 with ZIP install fix
 
 on:
   workflow_dispatch:
@@ -32,15 +32,15 @@ jobs:
           # Preserve Ninja history and objects; an exact cache miss stops the build.
           restore-key: kiwi-incremental-15673-ac6acd28b9f9dd3ad323b53269a7046216eec498-40938011373-1-build
           require-restore: "true"
-          # The source transition already completed in the restored checkpoint.
+          # Permit only the exact completed M156.73 provenance for this transition.
           bootstrap-revision: ""
-          transition-from-identity: ""
-          save-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
-          final-cache-key: kiwi-incremental-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
-          titanium-commit: c21bc5ac921fd9da96c108b40afff202f6e8b0ba
-          vanadium-commit: 8ae4b1b8b014862146ff9a09dc8c6fc6e9a0a978
-          chromium-commit: 2f9a11097447f226133bc1a31c787291a5eeab98
-          chromium-version: 156.0.8078.73
+          transition-from-identity: "c21bc5ac921fd9da96c108b40afff202f6e8b0ba:8ae4b1b8b014862146ff9a09dc8c6fc6e9a0a978:2f9a11097447f226133bc1a31c787291a5eeab98:validation"
+          save-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
+          final-cache-key: kiwi-incremental-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
+          titanium-commit: 5e9070a98b48f6b6cb239bf90b8718b91795b7c5
+          vanadium-commit: 0202b7badff99434822ba5e32e0d738792868455
+          chromium-commit: a21ce95c24ce3964416f09ae1862f53f319eb4d0
+          chromium-version: 156.0.8078.79
           patch-mode: strict
           build-budget-minutes: "270"
 
@@ -56,14 +56,14 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
+          restore-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           require-restore: "true"
-          save-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
-          final-cache-key: kiwi-incremental-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
-          titanium-commit: c21bc5ac921fd9da96c108b40afff202f6e8b0ba
-          vanadium-commit: 8ae4b1b8b014862146ff9a09dc8c6fc6e9a0a978
-          chromium-commit: 2f9a11097447f226133bc1a31c787291a5eeab98
-          chromium-version: 156.0.8078.73
+          save-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
+          final-cache-key: kiwi-incremental-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
+          titanium-commit: 5e9070a98b48f6b6cb239bf90b8718b91795b7c5
+          vanadium-commit: 0202b7badff99434822ba5e32e0d738792868455
+          chromium-commit: a21ce95c24ce3964416f09ae1862f53f319eb4d0
+          chromium-version: 156.0.8078.79
           patch-mode: strict
           build-budget-minutes: "270"
 
@@ -79,14 +79,14 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
+          restore-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
           require-restore: "true"
-          save-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
-          final-cache-key: kiwi-incremental-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
-          titanium-commit: c21bc5ac921fd9da96c108b40afff202f6e8b0ba
-          vanadium-commit: 8ae4b1b8b014862146ff9a09dc8c6fc6e9a0a978
-          chromium-commit: 2f9a11097447f226133bc1a31c787291a5eeab98
-          chromium-version: 156.0.8078.73
+          save-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
+          final-cache-key: kiwi-incremental-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
+          titanium-commit: 5e9070a98b48f6b6cb239bf90b8718b91795b7c5
+          vanadium-commit: 0202b7badff99434822ba5e32e0d738792868455
+          chromium-commit: a21ce95c24ce3964416f09ae1862f53f319eb4d0
+          chromium-version: 156.0.8078.79
           patch-mode: strict
           build-budget-minutes: "270"
 
@@ -102,14 +102,14 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
+          restore-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
           require-restore: "true"
-          save-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
-          final-cache-key: kiwi-incremental-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
-          titanium-commit: c21bc5ac921fd9da96c108b40afff202f6e8b0ba
-          vanadium-commit: 8ae4b1b8b014862146ff9a09dc8c6fc6e9a0a978
-          chromium-commit: 2f9a11097447f226133bc1a31c787291a5eeab98
-          chromium-version: 156.0.8078.73
+          save-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
+          final-cache-key: kiwi-incremental-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
+          titanium-commit: 5e9070a98b48f6b6cb239bf90b8718b91795b7c5
+          vanadium-commit: 0202b7badff99434822ba5e32e0d738792868455
+          chromium-commit: a21ce95c24ce3964416f09ae1862f53f319eb4d0
+          chromium-version: 156.0.8078.79
           patch-mode: strict
           build-budget-minutes: "270"
 
@@ -125,14 +125,14 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
+          restore-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
           require-restore: "true"
-          save-key: kiwi-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
-          final-cache-key: kiwi-incremental-15673-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
-          titanium-commit: c21bc5ac921fd9da96c108b40afff202f6e8b0ba
-          vanadium-commit: 8ae4b1b8b014862146ff9a09dc8c6fc6e9a0a978
-          chromium-commit: 2f9a11097447f226133bc1a31c787291a5eeab98
-          chromium-version: 156.0.8078.73
+          save-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
+          final-cache-key: kiwi-incremental-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
+          titanium-commit: 5e9070a98b48f6b6cb239bf90b8718b91795b7c5
+          vanadium-commit: 0202b7badff99434822ba5e32e0d738792868455
+          chromium-commit: a21ce95c24ce3964416f09ae1862f53f319eb4d0
+          chromium-version: 156.0.8078.79
           patch-mode: strict
           build-budget-minutes: "270"
 
