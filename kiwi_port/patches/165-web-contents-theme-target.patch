@@ -1,12 +1,12 @@
 diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
-index aef8f64fd535ad8f0faa89fa3a0a07b3775c4e65..a50eac7da9ba972281ed791138757b0839461b86 100644
+index aef8f64fd535ad8f0faa89fa3a0a07b3775c4e65..56e87bd4f510b56683fc8e73de4a21670737cd45 100644
 --- a/chrome/browser/android/BUILD.gn
 +++ b/chrome/browser/android/BUILD.gn
-@@ -224,6 +224,7 @@ if (is_android) {
-     ]
-   }
+@@ -226,6 +226,7 @@ if (is_android) {
  
-+  # Kiwi extension popup: reuse the upstream-provided standalone WebContents theme target.
    # A leaf target so that it can be used by targets that ":android" itself
    # depends on (see //chrome/browser/android/thin_webview:initializer).
++  # Kiwi extension popups also reuse this upstream leaf target.
    source_set("web_contents_theme_client") {
+     sources = [ "web_contents_theme_client.cc" ]
+     public = [ "web_contents_theme_client.h" ]

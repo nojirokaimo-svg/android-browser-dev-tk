@@ -5,10 +5,10 @@ KIT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 BUILD_ROOT="${KIWI_BUILD_ROOT:-$KIT_ROOT/work}"
 TITANIUM_DIR="$BUILD_ROOT/titanium"
 TITANIUM_REPOSITORY="${TITANIUM_REPOSITORY:-https://github.com/jqssun/android-titanium-browser.git}"
-TITANIUM_COMMIT="${TITANIUM_COMMIT:-e59e03dc83bc940d73cf29a7683286fca390b393}"
-VANADIUM_COMMIT="${VANADIUM_COMMIT:-20526e052e304b62cf3e80114b423934e2d1c540}"
-CHROMIUM_COMMIT="${CHROMIUM_COMMIT:-5869fe313571d75152b77813cf0a4ee26a4e6df0}"
-VERSION="${CHROMIUM_VERSION:-155.0.8059.84}"
+TITANIUM_COMMIT="${TITANIUM_COMMIT:-5e9070a98b48f6b6cb239bf90b8718b91795b7c5}"
+VANADIUM_COMMIT="${VANADIUM_COMMIT:-0202b7badff99434822ba5e32e0d738792868455}"
+CHROMIUM_COMMIT="${CHROMIUM_COMMIT:-a21ce95c24ce3964416f09ae1862f53f319eb4d0}"
+VERSION="${CHROMIUM_VERSION:-156.0.8078.79}"
 PHASE="${KIWI_BUILD_PHASE:-all}"
 PATCH_MODE="${KIWI_PATCH_MODE:-strict}"
 
@@ -128,16 +128,9 @@ version_lt() {
   [[ "$1" != "$2" ]] && [[ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1)" == "$1" ]]
 }
 source "$TITANIUM_DIR/patch.sh"
-
-# Chromium M156 / Titanium build compatibility: targeted GN edge repair.
-# Verify all three dependency nodes first; never touch restored out/Default.
-if [[ "$VERSION" == "156.0.8078.47" ]]; then
-  python3 "$KIT_ROOT/kiwi_port/m156_java_cycle_fix.py" "$PWD" \
-    "$KIT_ROOT/output/m156-java-cycle-fix.json"
-fi
 audit_kiwi_sources() {
   python3 - "$KIT_ROOT" "$PWD" "$1" <<'PY_AUDIT'
-import hashlib, json, os, sys, tarfile
+import hashlib, json, sys, tarfile
 from pathlib import Path
 kit, source, phase = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
 manifest = json.loads((kit / "kiwi_port/manifest.json").read_text())
@@ -153,9 +146,9 @@ with tarfile.open(output / f"kiwi-sources-{phase}.tar.gz", "w:gz") as archive:
         if path.is_file():
             archive.add(path, arcname=relative, recursive=False)
 (output / f"kiwi-source-hashes-{phase}.json").write_text(
-    json.dumps({"titanium_commit": os.environ.get("TITANIUM_COMMIT", manifest["titanium_commit"]),
-                "vanadium_commit": os.environ.get("VANADIUM_COMMIT", manifest["vanadium_commit"]),
-                "chromium_commit": os.environ.get("CHROMIUM_COMMIT", manifest["chromium_commit"]),
+    json.dumps({"titanium_commit": manifest["titanium_commit"],
+                "vanadium_commit": manifest["vanadium_commit"],
+                "chromium_commit": manifest["chromium_commit"],
                 "phase": phase, "files": hashes}, indent=2) + "\n")
 PY_AUDIT
 }
@@ -169,6 +162,7 @@ elif [[ "$PATCH_MODE" != "strict" ]]; then
 fi
 python3 "$KIT_ROOT/kiwi_port/apply.py" "$PWD" "${PATCH_ARGS[@]}"
 audit_kiwi_sources after
+python3 "$KIT_ROOT/kiwi_port/check_java_syntax.py" "$PWD"
 
 # Install compiler packages only after every source patch has applied cleanly.
 ./build/install-build-deps.sh --no-prompt
@@ -216,8 +210,6 @@ if 'is_debug = false' not in s or 'is_official_build = true' not in s:
 p.write_text(s, encoding="utf-8")
 PY
 
-# Keep this package installable over the currently deployed build in either
-# direction when future Titanium versions are built with the same certificate.
 python3 "$KIT_ROOT/kiwi_port/pin_version_code.py" --args-gn out/Default/args.gn
 gn gen out/Default
 fi

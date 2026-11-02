@@ -114,30 +114,24 @@ index 8f0ff05bb21cd46d009be17a2cedfe736d7d9365..5940d08e10f5381b6daf4294c3f22c6b
  </PreferenceScreen>
 \ No newline at end of file
 diff --git a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java
-index ab08ce4bad1fa998e66aea3e8f57cc9b1a3402c8..c134c815ead614d60500904156f73d3efc4725b6 100644
+index ab08ce4bad1fa998e66aea3e8f57cc9b1a3402c8..8cca87f4e8b83d12cc5e27d50ba1f38988926424 100644
 --- a/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java
 +++ b/chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/settings/ThemeSettingsFragment.java
-@@ -9,13 +9,19 @@ import static org.chromium.chrome.browser.preferences.ChromePreferenceKeys.UI_TH
+@@ -9,6 +9,13 @@ import static org.chromium.chrome.browser.preferences.ChromePreferenceKeys.UI_TH
  import android.content.Context;
  import android.os.Bundle;
  
 +import androidx.preference.ListPreference;
 +import androidx.preference.Preference;
 +
- import org.chromium.base.shared_preferences.SharedPreferencesManager;
 +import org.chromium.base.CommandLine;
 +import org.chromium.base.shared_preferences.SharedPrefsUtils;
++import org.chromium.chrome.browser.lifetime.ApplicationLifetime;
++
+ import org.chromium.base.shared_preferences.SharedPreferencesManager;
  import org.chromium.base.supplier.MonotonicObservableSupplier;
  import org.chromium.base.supplier.ObservableSuppliers;
- import org.chromium.base.supplier.SettableMonotonicObservableSupplier;
- import org.chromium.build.annotations.NullMarked;
- import org.chromium.build.annotations.Nullable;
- import org.chromium.chrome.browser.flags.ChromeFeatureList;
-+import org.chromium.chrome.browser.lifetime.ApplicationLifetime;
- import org.chromium.chrome.browser.night_mode.NightModeUtils;
- import org.chromium.chrome.browser.night_mode.R;
- import org.chromium.chrome.browser.night_mode.ThemeType;
-@@ -33,6 +39,7 @@ import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
+@@ -33,6 +40,7 @@ import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
  public class ThemeSettingsFragment extends ChromeBaseSettingsFragment
          implements CustomDividerFragment {
      static final String PREF_UI_THEME_PREF = "ui_theme_pref";
@@ -145,11 +139,10 @@ index ab08ce4bad1fa998e66aea3e8f57cc9b1a3402c8..c134c815ead614d60500904156f73d3e
      private static final String PREF_UI_THEME_PREF_LIGHT = "ui_theme_pref_light";
      private static final String PREF_UI_THEME_PREF_DARK = "ui_theme_pref_dark";
  
-@@ -71,6 +78,40 @@ public class ThemeSettingsFragment extends ChromeBaseSettingsFragment
+@@ -71,6 +79,39 @@ public class ThemeSettingsFragment extends ChromeBaseSettingsFragment
                      return true;
                  });
  
-+
 +        ListPreference nightModePreset = findPreference(PREF_KIWI_NIGHT_MODE_PRESET);
 +        assert nightModePreset != null;
 +        nightModePreset.setPersistent(false);

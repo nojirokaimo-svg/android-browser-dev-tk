@@ -37,13 +37,13 @@ index 774fe010ad73acd858a3bb4902ddd55d703fea71..bd269cc923e0598feb9cd4c9c7f06e06
  /** Fragment to manage appearance settings. */
  @NullMarked
  public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
-@@ -72,8 +77,107 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -72,6 +77,105 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
          initBookmarkBarPref();
          initToolbarShortcutPref();
          initTabPositionPref();
 +        initDarkSurfaceColorPref();
-     }
- 
++    }
++
 +    private void initDarkSurfaceColorPref() {
 +        Preference preference = findPreference("kiwi_dark_surface_color");
 +        assert preference != null;
@@ -140,11 +140,9 @@ index 774fe010ad73acd858a3bb4902ddd55d703fea71..bd269cc923e0598feb9cd4c9c7f06e06
 +                                            dialog.dismiss();
 +                                        }));
 +        dialog.show();
-+    }
-+
+     }
+ 
      @Override
-     @SuppressWarnings("UseSharedPreferencesManagerFromChromeCheck")
-     public void onDestroy() {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
 index 9ef13d839dfad4bac55f7cf9b5560dab83969af5..f30161aff3365a808753c303cd175f97e32c5ae0 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java

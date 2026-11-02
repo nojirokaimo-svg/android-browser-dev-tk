@@ -1,0 +1,187 @@
+{
+  "source": "/workspace/scratch/270ca992e838/rebase155_strict_final",
+  "features": [
+    {
+      "id": "resources",
+      "name": "Kiwi menu resources and localized labels",
+      "patch": "010-resources.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "app-menu-actions",
+      "name": "Extension rows and basic Night mode menu actions",
+      "patch": "020-app-menu-actions.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "menu-presentation",
+      "name": "Compact Kiwi menu presentation with matched main and flyout dark surfaces",
+      "patch": "030-menu-presentation.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "preference-registry",
+      "name": "Titanium preference registry and startup crash fix",
+      "patch": "040-preference-registry.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "night-mode-presets",
+      "name": "Six Kiwi Night mode presets on the Chromium renderer path",
+      "patch": "050-night-mode-presets.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "runtime-night-mode",
+      "name": "Make Kiwi global Night mode activate web darkening immediately",
+      "patch": "060-runtime-fixes.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "renderer-force-dark-runtime",
+      "name": "Drive renderer force-dark state and keep chrome-extension/kiwi-extension pages on the browser dark theme",
+      "patch": "070-force-dark-runtime.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "extension-mobile-ui",
+      "name": "Native responsive extension manager layout with dark colors",
+      "patch": "080-extension-mobile-ui.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "black-statusbar-full-backup",
+      "name": "Pure-black dark system bar across controller and edge-to-edge paths, live/composited toolbar, omnibox, and manual full browser-state backup",
+      "patch": "090-black-statusbar-full-backup.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "kiwi-tab-switcher",
+      "name": "Kiwi-style selectable tab switcher modes with unchanged default",
+      "patch": "100-kiwi-tab-switcher.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "amoled-surfaces",
+      "name": "Pure-black AMOLED new tab, omnibox, and Kiwi-matched tab switcher surfaces",
+      "patch": "110-amoled-surfaces.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "kiwi-migration-extension-import",
+      "name": "Native Kiwi migration plus chrome://extensions ZIP/CRX installation",
+      "patch": "120-kiwi-migration-extension-import.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "credentials-security",
+      "name": "Restore local password saving and migrate existing Android profiles once",
+      "patch": "130-credentials-security.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "kiwi-settings-dark",
+      "name": "Kiwi-like near-black Android settings surfaces in dark mode",
+      "patch": "150-kiwi-settings-dark.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "extension-popup-menu-fixes",
+      "name": "Keep extension action popups dark and Night mode toggle visible with submenu app menu",
+      "patch": "160-extension-popup-menu-fixes.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "web-contents-theme-target",
+      "name": "Backport standalone Android WebContents theme target for extension popups",
+      "patch": "165-web-contents-theme-target.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "context-menu-shape",
+      "name": "Slightly wider Chrome-like web context-menu width and Kiwi dark surface",
+      "patch": "170-context-menu-shape.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "kiwi-omnibox-history",
+      "name": "Kiwi top omnibox, hidden history info card, and lighter tappable focused-page scrim",
+      "patch": "180-kiwi-omnibox-history.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "portable-full-backup",
+      "name": "Passphrase-encrypted portable cookie/password migration backup",
+      "patch": "185-portable-full-backup.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "disable-single-tab-resumption",
+      "name": "Keep restored tabs visible by disabling the single-tab resume card",
+      "patch": "190-disable-single-tab-resumption.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "preserve-active-tab",
+      "name": "Keep the selected tab in front after a long background pause",
+      "patch": "195-preserve-active-tab.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "new-tab-clipboard-only",
+      "name": "Show a real clipboard row on new tabs with Android UI fallback and live tap routing",
+      "patch": "200-new-tab-clipboard-only.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "tab-search-setting",
+      "name": "Hide Hub tab search by default and expose an opt-in setting",
+      "patch": "205-tab-search-preference.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "dark-ui-surface-color",
+      "name": "Configurable dark settings, history, menus, flyouts and browser surface palette",
+      "patch": "210-configurable-dark-surfaces.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "independent-dark-ui-colors",
+      "name": "Separate dark page, card and menu colors",
+      "patch": "215-separate-dark-colors.patch",
+      "status": "already-applied",
+      "conflicts": []
+    },
+    {
+      "id": "extension-zip-crx-install",
+      "name": "Normalize and locally sign selected ZIP extensions; report completed install results",
+      "patch": "230-extension-zip-crx-install.patch",
+      "status": "already-applied",
+      "conflicts": []
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "base": "post-Titanium c21bc5ac921fd9da96c108b40afff202f6e8b0ba",
+  "base": "post-Titanium 5e9070a98b48f6b6cb239bf90b8718b91795b7c5; Kiwi feature source baseline acdde2860b6a4ee2f777920fbabaafa571cf909c",
   "features": [
     {
       "id": "resources",
@@ -11,7 +11,7 @@
         "chrome/android/java/res/values/kiwi_ui.xml",
         "chrome/android/java/res/values-ja/kiwi_ui.xml"
       ],
-      "sha256": "0540c9f4271dc24a8c4c1a9dc08abc9bbe80c24f42ba662edec84c846292123d"
+      "sha256": "dbba127f929c5b1198bf1e7821c51000188e40a67d94643ed131b7786507932f"
     },
     {
       "id": "app-menu-actions",
@@ -65,7 +65,7 @@
         "third_party/blink/renderer/platform/graphics/dark_mode_settings_builder.h",
         "third_party/blink/renderer/platform/graphics/dark_mode_filter_test.cc"
       ],
-      "sha256": "d2e9e7e1661efa2877cdae68461e141fca3be5188ccd4d49ea031b3720402cdc"
+      "sha256": "826a2b9061619aa3b801725f5b7c3dce06bc4b87a227a32bef6786580ec98a5b"
     },
     {
       "id": "runtime-night-mode",
@@ -208,7 +208,7 @@
       "files": [
         "chrome/browser/android/BUILD.gn"
       ],
-      "sha256": "d4af64190f090a41fc33c7159fe28d58419cbbd31c66c67024ee9ecf76d76bcb"
+      "sha256": "e75070d5c2261a4b7f126d826465fd212de8c3b197ed1da00430dba8537d46bd"
     },
     {
       "id": "context-menu-shape",
@@ -280,7 +280,7 @@
         "chrome/browser/ui/android/omnibox/java/res/values/kiwi_clipboard.xml",
         "chrome/browser/ui/android/omnibox/java/res/values-ja/kiwi_clipboard.xml"
       ],
-      "sha256": "4f5cf79118ca67a72936ed5f96c635a17796efa31a8b32fc93c3993de120627a"
+      "sha256": "31c53395db7f9ab9e8863eff3dd6d68394a4360d5c2f62a8bfd329f6dc061f29"
     },
     {
       "id": "tab-search-setting",
@@ -307,7 +307,7 @@
         "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
         "components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java"
       ],
-      "sha256": "8c5e5618f0c5308912b5237b6037429777e125c6277ed4e56433d26c339c6705"
+      "sha256": "48bc87727c2674a1a5e2a3cebbfc503c96461bb3bbc7ffec3a81c31ad9e77a48"
     },
     {
       "id": "independent-dark-ui-colors",

@@ -1,0 +1,147 @@
+{
+  "original_feature_revision": "acdde2860b6a4ee2f777920fbabaafa571cf909c",
+  "original_version": "155.0.8059.84",
+  "target_version": "156.0.8078.79",
+  "target_upstream": {
+    "titanium_commit": "5e9070a98b48f6b6cb239bf90b8718b91795b7c5",
+    "chromium_commit": "a21ce95c24ce3964416f09ae1862f53f319eb4d0",
+    "vanadium_commit": "0202b7badff99434822ba5e32e0d738792868455"
+  },
+  "features": [
+    {
+      "id": "resources",
+      "original_sha256": "dbba127f929c5b1198bf1e7821c51000188e40a67d94643ed131b7786507932f",
+      "rebased_sha256": "dbba127f929c5b1198bf1e7821c51000188e40a67d94643ed131b7786507932f"
+    },
+    {
+      "id": "app-menu-actions",
+      "original_sha256": "2aecb692dcecac241f465692ba0cc84f14eb1f2e2690d7deaf4e242e0b65b7c2",
+      "rebased_sha256": "88012850e452db23f0ba1d20de6a8717ae17223812474f8f318a44dfaf36e77b"
+    },
+    {
+      "id": "menu-presentation",
+      "original_sha256": "a92edf82ab19159d8771c024838fd4ff9d43820aab73065a07712a51726aec28",
+      "rebased_sha256": "58007e65b6026c87df24182723079c2936c78d89162bf64f53f68476f3f5ff70"
+    },
+    {
+      "id": "preference-registry",
+      "original_sha256": "84545717d8b15bbe3c238a4fa90d34133828418b8b65615e0d3ccf8c55772b22",
+      "rebased_sha256": "84545717d8b15bbe3c238a4fa90d34133828418b8b65615e0d3ccf8c55772b22"
+    },
+    {
+      "id": "night-mode-presets",
+      "original_sha256": "efe961f93307bc44bfbc83a101335191d262c395a91d5135da27445223dd9db7",
+      "rebased_sha256": "826a2b9061619aa3b801725f5b7c3dce06bc4b87a227a32bef6786580ec98a5b"
+    },
+    {
+      "id": "runtime-night-mode",
+      "original_sha256": "82b251613e68804ae1a520e6f06879fe3295ef821347ee11d47ae0fdf979e230",
+      "rebased_sha256": "82b251613e68804ae1a520e6f06879fe3295ef821347ee11d47ae0fdf979e230"
+    },
+    {
+      "id": "renderer-force-dark-runtime",
+      "original_sha256": "42df501c08df6c7e4751e55e65609af7400239fa60becf343b49239c3267e27d",
+      "rebased_sha256": "42df501c08df6c7e4751e55e65609af7400239fa60becf343b49239c3267e27d"
+    },
+    {
+      "id": "extension-mobile-ui",
+      "original_sha256": "a3753a9dcf4affe940f23f28c66f65545cc3fe4726ff9000f7700438d52b6f5e",
+      "rebased_sha256": "a3753a9dcf4affe940f23f28c66f65545cc3fe4726ff9000f7700438d52b6f5e"
+    },
+    {
+      "id": "black-statusbar-full-backup",
+      "original_sha256": "d610e0b21235bb6c7edbea2c2abd55a7c92661ef93f2e3e19107483b28bf902c",
+      "rebased_sha256": "86013f9277fcec85862e62f492b28bd75d089437fd955f049b1c91a6bf413674"
+    },
+    {
+      "id": "kiwi-tab-switcher",
+      "original_sha256": "32858616a88bc15a1ae6dbf2e7bec5fbe729cccd3efb23d1156fd5c6151b2f6f",
+      "rebased_sha256": "248e67e74d1be810404dc8a624c8b2aeef8bf53a9b57dd6fe50c33bec9f3500e"
+    },
+    {
+      "id": "amoled-surfaces",
+      "original_sha256": "44df74790fb57f5025e77567d9b207e875ba8242a3a057c12aa55c0f6e97e955",
+      "rebased_sha256": "a1748f0d03d48d2339d69e996309ec575964fe13d57392f03cfd5325f0f2c924"
+    },
+    {
+      "id": "kiwi-migration-extension-import",
+      "original_sha256": "76c1ec1f28f81bebf9806157d29000f125c8987b84e1377e00604348c7e0464b",
+      "rebased_sha256": "a69f2cea61efaa86e4d9c3d288d5e4c4df290ca3279568d874bd8d7bdb821237"
+    },
+    {
+      "id": "credentials-security",
+      "original_sha256": "38115405905dadc1a1cc8a7e6f6fb754a5347b5faab599a751c5bb82d68f880c",
+      "rebased_sha256": "5dee573fc57bbd3e3b777d6049d3bdc5036f82920797cb2808497f0af0eb49de"
+    },
+    {
+      "id": "kiwi-settings-dark",
+      "original_sha256": "16ec13c1c5e45682fd4abd7d7f583bc4446988314daebdc05e61850920626be2",
+      "rebased_sha256": "e3d9d46edd9745e38876749efb648b07191aeca68b62b9785d7dffa01fb8bd8b"
+    },
+    {
+      "id": "extension-popup-menu-fixes",
+      "original_sha256": "4a45034d393f232b37139e4b983e181a3a27a43bbbeb60be4575f3db1f189b8e",
+      "rebased_sha256": "41f8438a64309cd67e53006188dd9b56b3d449c3b7d9d18e795b6c53d6ea0094"
+    },
+    {
+      "id": "web-contents-theme-target",
+      "original_sha256": "492eee02971525225814ace0372683cd9eae51ce2a22da437e918ded689ae368",
+      "rebased_sha256": "e75070d5c2261a4b7f126d826465fd212de8c3b197ed1da00430dba8537d46bd"
+    },
+    {
+      "id": "context-menu-shape",
+      "original_sha256": "21bae2839c3548ec184380128cbf1c23adac521575763327698fe16431ed6559",
+      "rebased_sha256": "21bae2839c3548ec184380128cbf1c23adac521575763327698fe16431ed6559"
+    },
+    {
+      "id": "kiwi-omnibox-history",
+      "original_sha256": "79f0218b358bed7d9393373a52b27c9f462af2a3dd8112063b92ad9a44f10e1d",
+      "rebased_sha256": "a7ed752b2ace1dde21cc9d0c03f415ac3486b32a330c61df63eae1810a78665f"
+    },
+    {
+      "id": "portable-full-backup",
+      "original_sha256": "0742e013b5dadb132de26a2cb1b23e43b9ff756e60b0a636841a30238a587d51",
+      "rebased_sha256": "0742e013b5dadb132de26a2cb1b23e43b9ff756e60b0a636841a30238a587d51"
+    },
+    {
+      "id": "disable-single-tab-resumption",
+      "original_sha256": "4572613a8b6100b64158c9bc3f2da6adc73fbb90b764b617dc1c2368b0166be0",
+      "rebased_sha256": "4572613a8b6100b64158c9bc3f2da6adc73fbb90b764b617dc1c2368b0166be0"
+    },
+    {
+      "id": "preserve-active-tab",
+      "original_sha256": "e38645383988fb50b10bd57d1d7285797c395c8ed15df56399af5133864dfe8d",
+      "rebased_sha256": "ed3c8e9497141a5d16631e25b963ceb98314b1eed6575a4d2e1c1a05ea257ce9"
+    },
+    {
+      "id": "new-tab-clipboard-only",
+      "original_sha256": "56f5bf155a91231bfdd1fc6009d69f3bc617f276dac01db49a8a40b91cef5b63",
+      "rebased_sha256": "31c53395db7f9ab9e8863eff3dd6d68394a4360d5c2f62a8bfd329f6dc061f29"
+    },
+    {
+      "id": "tab-search-setting",
+      "original_sha256": "7824951d046a876a76a1062005edfdad22cba86505c4f3837ddbe57179064e4f",
+      "rebased_sha256": "89d6bd51a8fbc1fcf61fe54b78f1d0a5d308f71122f512198d61a370a4234a88"
+    },
+    {
+      "id": "dark-ui-surface-color",
+      "original_sha256": "20bb8f0cc19a5aa2d7904fc39f4ca82990c712c51e3ddb6531c7f5803d5d05bf",
+      "rebased_sha256": "48bc87727c2674a1a5e2a3cebbfc503c96461bb3bbc7ffec3a81c31ad9e77a48"
+    },
+    {
+      "id": "independent-dark-ui-colors",
+      "original_sha256": "36fd19007b513f43a07160e56a6324397157a8d1f724df85fa44bf54c5a4e79f",
+      "rebased_sha256": "a96f0bb5e4a66bc255e94b848201a657b6c3d182e0d0027b5f1366a2ca364933"
+    }
+  ],
+  "zip_import_repair": "230-extension-zip-crx-install.patch",
+  "strict_replay_files": 100,
+  "strict_replay_passed": true,
+  "second_apply_idempotent": true,
+  "jdk25_parse_java_sources": 55,
+  "unittest_total": 60,
+  "unittest_skipped": 1,
+  "device_export_verified": false,
+  "physical_device_install_verified": false,
+  "android36_emulator_installed73_and_updated79": true
+}

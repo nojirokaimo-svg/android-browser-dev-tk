@@ -21,7 +21,7 @@ for attempt in range(80):
             if 'webSocketDebuggerUrl' not in version: continue
             connected=True
             break
-        except (OSError, ValueError, Exception):
+        except Exception:
             continue
     if connected: break
     time.sleep(1)
@@ -36,7 +36,7 @@ for attempt in range(20):
 browser = websocket.create_connection(get('/json/version')['webSocketDebuggerUrl'], timeout=20)
 browser.send(json.dumps({'id':1,'method':'Browser.setDownloadBehavior','params':{'behavior':'default','eventsEnabled':True}}))
 (out/'download-behavior.json').write_text(browser.recv())
-probe = next((t for t in targets if t['url'].startswith('chrome-extension://')), None)
+probe = next((t for t in targets if t['url'].endswith('/probe.html')), None)
 if probe is None:
     # The extension may have loaded without a page; collect browser internals for diagnosis.
     target = next(t for t in targets if t['type']=='page')
@@ -75,3 +75,26 @@ for button in ('anchor','async','api'):
     (out/f'downloads-after-{button}.txt').write_text(adb('shell','ls','-la','/sdcard/Download'))
     call('Runtime.evaluate',{'expression':"document.querySelector('#log').innerText",'returnByValue':True})
 (out/'probe-cdp.json').write_text(json.dumps(messages,indent=2))
+extensions = call('Runtime.evaluate',{'expression':'new Promise(resolve=>chrome.management.getAll(resolve))','awaitPromise':True,'returnByValue':True})['result']['value']
+(out/'installed-extensions.json').write_text(json.dumps(extensions,indent=2))
+for ext in extensions:
+    if 'Violentmonkey' not in ext['name']: continue
+    call('Page.navigate',{'url':f"chrome-extension://{ext['id']}/options/index.html#settings"})
+    time.sleep(3)
+    call('Runtime.evaluate',{'expression':"addEventListener('unhandledrejection', e=>console.error('EXPORT_REJECTION',String(e.reason))); addEventListener('error',e=>console.error('EXPORT_ERROR',e.message))"})
+    code = '// ==UserScript==\n// @name ZIP export diagnostic\n// @namespace diagnostic-only\n// @version 1.0\n// @match https://example.invalid/*\n// @grant none\n// ==/UserScript==\nconsole.log("diagnostic");'
+    expression = 'chrome.runtime.sendMessage(' + json.dumps({'cmd':'ParseScript','data':{'code':code,'isNew':True}}) + ')'
+    call('Runtime.evaluate',{'expression':expression,'awaitPromise':True,'returnByValue':True})
+    call('Page.reload',{})
+    time.sleep(3)
+    call('Runtime.evaluate',{'expression':"addEventListener('unhandledrejection', e=>console.error('EXPORT_REJECTION',String(e.reason))); addEventListener('error',e=>console.error('EXPORT_ERROR',e.message)); document.body.innerText",'returnByValue':True})
+    button = call('Runtime.evaluate',{'expression':"JSON.stringify((()=>{const b=[...document.querySelectorAll('button')].find(b=>/export.*zip/i.test(b.innerText));if(!b)return null;b.scrollIntoView();let r=b.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2,text:b.innerText}})())",'returnByValue':True})['result']['value']
+    if button != 'null':
+        xy=json.loads(button); xy.pop('text',None)
+        call('Input.dispatchMouseEvent',{'type':'mousePressed','button':'left','clickCount':1,**xy})
+        call('Input.dispatchMouseEvent',{'type':'mouseReleased','button':'left','clickCount':1,**xy})
+        time.sleep(5)
+    (out/f"downloads-after-{ext['id']}.txt").write_text(adb('shell','ls','-la','/sdcard/Download'))
+    (out/f"vm-{ext['id']}-cdp.json").write_text(json.dumps(messages,indent=2))
+adb('pull','/sdcard/Download',str(out/'downloaded-zips'))
+

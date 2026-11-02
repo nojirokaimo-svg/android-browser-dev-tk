@@ -1,4 +1,6 @@
 import json
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -61,18 +63,36 @@ class NightModePatchTest(unittest.TestCase):
         self.assertIn("ColorUtils.inNightMode(ContextUtils.getApplicationContext())", patch)
 
     def test_extension_theme_client_has_leaf_gn_target(self):
+        # M156 already provides the M155 leaf target. Do not define it twice.
         patch = (ROOT / "patches/165-web-contents-theme-target.patch").read_text()
-        self.assertIn('source_set("web_contents_theme_client")', patch)
-        manifest = json.loads((ROOT / "manifest.json").read_text())
-        if manifest["chromium_version"].startswith("156."):
-            # Chromium M156 already includes the GN leaf target. The isolated
-            # source rebase verifies the existing source/public/deps instead.
-            self.assertIn("Kiwi extension popup: reuse the upstream-provided", patch)
-            self.assertIn('source_set("web_contents_theme_client")', patch)
-        else:
-            self.assertIn('public = [ "web_contents_theme_client.h" ]', patch)
-            self.assertIn('":web_contents_theme_client"', patch)
-            self.assertNotIn('"web_contents_theme_client.cc",\\n      "web_contents_theme_client.h"', patch)
+        upstream = """
+  # A leaf target so that it can be used by targets that ":android" itself
+  # depends on (see //chrome/browser/android/thin_webview:initializer).
+  source_set("web_contents_theme_client") {
+    sources = [ "web_contents_theme_client.cc" ]
+    public = [ "web_contents_theme_client.h" ]
+    public_deps = [ "//content/public/browser" ]
+    deps = [
+      "//base",
+      "//chrome/browser/ui/android/night_mode:jni_headers",
+    ]
+  }
+  source_set("android") {
+    deps = [ ":web_contents_theme_client" ]
+  }
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'chrome/browser/android/BUILD.gn'
+            path.parent.mkdir(parents=True)
+            path.write_text(upstream)
+            result = subprocess.run(
+                ['git', 'apply', '--whitespace=nowarn', '-'], input=patch,
+                cwd=directory, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            applied = path.read_text()
+            self.assertEqual(applied.count('source_set("web_contents_theme_client")'), 1)
+            self.assertIn('public = [ "web_contents_theme_client.h" ]', applied)
+            self.assertIn('":web_contents_theme_client"', applied)
 
     def test_context_menu_matches_chrome_width_and_kiwi_dark_surface(self):
         patch = (ROOT / "patches/170-context-menu-shape.patch").read_text()

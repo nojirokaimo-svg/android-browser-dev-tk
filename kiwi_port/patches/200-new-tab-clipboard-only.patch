@@ -446,7 +446,7 @@ index e978d4b3f1aec72be1c8604a152628f080b4ffec..f718cafb1a3421821e14a4a966e3c053
    // run the typed search provider. Else, will use the IsLensSearchbox check
    // below.
 diff --git a/components/omnibox/browser/clipboard_provider.cc b/components/omnibox/browser/clipboard_provider.cc
-index be3428152f2d977261139fa87d943c8adbdda016..4c965b98552fe8c1300a4913b663cf30ea5bd78d 100644
+index be3428152f2d977261139fa87d943c8adbdda016..bf95823b59f8eb65ac69214b488d83a6cd69b2fa 100644
 --- a/components/omnibox/browser/clipboard_provider.cc
 +++ b/components/omnibox/browser/clipboard_provider.cc
 @@ -10,6 +10,7 @@
@@ -555,15 +555,16 @@ index be3428152f2d977261139fa87d943c8adbdda016..4c965b98552fe8c1300a4913b663cf30
    std::set<ClipboardContentType> desired_types;
    desired_types.insert(ClipboardContentType::URL);
  
-@@ -402,6 +450,29 @@ void ClipboardProvider::UpdateClipboardMatchWithContent(
+@@ -402,6 +450,30 @@ void ClipboardProvider::UpdateClipboardMatchWithContent(
      base::WeakPtr<AutocompleteMatch> match,
      ClipboardMatchCallback callback) {
    DCHECK(match);
 +#if BUILDFLAG(IS_ANDROID)
-+  if (ntp_clipboard_mode_ &&
-+      match->type == omnibox::AutocompleteMatchType::kClipboardUrl) {
-+    // Use the current clipboard item at selection time to support both links
-+    // and text without displaying clipboard contents in the NTP suggestion.
++  if (ntp_clipboard_mode_ && match->type == omnibox::AutocompleteMatchType::kClipboardUrl) {
++    // The placeholder stands for either a link or text. Reading the current
++    // value at selection time also respects changes to the clipboard while
++    // the omnibox is open. UpdateClipboardTextContent handles both URLs and
++    // search terms without trusting Android's asynchronous URL classifier.
 +    ui::DataTransferEndpoint data_dst(
 +        ui::EndpointType::kDefault, {.notify_if_restricted = false});
 +    ui::Clipboard::GetForCurrentThread()->ReadText(
@@ -610,27 +611,26 @@ index f174e87c6df5d010bbf7cf849c44a54531b464bc..59fc6da09c1a1f30f5f89ef2d04d535b
    // Used for recording metrics.
    GURL current_url_suggested_;
 diff --git a/components/omnibox/browser/clipboard_provider_unittest.cc b/components/omnibox/browser/clipboard_provider_unittest.cc
-index 7db4ea07dade01f2d80ecd2c919797b2f1899457..abfe252472aa8bc2ec7e8038ef6bf6f6e0ec52e0 100644
+index 7db4ea07dade01f2d80ecd2c919797b2f1899457..df36352ad90a21b9f2f645424da2a6bd0f1d18cf 100644
 --- a/components/omnibox/browser/clipboard_provider_unittest.cc
 +++ b/components/omnibox/browser/clipboard_provider_unittest.cc
-@@ -406,25 +406,50 @@ TEST_F(ClipboardProviderTest, CreateImageMatchWithContent) {
+@@ -406,8 +406,12 @@ TEST_F(ClipboardProviderTest, CreateImageMatchWithContent) {
  }
  
  #if BUILDFLAG(IS_ANDROID)
 -TEST_F(ClipboardProviderTest, Android_MergedWithPZPSGroupOnNTP) {
 -  SetClipboardText(kClipboardText);
 +TEST_F(ClipboardProviderTest, Android_NTPClipboardLinkWithUnknownTimestamp) {
-+  // Verify NTP obtains a real link even when Android has not reported age.
++  // Reproduces a cold-start clipboard: Android has the item but has not yet
++  // delivered its last-modified timestamp to the native clipboard.
 +  auto* system_clipboard = ui::TestClipboard::CreateForCurrentThread();
 +  system_clipboard->WriteText(kClipboardURL);
 +  system_clipboard->SetLastModifiedTime(base::Time());
    client_->set_template_url_service(
        search_engines_test_environment_.template_url_service());
  
-   AutocompleteInput input(std::u16string(), metrics::OmniboxEventProto::NTP,
-                           classifier_);
-   input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
--
+@@ -417,14 +421,37 @@ TEST_F(ClipboardProviderTest, Android_MergedWithPZPSGroupOnNTP) {
+ 
    provider_->Start(input, false);
  
 -  // Expect the clipboard entry, but not the content. Content is not directly
