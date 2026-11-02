@@ -5,7 +5,7 @@ on:
     branches: [codex/kiwi-ui-port]
     paths:
       - .github/workflows/kiwi-apk-install-diagnostic.yml
-      - diagnostics/install_apks.sh
+      - diagnostics/**
 permissions:
   contents: read
   actions: read
@@ -32,13 +32,16 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+      - run: pip install websocket-client
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 36
           target: google_apis
           arch: x86_64
           disable-animations: true
-          script: bash diagnostics/install_apks.sh
+          script: |
+            bash diagnostics/install_apks.sh
+            bash diagnostics/runtime_export.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
