@@ -5,18 +5,28 @@ import websocket
 out = pathlib.Path('diagnostics-output')
 def adb(*args):
     return subprocess.check_output(['adb', *args], text=True)
-for attempt in range(40):
+def get(path):
+    return json.load(urllib.request.urlopen('http://127.0.0.1:9222' + path, timeout=3))
+for attempt in range(80):
     sockets = adb('shell', 'cat', '/proc/net/unix')
+    (out/'devtools-sockets.txt').write_text(sockets)
     matches = [line.split('@')[-1] for line in sockets.splitlines()
-               if '@' in line and 'devtools_remote' in line]
-    if matches:
-        adb('forward', 'tcp:9222', 'localabstract:' + matches[0])
-        break
+               if '@' in line and 'chrome_devtools_remote' in line and 'stetho' not in line]
+    endpoints = ['localabstract:' + name for name in matches] + ['tcp:9222']
+    connected = False
+    for endpoint in endpoints:
+        adb('forward', 'tcp:9222', endpoint)
+        try:
+            version=get('/json/version')
+            if 'webSocketDebuggerUrl' not in version: continue
+            connected=True
+            break
+        except (OSError, ValueError, Exception):
+            continue
+    if connected: break
     time.sleep(1)
 else:
-    raise RuntimeError('No browser DevTools socket after launch')
-def get(path):
-    return json.load(urllib.request.urlopen('http://127.0.0.1:9222' + path, timeout=10))
+    raise RuntimeError('No responding Chrome DevTools endpoint after launch')
 for attempt in range(20):
     targets = get('/json')
     if any(t['url'].endswith('/probe.html') for t in targets): break
