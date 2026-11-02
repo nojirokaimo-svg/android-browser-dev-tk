@@ -30,7 +30,7 @@ jobs:
         with:
           # Reuse the completed M156.79 checkpoint exactly. Keep Ninja history and
           # object/generated files; a cache miss stops the build.
-          restore-key: kiwi-incremental-15679-f8d7795eb78e810a0ad1f60a83715a441479928e-41200960780-1-continue-1
+          restore-key: kiwi-incremental-15679-5e5383a3e97080ca45686f1b479091abe44903b2-41372171273-1-build
           require-restore: "true"
           # Source identity is unchanged; the 25 feature patches are rebuilt from M155.
           bootstrap-revision: ""
