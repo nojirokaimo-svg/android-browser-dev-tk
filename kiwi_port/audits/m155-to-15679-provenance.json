@@ -139,9 +139,11 @@
   "strict_replay_passed": true,
   "second_apply_idempotent": true,
   "jdk25_parse_java_sources": 55,
-  "unittest_total": 60,
-  "unittest_skipped": 1,
+  "unittest_total": 65,
+  "unittest_skipped": 0,
   "device_export_verified": false,
   "physical_device_install_verified": false,
-  "android36_emulator_installed73_and_updated79": true
+  "android36_emulator_installed73_and_updated79": true,
+  "ninja_test_version": "1.13.2",
+  "original_m155_suite_total": 60
 }

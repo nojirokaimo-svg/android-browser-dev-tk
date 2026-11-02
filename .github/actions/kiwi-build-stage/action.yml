@@ -35,16 +35,16 @@ inputs:
     default: "false"
   titanium-commit:
     required: false
-    default: "e59e03dc83bc940d73cf29a7683286fca390b393"
+    default: "5e9070a98b48f6b6cb239bf90b8718b91795b7c5"
   vanadium-commit:
     required: false
-    default: "20526e052e304b62cf3e80114b423934e2d1c540"
+    default: "0202b7badff99434822ba5e32e0d738792868455"
   chromium-commit:
     required: false
-    default: "5869fe313571d75152b77813cf0a4ee26a4e6df0"
+    default: "a21ce95c24ce3964416f09ae1862f53f319eb4d0"
   chromium-version:
     required: false
-    default: "155.0.8059.84"
+    default: "156.0.8078.79"
   patch-mode:
     description: strict for pinned builds; best-effort for a newly resolved upstream.
     required: false
@@ -77,11 +77,9 @@ runs:
           kiwi_port.test_checkpoint_compat \
           kiwi_port.test_night_mode_patch \
           kiwi_port.test_credentials_patch \
-          kiwi_port.test_extension_zip_install \
           kiwi_port.test_checkpoint_restore \
           kiwi_port.test_job_budget \
-          kiwi_port.test_m156_java_cycle_fix \
-          kiwi_port.test_m156_java_checkpoint_compat \
+          kiwi_port.test_extension_zip_install \
           kiwi_port.test_pin_version_code
 
     - name: Enforce checkpoint-only resume
@@ -159,7 +157,7 @@ runs:
         VANADIUM_COMMIT: ${{ inputs.vanadium-commit }}
         CHROMIUM_COMMIT: ${{ inputs.chromium-commit }}
         CHROMIUM_VERSION: ${{ inputs.chromium-version }}
-      run: bash ./build_kiwi_ui_arm64.sh
+      run: ./build_kiwi_ui_arm64.sh
 
     - name: Preserve the prepared UI source for exact manifest verification
       if: always() && hashFiles('output/kiwi-sources-before.tar.gz') != ''
@@ -235,48 +233,11 @@ runs:
           --identity '${{ inputs.titanium-commit }}:${{ inputs.vanadium-commit }}:${{ inputs.chromium-commit }}:validation' \
           "${bootstrap_args[@]}" \
           "${transition_args[@]}"
-        # Modify only the version-code argument in the restored copy. This
-        # leaves the immutable source cache and all Ninja histories intact.
-        version_pin_status="$(python3 kiwi_port/pin_version_code.py --args-gn \
-          work/titanium/chromium/src/out/Default/args.gn)"
+        version_pin_status="$(python3 kiwi_port/pin_version_code.py --args-gn work/titanium/chromium/src/out/Default/args.gn)"
         [[ "$version_pin_status" == changed || "$version_pin_status" == unchanged ]]
-        echo "Version-code override: $version_pin_status"
-        # M156 targeted GN dependency correction requires regenerating this
-        # stage's Ninja build graph even when reusing an M156 partial checkpoint.
-        # This is gn gen, NEVER gn clean; objects and Ninja histories are preserved.
-        if [[ -n '${{ inputs.transition-from-identity }}' || '${{ inputs.chromium-version }}' == '156.0.8078.47' || "$version_pin_status" == changed ]]; then
+        if [[ -n '${{ inputs.transition-from-identity }}' || "$version_pin_status" == changed ]]; then
           export PATH="$GITHUB_WORKSPACE/work/depot_tools:$PATH"
-          if [[ '${{ inputs.chromium-version }}' == '156.0.8078.47' ]]; then
-            test -s output/m156-java-cycle-fix.json
-            python3 - <<'PY_VERIFY'
-        import json
-        from pathlib import Path
-        p=json.loads(Path('output/m156-java-cycle-fix.json').read_text())
-        assert p['version']=='156.0.8078.47'
-        assert ((p['status']=='fixed' and p['before_sha256'] != p['after_sha256'])
-                or (p['status']=='already-correct' and p['before_sha256'] == p['after_sha256']))
-        PY_VERIFY
-          fi
           (cd work/titanium/chromium/src && gn gen out/Default)
-          if [[ '${{ inputs.chromium-version }}' == '156.0.8078.47' ]]; then
-            # Materialize GN's own build.ninja regeneration before checking
-            # Java depfiles; Ninja -n alone may only print regeneration.
-            /usr/bin/ninja -C work/titanium/chromium/src/out/Default build.ninja
-            # GN source edge is correct; the restored checkpoint still contains
-            # five stale generated Java classpath/depfile edges from M155.
-            # Backup each original and remove ONLY the proven obsolete edge.
-            python3 kiwi_port/checkpoint_compat.py \
-              work/titanium/chromium/src/out/Default --m156-build-info
-            /usr/bin/ninja -C work/titanium/chromium/src/out/Default -n chrome_public_apk > output/m156-ninja-graph-check.log 2>&1 || {
-              tail -n 100 output/m156-ninja-graph-check.log >&2
-              exit 1
-            }
-            if grep -q '^\[0/1\] Regenerating ninja files' output/m156-ninja-graph-check.log; then
-              echo 'Ninja -n checked only graph regeneration, not the APK graph; refusing false positive.' >&2
-              exit 1
-            fi
-            echo 'M156 regenerated Ninja graph dry-run passed.'
-          fi
         fi
 
     - name: Continue arm64 APK compilation within the stage budget
@@ -318,7 +279,7 @@ runs:
           --elapsed-seconds "$elapsed" \
           --requested-minutes "$KIWI_BUILD_BUDGET_MINUTES")
         echo "Ninja budget: ${KIWI_BUILD_BUDGET_SECONDS}s; 45 minutes reserved for checkpoint/signing/upload."
-        bash ./build_kiwi_ui_arm64.sh 2>&1 | tee output/build.log
+        ./build_kiwi_ui_arm64.sh 2>&1 | tee output/build.log
 
     - name: Record result and checkpoint size
       id: result

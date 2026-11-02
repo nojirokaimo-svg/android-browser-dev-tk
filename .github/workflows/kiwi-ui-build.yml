@@ -1,4 +1,4 @@
-name: Build Titanium-Kiwi 156.0.8078.79 with ZIP install fix
+name: Rebuild Titanium-Kiwi 156.0.8078.79 from M155 feature sources
 
 on:
   workflow_dispatch:
@@ -28,11 +28,11 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Restore the exact completed M156.79 checkpoint from run 41200960780.
-          # Preserve Ninja history and objects; an exact cache miss stops the build.
+          # Reuse the completed M156.79 checkpoint exactly. Keep Ninja history and
+          # object/generated files; a cache miss stops the build.
           restore-key: kiwi-incremental-15679-f8d7795eb78e810a0ad1f60a83715a441479928e-41200960780-1-continue-1
           require-restore: "true"
-          # The source transition already completed in this checkpoint.
+          # Source identity is unchanged; the 25 feature patches are rebuilt from M155.
           bootstrap-revision: ""
           transition-from-identity: ""
           save-key: kiwi-15679-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
@@ -153,3 +153,80 @@ jobs:
             echo "Build and exact-cache continuations ended without producing an APK." >&2
             exit 1
           fi
+
+  install-verified-apk:
+    needs: require-apk
+    if: always() && needs.require-apk.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 36]
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: Titanium-Kiwi-core-156.0.8078.79-arm64
+          path: artifacts/repair
+      - uses: actions/download-artifact@v4
+        with:
+          name: Titanium-Kiwi-core-156.0.8078.73-arm64
+          run-id: 40938011373
+          github-token: ${{ github.token }}
+          path: artifacts/73
+      - run: bash diagnostics/verify_repair_apk.sh
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: bash diagnostics/install_repair_apk.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: repair-apk-install-api${{ matrix.api }}-${{ github.run_id }}
+          path: verification-output/
+          retention-days: 14
+
+  publish-verified-apk:
+    needs: [require-apk, install-verified-apk]
+    if: always() && needs.require-apk.result == 'success' && needs.install-verified-apk.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: Titanium-Kiwi-core-156.0.8078.79-arm64
+          path: artifacts/repair
+      - name: Publish immutable directly downloadable APK and ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          tag="titanium-kiwi-156.0.8078.79-repair-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cd artifacts/repair
+          apk=Titanium-Kiwi-core-156.0.8078.79-arm64-v8a.apk
+          test -s "$apk"
+          sha256sum "$apk" > SHA256SUMS.txt
+          zip -q Titanium-Kiwi-156.0.8078.79-repair.zip "$apk" SHA256SUMS.txt apk-signature.txt
+          cat > release-notes.md <<'NOTES'
+          M155由来の25機能を156.0.8078.79へ再移植したビルドです。
+          versionCode: 807807374、package: io.github.nojirokaimo.titaniumkiwi。
+          署名v2と既存の証明書を照合し、Android API30/36エミュレーターで73→79→73→79の上書き検査を通過しました。
+          実機での動作は未検証です。APKを直接ダウンロードするか、ZIPを展開して中のAPKをインストールしてください。
+          NOTES
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'Titanium-Kiwi 156.0.8078.79 修正版' --notes-file release-notes.md "$apk" Titanium-Kiwi-156.0.8078.79-repair.zip SHA256SUMS.txt apk-signature.txt
+          echo "APK: https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/${apk}" >> "$GITHUB_STEP_SUMMARY"
