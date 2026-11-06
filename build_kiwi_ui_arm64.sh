@@ -129,7 +129,7 @@ version_lt() {
 }
 source "$TITANIUM_DIR/patch.sh"
 audit_kiwi_sources() {
-  python3 - "$KIT_ROOT" "$PWD" "$1" <<'PY_AUDIT'
+  python3 - "$KIT_ROOT" "$PWD" "$1" "$TITANIUM_COMMIT" "$VANADIUM_COMMIT" "$CHROMIUM_COMMIT" "$VERSION" <<'PY_AUDIT'
 import hashlib, json, sys, tarfile
 from pathlib import Path
 kit, source, phase = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
@@ -146,13 +146,18 @@ with tarfile.open(output / f"kiwi-sources-{phase}.tar.gz", "w:gz") as archive:
         if path.is_file():
             archive.add(path, arcname=relative, recursive=False)
 (output / f"kiwi-source-hashes-{phase}.json").write_text(
-    json.dumps({"titanium_commit": manifest["titanium_commit"],
-                "vanadium_commit": manifest["vanadium_commit"],
-                "chromium_commit": manifest["chromium_commit"],
+    json.dumps({"titanium_commit": sys.argv[4],
+                "vanadium_commit": sys.argv[5],
+                "chromium_commit": sys.argv[6],
+                "chromium_version": sys.argv[7],
                 "phase": phase, "files": hashes}, indent=2) + "\n")
 PY_AUDIT
 }
 audit_kiwi_sources before
+if [[ "${KIWI_MANIFEST_AUDIT_ONLY:-false}" == "true" ]]; then
+  echo "Source audit only: captured pinned post-Titanium sources before Kiwi patches."
+  exit 0
+fi
 PATCH_ARGS=()
 if [[ "$PATCH_MODE" == "best-effort" ]]; then
   PATCH_ARGS+=(--best-effort --report "${KIWI_PATCH_REPORT:-$KIT_ROOT/output/kiwi-patch-report.md}")
