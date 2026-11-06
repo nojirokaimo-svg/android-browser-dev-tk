@@ -1,16 +1,16 @@
 diff --git a/chrome/browser/ui/android/omnibox/BUILD.gn b/chrome/browser/ui/android/omnibox/BUILD.gn
-index 58630d984997b17fbc91bfd3cadc6d59a34da20b..c088491132fcf5553ff388e26626650e66ed7771 100644
+index e3cde2dc7a58b479a1ac4b78e11cdbcf41f82d76..77c2159acef50ee2df79d99ae745a94754ccb7bd 100644
 --- a/chrome/browser/ui/android/omnibox/BUILD.gn
 +++ b/chrome/browser/ui/android/omnibox/BUILD.gn
-@@ -467,6 +467,7 @@ android_resources("java_resources") {
+@@ -471,6 +471,7 @@ android_resources("java_resources") {
      "java/res/layout/suggestions_tile_vertical_divider.xml",
      "java/res/layout/suggestions_tile_view.xml",
      "java/res/layout/url_action_container.xml",
 +    "java/res/values-ja/kiwi_clipboard.xml",
+     "java/res/values-large/dimens.xml",
      "java/res/values-ldrtl/drawables.xml",
      "java/res/values-night/drawables.xml",
-     "java/res/values-sw600dp-w600dp/dimens.xml",
-@@ -475,6 +476,7 @@ android_resources("java_resources") {
+@@ -480,6 +481,7 @@ android_resources("java_resources") {
      "java/res/values/dimens.xml",
      "java/res/values/drawables.xml",
      "java/res/values/ids.xml",
@@ -39,7 +39,7 @@ index 0000000000000000000000000000000000000000..af7886bd35f72338b7af24c45086ee7a
 +    <string name="kiwi_clipboard_link">Link you copied</string>
 +</resources>
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java
-index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b2c1c21cf 100644
+index bf911861566ede38de82184ae38e24d028c4d631..9dbf9eabc94913ac899ef54401b1d81bc2fbdc25 100644
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediator.java
 @@ -9,8 +9,11 @@ import static org.chromium.build.NullUtil.assumeNonNull;
@@ -51,10 +51,10 @@ index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b
  import android.content.Context;
  import android.content.Intent;
 +import android.net.Uri;
+ import android.os.Build;
  import android.os.Handler;
  import android.os.SystemClock;
- import android.text.TextUtils;
-@@ -191,6 +194,7 @@ class AutocompleteMediator
+@@ -192,6 +195,7 @@ class AutocompleteMediator
  
      private @Nullable AutocompleteController mAutocomplete;
      private @Nullable AutocompleteResult mAutocompleteResult;
@@ -62,7 +62,7 @@ index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b
      private @Nullable Runnable mCurrentAutocompleteRequest;
      private @Nullable PropertyModel mDeleteDialogModel;
  
-@@ -439,7 +443,20 @@ class AutocompleteMediator
+@@ -441,7 +445,20 @@ class AutocompleteMediator
      void startZeroSuggest() {
          if (!isInInputSession()) return;
  
@@ -84,7 +84,7 @@ index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b
              // Serve suggestions anticipating higher latency from the server?
              serveCachedZeroSuggest(mAutocompleteInput);
          }
-@@ -447,6 +464,89 @@ class AutocompleteMediator
+@@ -449,6 +466,89 @@ class AutocompleteMediator
          fetchZeroSuggest();
      }
  
@@ -174,7 +174,7 @@ index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b
      /** Save AutocompleteResult to Cache for early serving. */
      private void maybeCacheResult(AutocompleteResult result) {
          if (!isInInputSession()
-@@ -780,6 +880,19 @@ class AutocompleteMediator
+@@ -782,6 +882,19 @@ class AutocompleteMediator
              AutocompleteMatch suggestion, int matchIndex, GURL url, int modifiers) {
          if (!isInInputSession()) return;
  
@@ -194,7 +194,7 @@ index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b
          if (suggestion.getTakeoverAction() != null) {
              onOmniboxActionClicked(suggestion.getTakeoverAction(), matchIndex);
              return;
-@@ -839,6 +952,7 @@ class AutocompleteMediator
+@@ -841,6 +954,7 @@ class AutocompleteMediator
      public void onSuggestionTouchDown(
              AutocompleteMatch suggestion, int matchIndex, long eventTime) {
          if (!isInInputSession()) return;
@@ -202,7 +202,7 @@ index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b
          if (mNumTouchDownEventForwardedInOmniboxSession
                  >= OmniboxFeatures.getMaxPrefetchesPerOmniboxSession()) {
              return;
-@@ -1150,6 +1264,10 @@ class AutocompleteMediator
+@@ -1154,6 +1268,10 @@ class AutocompleteMediator
          if (!isInInputSession()) return;
          if (mShouldPreventOmniboxAutocomplete) return;
  
@@ -213,7 +213,7 @@ index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b
          if (mAutocompleteInput.getAutocompleteState() != AutocompleteState.ENABLED) {
              return;
          }
-@@ -1246,7 +1364,10 @@ class AutocompleteMediator
+@@ -1250,7 +1368,10 @@ class AutocompleteMediator
              mAutocomplete.startPrewarm(webContents);
          }
  
@@ -225,7 +225,7 @@ index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b
      }
  
      /**
-@@ -1997,6 +2118,7 @@ class AutocompleteMediator
+@@ -2005,6 +2126,7 @@ class AutocompleteMediator
  
          mDropdownViewInfoListManager.clear();
          mAutocompleteResult = null;
@@ -234,7 +234,7 @@ index eb088ac7339bebbb5c473eb5ae1b3be7ea3b9759..f223d6bd21bb89861591106f035baf2b
  
      /**
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java
-index 3c682c834acc2cca588212bef03c5b713ff3ef59..88b23a36fe4f4d98d19af21298e081efd89b4df9 100644
+index f7f1e2e11fa224555922d2eb3f078a3a9edb9c74..9d6b6f91cd2d97d5183470a53d05a3b6102924a8 100644
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/suggestions/AutocompleteMediatorUnitTest.java
 @@ -28,6 +28,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -246,7 +246,7 @@ index 3c682c834acc2cca588212bef03c5b713ff3ef59..88b23a36fe4f4d98d19af21298e081ef
  import android.content.Context;
  import android.os.Handler;
  import android.view.ContextThemeWrapper;
-@@ -658,6 +660,79 @@ public class AutocompleteMediatorUnitTest {
+@@ -661,6 +663,79 @@ public class AutocompleteMediatorUnitTest {
          mMediator.onSuggestionsReceived(AutocompleteResult.fromCache(mSuggestionsList, null), true);
      }
  
@@ -355,10 +355,10 @@ index 8193992e69746ba4a152d6a921fe22fc26647ecc..47b3c556dd2b891a170af145cb22d333
              super.onSuggestionClicked(suggestion, position, modifiers);
              return;
 diff --git a/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java b/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
-index ab735de16e1eae0c6e15765f2638a6357302eeb7..8e93e45306ca70ec6ac268a584e9ccc309777bfc 100644
+index 0f6383f23a9cfb91084ca8f361ecb1461fe89b48..eb9facadb784aa4fd5b427959f27b407d82007ac 100644
 --- a/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
 +++ b/components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteMatch.java
-@@ -74,6 +74,8 @@ public class AutocompleteMatch {
+@@ -73,6 +73,8 @@ public class AutocompleteMatch {
      }
  
      private final int mType;
@@ -367,7 +367,7 @@ index ab735de16e1eae0c6e15765f2638a6357302eeb7..8e93e45306ca70ec6ac268a584e9ccc3
      private final Set<Integer> mSubtypes;
      private final boolean mIsSearchType;
      private final @OmniboxSuggestionKind int mSuggestionKind;
-@@ -209,6 +211,57 @@ public class AutocompleteMatch {
+@@ -199,6 +201,57 @@ public class AutocompleteMatch {
          updatePostContentType(postContentType);
      }
  
@@ -426,7 +426,7 @@ index ab735de16e1eae0c6e15765f2638a6357302eeb7..8e93e45306ca70ec6ac268a584e9ccc3
          if (TextUtils.isEmpty(postContentType)) {
              mExtraHeaders.remove("Content-Type");
 diff --git a/components/omnibox/browser/autocomplete_controller.cc b/components/omnibox/browser/autocomplete_controller.cc
-index e978d4b3f1aec72be1c8604a152628f080b4ffec..f718cafb1a3421821e14a4a966e3c053c2875763 100644
+index f847fa3bcde6f0bbe38618b6270da080fb3bc748..c4f8501c51ed1525e0168873a5b8206ef9ee2eeb 100644
 --- a/components/omnibox/browser/autocomplete_controller.cc
 +++ b/components/omnibox/browser/autocomplete_controller.cc
 @@ -1154,6 +1154,15 @@ bool AutocompleteController::ShouldRunProvider(
@@ -446,7 +446,7 @@ index e978d4b3f1aec72be1c8604a152628f080b4ffec..f718cafb1a3421821e14a4a966e3c053
    // run the typed search provider. Else, will use the IsLensSearchbox check
    // below.
 diff --git a/components/omnibox/browser/clipboard_provider.cc b/components/omnibox/browser/clipboard_provider.cc
-index be3428152f2d977261139fa87d943c8adbdda016..bf95823b59f8eb65ac69214b488d83a6cd69b2fa 100644
+index a9f4ebdeb47cb844fdfe35a184b154a7c3ca7221..63cd87e1220137db8b8b25da31bcfcd80a2838b7 100644
 --- a/components/omnibox/browser/clipboard_provider.cc
 +++ b/components/omnibox/browser/clipboard_provider.cc
 @@ -10,6 +10,7 @@
@@ -555,7 +555,7 @@ index be3428152f2d977261139fa87d943c8adbdda016..bf95823b59f8eb65ac69214b488d83a6
    std::set<ClipboardContentType> desired_types;
    desired_types.insert(ClipboardContentType::URL);
  
-@@ -402,6 +450,30 @@ void ClipboardProvider::UpdateClipboardMatchWithContent(
+@@ -409,6 +457,30 @@ void ClipboardProvider::UpdateClipboardMatchWithContent(
      base::WeakPtr<AutocompleteMatch> match,
      ClipboardMatchCallback callback) {
    DCHECK(match);
@@ -611,10 +611,10 @@ index f174e87c6df5d010bbf7cf849c44a54531b464bc..59fc6da09c1a1f30f5f89ef2d04d535b
    // Used for recording metrics.
    GURL current_url_suggested_;
 diff --git a/components/omnibox/browser/clipboard_provider_unittest.cc b/components/omnibox/browser/clipboard_provider_unittest.cc
-index 7db4ea07dade01f2d80ecd2c919797b2f1899457..df36352ad90a21b9f2f645424da2a6bd0f1d18cf 100644
+index 292bf89a2eb069568534544f73f140b3b58c3c9f..43eb72684f6597a1e24093955a32c4ca90434333 100644
 --- a/components/omnibox/browser/clipboard_provider_unittest.cc
 +++ b/components/omnibox/browser/clipboard_provider_unittest.cc
-@@ -406,8 +406,12 @@ TEST_F(ClipboardProviderTest, CreateImageMatchWithContent) {
+@@ -441,8 +441,12 @@ TEST_F(ClipboardProviderTest, NewClipboardImageMatchWithEmptyOrNullImageSkia) {
  }
  
  #if BUILDFLAG(IS_ANDROID)
@@ -629,7 +629,7 @@ index 7db4ea07dade01f2d80ecd2c919797b2f1899457..df36352ad90a21b9f2f645424da2a6bd
    client_->set_template_url_service(
        search_engines_test_environment_.template_url_service());
  
-@@ -417,14 +421,37 @@ TEST_F(ClipboardProviderTest, Android_MergedWithPZPSGroupOnNTP) {
+@@ -452,14 +456,37 @@ TEST_F(ClipboardProviderTest, Android_MergedWithPZPSGroupOnNTP) {
  
    provider_->Start(input, false);
  

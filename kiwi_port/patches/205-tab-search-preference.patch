@@ -1,8 +1,8 @@
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
-index 21b8404320dfdca555e9bc9a09ff146973b09f8c..781af1355aa5c6c7d91c48179d8e6600fb931d8f 100644
+index aedce8d9b132fed2062bd9251cbf8175f0fc1dc9..269cc354154a5cf3559aa6865b6b0d061e11ce78 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneBase.java
-@@ -90,6 +90,13 @@ public abstract class TabSwitcherPaneBase extends PaneBase
+@@ -91,6 +91,13 @@ public abstract class TabSwitcherPaneBase extends PaneBase
      private static final String TAG = "TabSwitcherPaneBase";
      private static final int ON_SHOWN_IPH_DELAY = 700;
  
@@ -16,7 +16,7 @@ index 21b8404320dfdca555e9bc9a09ff146973b09f8c..781af1355aa5c6c7d91c48179d8e6600
      private static boolean sShowIphForTesting;
  
      private final MonotonicObservableSupplier<FullButtonData> mEmptyActionButtonDataSupplier =
-@@ -180,6 +187,7 @@ public abstract class TabSwitcherPaneBase extends PaneBase
+@@ -181,6 +188,7 @@ public abstract class TabSwitcherPaneBase extends PaneBase
              NonNullObservableSupplier<Boolean> xrSpaceModeObservableSupplier,
              OnClickListener newTabButtonClickListener) {
          super(paneId, context, onToolbarAlphaChange);
@@ -24,7 +24,7 @@ index 21b8404320dfdca555e9bc9a09ff146973b09f8c..781af1355aa5c6c7d91c48179d8e6600
          mMenuButtonVisible = shouldShowMenuButton(context);
          mFactory = factory;
          mIsIncognito = isIncognito;
-@@ -245,13 +253,22 @@ public abstract class TabSwitcherPaneBase extends PaneBase
+@@ -246,13 +254,22 @@ public abstract class TabSwitcherPaneBase extends PaneBase
          if (isFocused()) {
              int screenWidthDp =
                      mRootView.getContext().getResources().getConfiguration().screenWidthDp;
@@ -49,10 +49,10 @@ index 21b8404320dfdca555e9bc9a09ff146973b09f8c..781af1355aa5c6c7d91c48179d8e6600
          removeDelayedCallbacks();
  
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-index 96216cab4882839197c136584dc8230b344a5718..76b8612930c38d6099dfba4039867cf61e8a8ddd 100644
+index a95a76dc6ce22d2c56e89fbef6e985150624d465..2ee5964d71b838c78a13030e1c591869eedf59c6 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-@@ -1246,7 +1246,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
+@@ -1245,7 +1245,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
      private void maybeMakeSpaceForSearchBar() {
          Configuration config = mActivity.getResources().getConfiguration();
          boolean isTabletOrLandscape = HubUtils.isScreenWidthTablet(config.screenWidthDp);
@@ -64,10 +64,10 @@ index 96216cab4882839197c136584dc8230b344a5718..76b8612930c38d6099dfba4039867cf6
              mMediator.maybeTranslatePinnedStrip(
                      /* shouldShowSearchBox= */ false, /* forced= */ true);
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
-index 7b8825d9f3308bdb1df89e8c48848e80756bda7d..c5d5969936a8408ef5d6a09753544f74e94942fc 100644
+index 10429e320acb0031962c0dd68bad8bf78e823768..5eb7829b558ad5b7916dc5028bb84343e58ffd0c 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneMediator.java
-@@ -419,14 +419,18 @@ public class TabSwitcherPaneMediator
+@@ -420,14 +420,18 @@ public class TabSwitcherPaneMediator
  
      /** Sets the visibility of the Hub search box. */
      void setHubSearchBoxVisibility(boolean isVisible) {

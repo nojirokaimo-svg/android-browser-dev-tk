@@ -1,8 +1,8 @@
 diff --git a/chrome/android/java/res/xml/appearance_preferences.xml b/chrome/android/java/res/xml/appearance_preferences.xml
-index 490416cb649cc934f103398cc5854cc52739f666..735ada7371db7779250e48ba53ba2ab070268046 100644
+index faecaaea302eb24338c6623facccb58ea639ebc8..8d4c551b9a51927c8a28972d92965c063452f5e6 100644
 --- a/chrome/android/java/res/xml/appearance_preferences.xml
 +++ b/chrome/android/java/res/xml/appearance_preferences.xml
-@@ -43,5 +43,11 @@ exclusive options. -->
+@@ -49,5 +49,11 @@ exclusive options. -->
      <Preference
          android:key="kiwi_dark_surface_color"
          android:order="3" />
@@ -15,11 +15,11 @@ index 490416cb649cc934f103398cc5854cc52739f666..735ada7371db7779250e48ba53ba2ab0
  
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-index bd269cc923e0598feb9cd4c9c7f06e0611a3752a..c5c3bc1b43d01c685cb5e5dcf6dd166acec1bc38 100644
+index bc45705e9faad8ad121495a70d2e88d1f5e482fc..30acd3360f3727d19ff831a83c4851553bee75bd 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-@@ -78,21 +78,34 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
-         initToolbarShortcutPref();
+@@ -87,21 +87,34 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+         initBottomBarPref();
          initTabPositionPref();
          initDarkSurfaceColorPref();
 +        initDarkSurfaceColorPref(
@@ -57,7 +57,7 @@ index bd269cc923e0598feb9cd4c9c7f06e0611a3752a..c5c3bc1b43d01c685cb5e5dcf6dd166a
                          : chosen);
          preference.setOnPreferenceClickListener(
                  ignored -> {
-@@ -114,45 +127,48 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -123,45 +136,48 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
                                                          ? null
                                                          : new String[] {"#000000", "#16171B", "#202124"}[
                                                                  which - 1];
@@ -114,7 +114,7 @@ index bd269cc923e0598feb9cd4c9c7f06e0611a3752a..c5c3bc1b43d01c685cb5e5dcf6dd166a
                          .setView(input)
                          .setPositiveButton(ja ? "適用" : "Apply", null)
                          .setNegativeButton(ja ? "キャンセル" : "Cancel", null)
-@@ -172,7 +188,7 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+@@ -181,7 +197,7 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
                                                                  : "Enter a dark #RRGGBB color");
                                                  return;
                                              }
@@ -124,10 +124,10 @@ index bd269cc923e0598feb9cd4c9c7f06e0611a3752a..c5c3bc1b43d01c685cb5e5dcf6dd166a
                                          }));
          dialog.show();
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-index 72d2a3454aefa27189efd3d90082a4cc6a57040e..0dee1da546e8f1a8a1beea55764e357d5dd6125a 100644
+index 7fbb1711a1df45b9917784a5d5c3816be942e9db..7d24c6c990ea51f1e37aa4841250f1d9c57d4a34 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -998,7 +998,7 @@ class AppMenu implements OnKeyListener {
+@@ -1027,7 +1027,7 @@ class AppMenu implements OnKeyListener {
      }
  
      private static int getKiwiMenuBackgroundColor(Context context) {
@@ -137,7 +137,7 @@ index 72d2a3454aefa27189efd3d90082a4cc6a57040e..0dee1da546e8f1a8a1beea55764e357d
          int menuBgColor = SemanticColorUtils.getMenuBgColor(context);
          boolean isDark =
 diff --git a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
-index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed10f20aa5 100644
+index 22d28dc3b1142b155f2076d4f57cf97e71ddf45c..7fe87b333e55d54beea53158de4b0030a749e17f 100644
 --- a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 +++ b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 @@ -27,13 +27,27 @@ import org.chromium.ui.util.ColorUtils;
@@ -170,7 +170,7 @@ index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed
          if (hex == null || !hex.matches("#[0-9a-fA-F]{6}")) return null;
          int color = Color.parseColor(hex);
          // White icons and labels must remain legible even after an external preference edit.
-@@ -180,7 +194,7 @@ public class SemanticColorUtils {
+@@ -175,7 +189,7 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color value that corresponds to settings_container_background_color. */
      public static @ColorInt int getSettingsContainerBackgroundColor(Context context) {
@@ -179,7 +179,7 @@ index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed
          if (custom != null) return custom;
          if (ColorUtils.inNightMode(context)) {
              return Color.rgb(27, 28, 33);
-@@ -205,7 +219,7 @@ public class SemanticColorUtils {
+@@ -200,7 +214,7 @@ public class SemanticColorUtils {
  
      /** Returns the surface color value of the conceptual dialog_bg_color. */
      public static @ColorInt int getDialogBgColor(Context context) {
@@ -188,7 +188,7 @@ index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed
          if (custom != null) return custom;
          return ContextCompat.getColor(context, R.color.dialog_bg_color);
      }
-@@ -217,7 +231,7 @@ public class SemanticColorUtils {
+@@ -212,7 +226,7 @@ public class SemanticColorUtils {
       */
      @Deprecated
      public static @ColorInt int getSheetBgColor(Context context) {
@@ -197,7 +197,7 @@ index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed
          if (custom != null) return custom;
          return resolve(R.attr.colorSurface, context);
      }
-@@ -230,7 +244,7 @@ public class SemanticColorUtils {
+@@ -225,7 +239,7 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color value that corresponds to menu_bg_color. */
      public static @ColorInt int getMenuBgColor(Context context) {
@@ -206,7 +206,7 @@ index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed
          if (custom != null) return custom;
          return resolve(R.attr.colorSurfaceBright, context);
      }
-@@ -284,14 +298,14 @@ public class SemanticColorUtils {
+@@ -279,14 +293,14 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color values that correspond to colorSurface. */
      public static @ColorInt int getColorSurface(Context context) {
@@ -223,7 +223,7 @@ index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed
          if (custom != null) return custom;
          return resolve(R.attr.colorSurfaceBright, context);
      }
-@@ -303,7 +317,7 @@ public class SemanticColorUtils {
+@@ -298,7 +312,7 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color values that correspond to colorSurfaceContainerLow. */
      public static @ColorInt int getColorSurfaceContainerLow(Context context) {
@@ -232,7 +232,7 @@ index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed
          if (custom != null) return custom;
          return resolve(R.attr.colorSurfaceContainerLow, context);
      }
-@@ -317,28 +331,28 @@ public class SemanticColorUtils {
+@@ -312,28 +326,28 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color values that correspond to colorSurfaceContainer. */
      public static @ColorInt int getColorSurfaceContainer(Context context) {
@@ -265,7 +265,7 @@ index 9802ca81e386f675ed9a8f7849dfd58b2cd98596..07a12b9e6ed5d82854fb5985a88de4ed
          if (custom != null) return custom;
          return resolve(R.attr.colorSurfaceContainerHighest, context);
      }
-@@ -357,7 +371,7 @@ public class SemanticColorUtils {
+@@ -352,7 +366,7 @@ public class SemanticColorUtils {
  
      /** Returns the surface color value of the conceptual floating snackbar background color. */
      public static @ColorInt int getFloatingSnackbarBackgroundColor(Context context) {

@@ -1,8 +1,8 @@
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-index 5456f0963343c0d6db1b2c8b3b08e0e30214bdc0..a4c85d1db93f3c3756d47ad0e015e88488d55cac 100644
+index 27cc2068df46ab9a3165737d84908bd0813ebd1c..9cd963e5bac9f51032eceb148e45b73003bf48a3 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -417,11 +417,12 @@ class AppMenu implements OnKeyListener {
+@@ -433,11 +433,12 @@ class AppMenu implements OnKeyListener {
              mListView.setVerticalScrollBarEnabled(false);
          }
  
@@ -17,7 +17,7 @@ index 5456f0963343c0d6db1b2c8b3b08e0e30214bdc0..a4c85d1db93f3c3756d47ad0e015e884
                  drawable.setTintMode(PorterDuff.Mode.MULTIPLY);
                  contentView.setBackground(drawable);
              }
-@@ -996,11 +997,42 @@ class AppMenu implements OnKeyListener {
+@@ -1025,11 +1026,42 @@ class AppMenu implements OnKeyListener {
          mMenuItemEnterAnimator.start();
      }
  

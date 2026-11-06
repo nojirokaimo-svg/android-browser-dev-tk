@@ -1,8 +1,8 @@
 diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
-index aef8f64fd535ad8f0faa89fa3a0a07b3775c4e65..56e87bd4f510b56683fc8e73de4a21670737cd45 100644
+index 61c50ea857f8eb794a09c2089e2825524c8a4d92..38cdac2f6e64963a3526be12864202912b20ea2f 100644
 --- a/chrome/browser/android/BUILD.gn
 +++ b/chrome/browser/android/BUILD.gn
-@@ -226,6 +226,7 @@ if (is_android) {
+@@ -367,6 +367,7 @@ if (is_android) {
  
    # A leaf target so that it can be used by targets that ":android" itself
    # depends on (see //chrome/browser/android/thin_webview:initializer).

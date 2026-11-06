@@ -1,9 +1,9 @@
 diff --git a/chrome/android/java/res/xml/appearance_preferences.xml b/chrome/android/java/res/xml/appearance_preferences.xml
-index d89b76290c5ccc3de6b07bc1cf2d43861adda34a..490416cb649cc934f103398cc5854cc52739f666 100644
+index 50632d42d73aecc06bd59305defa275816674829..faecaaea302eb24338c6623facccb58ea639ebc8 100644
 --- a/chrome/android/java/res/xml/appearance_preferences.xml
 +++ b/chrome/android/java/res/xml/appearance_preferences.xml
-@@ -40,4 +40,8 @@ exclusive options. -->
-         android:order="3"
+@@ -46,4 +46,8 @@ exclusive options. -->
+         android:order="4"
          android:title="@string/tab_position_settings_title" />
  
 +    <Preference
@@ -12,7 +12,7 @@ index d89b76290c5ccc3de6b07bc1cf2d43861adda34a..490416cb649cc934f103398cc5854cc5
 +
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-index 774fe010ad73acd858a3bb4902ddd55d703fea71..bd269cc923e0598feb9cd4c9c7f06e0611a3752a 100644
+index dfd8f79fed49a2dd645e51745f6761051edf6fe2..bc45705e9faad8ad121495a70d2e88d1f5e482fc 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 @@ -4,9 +4,12 @@
@@ -28,7 +28,7 @@ index 774fe010ad73acd858a3bb4902ddd55d703fea71..bd269cc923e0598feb9cd4c9c7f06e06
  
  import androidx.annotation.StringRes;
  import androidx.preference.Preference;
-@@ -41,6 +44,8 @@ import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
+@@ -45,6 +48,8 @@ import org.chromium.components.feature_engagement.EventConstants;
  import org.chromium.components.prefs.PrefChangeRegistrar;
  import org.chromium.components.prefs.PrefChangeRegistrar.PrefObserver;
  
@@ -37,9 +37,9 @@ index 774fe010ad73acd858a3bb4902ddd55d703fea71..bd269cc923e0598feb9cd4c9c7f06e06
  /** Fragment to manage appearance settings. */
  @NullMarked
  public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
-@@ -72,6 +77,105 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
-         initBookmarkBarPref();
+@@ -81,6 +86,105 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
          initToolbarShortcutPref();
+         initBottomBarPref();
          initTabPositionPref();
 +        initDarkSurfaceColorPref();
 +    }
@@ -144,7 +144,7 @@ index 774fe010ad73acd858a3bb4902ddd55d703fea71..bd269cc923e0598feb9cd4c9c7f06e06
  
      @Override
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
-index 9ef13d839dfad4bac55f7cf9b5560dab83969af5..f30161aff3365a808753c303cd175f97e32c5ae0 100644
+index f9fa10f6e0831bc685c619875d086bfc2c955e2e..e56ead8b4e72b83928cceef83cd8c177b65f0c65 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
 @@ -44,6 +44,7 @@ import org.chromium.chrome.browser.ui.messages.snackbar.Snackbar;
@@ -177,7 +177,7 @@ index 9ef13d839dfad4bac55f7cf9b5560dab83969af5..f30161aff3365a808753c303cd175f97
  
          if (isDesktopLayoutEnabled) {
              View navigationPane = mainView.findViewById(R.id.navigation_pane);
-@@ -277,6 +286,7 @@ public class HistoryManager
+@@ -274,6 +283,7 @@ public class HistoryManager
                                          ? R.menu.app_specific_history_manager_menu
                                          : R.menu.history_manager_menu,
                                  launchedForApp);
@@ -186,10 +186,10 @@ index 9ef13d839dfad4bac55f7cf9b5560dab83969af5..f30161aff3365a808753c303cd175f97
          mToolbar.setMenuDelegate(
                  new HistoryManagerToolbar.HistoryManagerMenuDelegate() {
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-index a4c85d1db93f3c3756d47ad0e015e88488d55cac..72d2a3454aefa27189efd3d90082a4cc6a57040e 100644
+index 9cd963e5bac9f51032eceb148e45b73003bf48a3..7fbb1711a1df45b9917784a5d5c3816be942e9db 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -998,6 +998,8 @@ class AppMenu implements OnKeyListener {
+@@ -1027,6 +1027,8 @@ class AppMenu implements OnKeyListener {
      }
  
      private static int getKiwiMenuBackgroundColor(Context context) {
@@ -199,7 +199,7 @@ index a4c85d1db93f3c3756d47ad0e015e88488d55cac..72d2a3454aefa27189efd3d90082a4cc
          boolean isDark =
                  Color.red(menuBgColor) * 299
 diff --git a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
-index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b2cd98596 100644
+index 1aff829672fff1bc62e97c0e5bc74313ef9fd405..22d28dc3b1142b155f2076d4f57cf97e71ddf45c 100644
 --- a/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 +++ b/components/browser_ui/styles/android/java/src/org/chromium/components/browser_ui/styles/SemanticColorUtils.java
 @@ -27,6 +27,19 @@ import org.chromium.ui.util.ColorUtils;
@@ -231,7 +231,7 @@ index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b
          return resolve(R.attr.colorSurface, context);
      }
  
-@@ -154,6 +169,8 @@ public class SemanticColorUtils {
+@@ -149,6 +164,8 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color value that corresponds to settings_bg_color. */
      public static @ColorInt int getSettingsBackgroundColor(Context context) {
@@ -240,7 +240,7 @@ index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b
          // Match Kiwi's near-black settings surface without changing light mode.
          if (ColorUtils.inNightMode(context)) {
              return Color.rgb(16, 17, 20);
-@@ -163,6 +180,8 @@ public class SemanticColorUtils {
+@@ -158,6 +175,8 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color value that corresponds to settings_container_background_color. */
      public static @ColorInt int getSettingsContainerBackgroundColor(Context context) {
@@ -249,7 +249,7 @@ index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b
          if (ColorUtils.inNightMode(context)) {
              return Color.rgb(27, 28, 33);
          }
-@@ -186,6 +205,8 @@ public class SemanticColorUtils {
+@@ -181,6 +200,8 @@ public class SemanticColorUtils {
  
      /** Returns the surface color value of the conceptual dialog_bg_color. */
      public static @ColorInt int getDialogBgColor(Context context) {
@@ -258,7 +258,7 @@ index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b
          return ContextCompat.getColor(context, R.color.dialog_bg_color);
      }
  
-@@ -196,6 +217,8 @@ public class SemanticColorUtils {
+@@ -191,6 +212,8 @@ public class SemanticColorUtils {
       */
      @Deprecated
      public static @ColorInt int getSheetBgColor(Context context) {
@@ -267,7 +267,7 @@ index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b
          return resolve(R.attr.colorSurface, context);
      }
  
-@@ -207,6 +230,8 @@ public class SemanticColorUtils {
+@@ -202,6 +225,8 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color value that corresponds to menu_bg_color. */
      public static @ColorInt int getMenuBgColor(Context context) {
@@ -276,7 +276,7 @@ index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b
          return resolve(R.attr.colorSurfaceBright, context);
      }
  
-@@ -259,11 +284,15 @@ public class SemanticColorUtils {
+@@ -254,11 +279,15 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color values that correspond to colorSurface. */
      public static @ColorInt int getColorSurface(Context context) {
@@ -292,7 +292,7 @@ index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b
          return resolve(R.attr.colorSurfaceBright, context);
      }
  
-@@ -274,36 +303,50 @@ public class SemanticColorUtils {
+@@ -269,36 +298,50 @@ public class SemanticColorUtils {
  
      /** Returns the semantic color values that correspond to colorSurfaceContainerLow. */
      public static @ColorInt int getColorSurfaceContainerLow(Context context) {
@@ -343,7 +343,7 @@ index 164dd615fec9b06db81f6ffaa8ed902e2b99d954..9802ca81e386f675ed9a8f7849dfd58b
          return resolve(R.attr.colorSurfaceDim, context);
      }
  
-@@ -314,6 +357,8 @@ public class SemanticColorUtils {
+@@ -309,6 +352,8 @@ public class SemanticColorUtils {
  
      /** Returns the surface color value of the conceptual floating snackbar background color. */
      public static @ColorInt int getFloatingSnackbarBackgroundColor(Context context) {

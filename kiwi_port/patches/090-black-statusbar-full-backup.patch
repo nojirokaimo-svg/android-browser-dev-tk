@@ -1,8 +1,8 @@
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index d1da6861f08f2faf0e84206c94154f40fd60a0c8..3862eaa97eec03fbce416207b70c5d1ccf6fb952 100644
+index cb47bd657043def563de6dadcbb728d907b09bc2..3ab41d87e192bb3ce266c314c13e428cadecf6bb 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -247,6 +247,7 @@ chrome_java_sources = [
+@@ -246,6 +246,7 @@ chrome_java_sources = [
    "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
@@ -11,10 +11,10 @@ index d1da6861f08f2faf0e84206c94154f40fd60a0c8..3862eaa97eec03fbce416207b70c5d1c
    "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
    "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
-index 986ca2fc76740ecc1eafb5bafb20730b497c9702..5b16ce7c3abfcddc131aed235aa90904f8f09940 100644
+index 845af00a321cf02515f25f29b435dc447d9ea2a3..4d9e6e718c9f2cbc06ac77f6009386d15b291349 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
-@@ -265,6 +265,11 @@ by a child template that "extends" this file.
+@@ -269,6 +269,11 @@ by a child template that "extends" this file.
               Since this activity (shown in the launcher) and the application
               (shown in Android's Settings/Apps list) share the same label, we
               do not specify one here to allow it to inherit from the app. -->
@@ -540,10 +540,10 @@ index 0000000000000000000000000000000000000000..d0b19c161e83eefff9ef8c770d412dd1
 +    }
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 1e3be2e6f7364d9405f32744c9a4a7bb456f1477..7bf97b8c5d2b268a3f6d0c5fe11109d586a6f524 100644
+index 14ad809854a0060ec350d74bf7af79057e3c4990..aa5be13906cf016d0f84b1dedda83b9b2693544b 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-@@ -38,6 +38,7 @@ import org.chromium.build.annotations.Nullable;
+@@ -39,6 +39,7 @@ import org.chromium.build.annotations.Nullable;
  import org.chromium.chrome.R;
  import org.chromium.chrome.browser.appearance.settings.AppearanceSettingsFragment;
  import org.chromium.chrome.browser.autofill.settings.SettingsNavigationHelper;
@@ -551,7 +551,7 @@ index 1e3be2e6f7364d9405f32744c9a4a7bb456f1477..7bf97b8c5d2b268a3f6d0c5fe11109d5
  import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFragment;
  import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsMediator;
  import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsReferrer;
-@@ -359,6 +360,21 @@ public class MainSettings extends ChromeBaseSettingsFragment
+@@ -385,6 +386,21 @@ public class MainSettings extends ChromeBaseSettingsFragment
          mManagedPreferenceDelegate = createManagedPreferenceDelegate();
  
          SettingsUtils.addPreferencesFromResource(this, R.xml.main_preferences);
@@ -574,10 +574,10 @@ index 1e3be2e6f7364d9405f32744c9a4a7bb456f1477..7bf97b8c5d2b268a3f6d0c5fe11109d5
          IdentityManager identityManager =
                  IdentityServicesProvider.get().getIdentityManager(getProfile());
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java b/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
-index 06f0fa32a74f704b5e8881a7f99530cf732c394c..afb1bf4a4df85621e6b1bdcff9e0b3a1c9419868 100644
+index 2b43be7a162c6aa838c001639e0a39c13eafa641..d73cfdf7af0b8e437163dc8bc8b103dd622a835a 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java
-@@ -648,6 +648,13 @@ public class StatusBarColorController
+@@ -651,6 +651,13 @@ public class StatusBarColorController
              Activity activity,
              @ColorInt int color,
              boolean forceLightIconColor) {
@@ -592,10 +592,10 @@ index 06f0fa32a74f704b5e8881a7f99530cf732c394c..afb1bf4a4df85621e6b1bdcff9e0b3a1
          final View root = window.getDecorView().getRootView();
          boolean needsDarkStatusBarIcons = !ColorUtils.shouldUseLightForegroundOnBackground(color);
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java
-index d02d7ac7b4864228cd12ff90ec7eff7bee7b5880..dd0c9fc9ed35b561f8b2dfa58306330594d5c1ec 100644
+index 1d985cb27b5b9213ece7dcafa113861c8c4b3d88..08e001ec25e7d2bc941a364daf57940b3cf9e8da 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarControlContainer.java
-@@ -333,7 +333,7 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
+@@ -350,7 +350,7 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
              mToolbarView.setVisibility(View.GONE);
              mToolbarView.removeView(mLocationBarView);
              mToolbarContainer.addView(mLocationBarView);
@@ -604,7 +604,7 @@ index d02d7ac7b4864228cd12ff90ec7eff7bee7b5880..dd0c9fc9ed35b561f8b2dfa583063305
          } else {
              assert mLocationBarView != null
                      : "Trying to restore location bar view to toolbar without removing it first";
-@@ -743,6 +743,14 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
+@@ -763,6 +763,14 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
          updateBackgroundColor();
      }
  
@@ -619,7 +619,7 @@ index d02d7ac7b4864228cd12ff90ec7eff7bee7b5880..dd0c9fc9ed35b561f8b2dfa583063305
      /** The layout that handles generating the toolbar view resource. */
      // Only publicly visible due to lint warnings.
      public static class ToolbarViewResourceCoordinatorLayout extends ViewResourceCoordinatorLayout {
-@@ -1428,7 +1436,7 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
+@@ -1509,7 +1517,7 @@ public class ToolbarControlContainer extends OptimizedFrameLayout
      private void updateBackgroundColor() {
          if (mToolbarDataProvider != null
                  && (mShowLocationBarOnly || getVerticalTabsTopMargin() > 0)) {
@@ -629,10 +629,10 @@ index d02d7ac7b4864228cd12ff90ec7eff7bee7b5880..dd0c9fc9ed35b561f8b2dfa583063305
              setBackgroundResource(Resources.ID_NULL);
          }
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
-index d489d6efb0409238be768251860e82a217e17341..433664b510ba0761d27149dbec434d3fe666617d 100644
+index f7772d2f5300beb3dd1f37e4b4c29eaaeea69aa5..a78247f2d98484d8dd14ffc63d41a8ddf041d32b 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
-@@ -573,6 +573,7 @@ public class ToolbarPhone extends ToolbarLayout
+@@ -578,6 +578,7 @@ public class ToolbarPhone extends ToolbarLayout
  
      /** Set the background color of the location bar to appropriately match the theme color. */
      private void updateModernLocationBarColor(@ColorInt int color) {
@@ -640,7 +640,7 @@ index d489d6efb0409238be768251860e82a217e17341..433664b510ba0761d27149dbec434d3f
          if (mCurrentLocationBarColor == color) return;
          mCurrentLocationBarColor = color;
          mLocationBarBackground.setBackgroundColor(color);
-@@ -916,7 +917,19 @@ public class ToolbarPhone extends ToolbarLayout
+@@ -928,7 +929,19 @@ public class ToolbarPhone extends ToolbarLayout
          return Math.max(mToolbarSidePaddingForNtp, toolbarButtonsContainerWidth);
      }
  

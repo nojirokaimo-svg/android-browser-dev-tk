@@ -1,8 +1,8 @@
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 91a34a4..69e0df6 100644
+index c7cbb20db408181b6a15a71924f2769056c11cf0..e28fc1b40e79a246722678df5efdc18e8736c689 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -247,6 +247,7 @@ chrome_java_sources = [
+@@ -246,6 +246,7 @@ chrome_java_sources = [
    "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
@@ -12,7 +12,7 @@ index 91a34a4..69e0df6 100644
    "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiCrxPacker.java b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiCrxPacker.java
 new file mode 100644
-index 0000000..d973e21
+index 0000000000000000000000000000000000000000..d973e21cf2465ed102eb1ca28a0b6672f4e66ba3
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiCrxPacker.java
 @@ -0,0 +1,261 @@
@@ -278,7 +278,7 @@ index 0000000..d973e21
 +    }
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
-index 7c57d83..0f40f24 100644
+index 7c57d830bd61361bc730936269c5fe0ca6ac5110..0f40f240185fa670bf73f140fb12da8f4a6f3662 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/backup/KiwiMigrationActivity.java
 @@ -6,11 +6,9 @@ package org.chromium.chrome.browser.backup;
@@ -430,7 +430,7 @@ index 7c57d83..0f40f24 100644
      }
  
 diff --git a/chrome/browser/android/backup/kiwi_migration_bridge.cc b/chrome/browser/android/backup/kiwi_migration_bridge.cc
-index 87b1b73..092adfd 100644
+index 87b1b735fc0d40908f10309ec8cb568993e1284e..092adfd9ae644ebfa2a9a67f14029df885575f29 100644
 --- a/chrome/browser/android/backup/kiwi_migration_bridge.cc
 +++ b/chrome/browser/android/backup/kiwi_migration_bridge.cc
 @@ -7,16 +7,17 @@

@@ -5,10 +5,10 @@ KIT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 BUILD_ROOT="${KIWI_BUILD_ROOT:-$KIT_ROOT/work}"
 TITANIUM_DIR="$BUILD_ROOT/titanium"
 TITANIUM_REPOSITORY="${TITANIUM_REPOSITORY:-https://github.com/jqssun/android-titanium-browser.git}"
-TITANIUM_COMMIT="${TITANIUM_COMMIT:-5e9070a98b48f6b6cb239bf90b8718b91795b7c5}"
-VANADIUM_COMMIT="${VANADIUM_COMMIT:-0202b7badff99434822ba5e32e0d738792868455}"
-CHROMIUM_COMMIT="${CHROMIUM_COMMIT:-a21ce95c24ce3964416f09ae1862f53f319eb4d0}"
-VERSION="${CHROMIUM_VERSION:-156.0.8078.79}"
+TITANIUM_COMMIT="${TITANIUM_COMMIT:-8516166ece02309125af6edc9fd80dde7470df05}"
+VANADIUM_COMMIT="${VANADIUM_COMMIT:-99a6c8285bf88edf55d7614e8ceb247350620d52}"
+CHROMIUM_COMMIT="${CHROMIUM_COMMIT:-a733b5afbb3ba618844ff8876b89ad1a774b2f18}"
+VERSION="${CHROMIUM_VERSION:-157.0.8103.38}"
 PHASE="${KIWI_BUILD_PHASE:-all}"
 PATCH_MODE="${KIWI_PATCH_MODE:-strict}"
 
@@ -108,7 +108,7 @@ rm -f "$TITANIUM_DIR"/vanadium/patches/*trichrome-{apk-build-targets,browser-apk
 rm -f "$TITANIUM_DIR"/vanadium/patches/*{detailed,supported}-language*.patch
 rm -f "$TITANIUM_DIR"/vanadium/patches/*javascript-optimizer-{site-setting,settings-UI}.patch
 rm -f "$TITANIUM_DIR"/vanadium/patches/*component-updates.patch
-rm -f "$TITANIUM_DIR"/vanadium/patches/*{pdf,PDF,for-content-public,toolbar-button,configs-from-config-app,new-tab-card,predictive-back*}*.patch
+rm -f "$TITANIUM_DIR"/vanadium/patches/*{pdf,PDF,for-content-public,toolbar-button,configs-from-config-app,config-app-parsing,new-tab-card,predictive-back}*.patch
 
 replace_tree() {
   local directory="$1" old="$2" new="$3"

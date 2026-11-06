@@ -102,7 +102,7 @@ index 76e6c3fa0fe7ac69910fd95e8f185525f90a0f4a..9737524f9075be51eba2a24830451fc2
              case HubColorScheme.DEFAULT -> SemanticColorUtils.getColorSurfaceContainer(context);
              case HubColorScheme.INCOGNITO ->
 diff --git a/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java b/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java
-index 23ac4204ec16697bbc1020b7a82681fc477eba6d..ea92e46fbbc36f473ce236a78e61ed698acab2d5 100644
+index 0344d422c8ef08a2104c6d70ae9e443753d5b90a..bb446bf9842aa4ff74ab7aa44c9ac40d681d8051 100644
 --- a/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java
 +++ b/chrome/browser/tab_ui/android/java/src/org/chromium/chrome/browser/tab_ui/TabCardThemeUtil.java
 @@ -9,6 +9,7 @@ import android.content.Context;
@@ -148,7 +148,7 @@ index 5802fb20c25cc1e075a54798c9b00487779f6202..dbc54f509e10f33dceb8afcf2c1b3ad0
      }
  
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
-index df784833bd73496f889d47fa67bfd66e36781e41..7da513708581cee126ba08c64defb845339a6ee4 100644
+index 5274531ae38babcaef2d6f67dc6bbbf86c1f4078..944a2f774dd49ac1d44c7cf26f810efbd629391e 100644
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java
 @@ -12,6 +12,7 @@ import android.content.res.ColorStateList;
@@ -159,7 +159,7 @@ index df784833bd73496f889d47fa67bfd66e36781e41..7da513708581cee126ba08c64defb845
  import android.graphics.drawable.ColorDrawable;
  import android.graphics.drawable.Drawable;
  import android.graphics.drawable.Drawable.ConstantState;
-@@ -1052,6 +1053,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
+@@ -1076,6 +1077,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
      /** Returns the background color for suggestions in the given color scheme and context. */
      public static @ColorInt int getStandardSuggestionBackgroundColor(
              Context context, @BrandedColorScheme int colorScheme) {
@@ -169,7 +169,7 @@ index df784833bd73496f889d47fa67bfd66e36781e41..7da513708581cee126ba08c64defb845
          return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
                  ? context.getColor(R.color.search_suggestion_bg_color_incognito)
                  : ContextCompat.getColor(context, R.color.search_suggestion_bg_color);
-@@ -1063,6 +1067,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
+@@ -1087,6 +1091,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
       */
      public static @ColorInt int getPopoverSuggestionBackgroundColor(
              Context context, @BrandedColorScheme int colorScheme) {
@@ -179,7 +179,7 @@ index df784833bd73496f889d47fa67bfd66e36781e41..7da513708581cee126ba08c64defb845
          return convertBrandedColorSchemeToIncognitoOrDayNightAdaptive(colorScheme)
                  ? context.getColor(R.color.gm3_baseline_surface_container_dark)
                  : ContextCompat.getColor(context, R.color.omnibox_popover_suggestion_bg_color);
-@@ -1113,6 +1120,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
+@@ -1137,6 +1144,9 @@ public class OmniboxResourceProvider implements ComponentCallbacks2 {
       */
      public static @ColorInt int getSuggestionsDropdownBackgroundColor(
              Context context, @BrandedColorScheme int brandedColorScheme) {
@@ -212,10 +212,10 @@ index 256284aa3630ac838bb51c617774719213d42b9e..3ea014fd6636293de8c9a60a7a834849
              if (ColorUtils.inNightMode(context)) {
                  return SemanticColorUtils.getColorSurface(context);
 diff --git a/components/browser_ui/widget/android/BUILD.gn b/components/browser_ui/widget/android/BUILD.gn
-index cb6d0390e4dcab63400185b8dabed11b5f85cf4d..57861de82606cb7ee69247f913b484fc5f54008e 100644
+index 125f724161bed1dd3aa9674a8270bf610f9966da..53e92cb5d6304b595de7e54d4b5434f501c2459e 100644
 --- a/components/browser_ui/widget/android/BUILD.gn
 +++ b/components/browser_ui/widget/android/BUILD.gn
-@@ -220,6 +220,7 @@ android_resources("java_resources") {
+@@ -221,6 +221,7 @@ android_resources("java_resources") {
      "java/res/color/tab_resumption_module_icon_background_color.xml",
      "java/res/color/tile_view_icon_background_color.xml",
      "java/res/color/toolbar_text_box_bg_color.xml",

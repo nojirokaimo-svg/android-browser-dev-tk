@@ -1,8 +1,8 @@
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
-index 28c39cf5c2f0dd8f402a690eb52347a8ed45ab23..900de4b50ab6d41bf866cb35829ef5a411553915 100644
+index a7d4f137472827037ef5ea008974ef978ef58f92..d1a69079ea7bfdb48784b3dba89a8c464e74bc4d 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
-@@ -3089,6 +3089,7 @@ if (_is_default_toolchain) {
+@@ -3029,6 +3029,7 @@ if (_is_default_toolchain) {
        "java/src/org/chromium/chrome/browser/background_task_scheduler/ProxyNativeTask.java",
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
@@ -11,10 +11,10 @@ index 28c39cf5c2f0dd8f402a690eb52347a8ed45ab23..900de4b50ab6d41bf866cb35829ef5a4
        "java/src/org/chromium/chrome/browser/browserservices/digitalgoods/SiteIsolator.java",
        "java/src/org/chromium/chrome/browser/browserservices/permissiondelegation/InstalledWebappBridge.java",
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 4fd3f1d58c6c5db65d4e7daa04006e625d6f9d30..91a34a42c9423086ea59b93ca87015799c92fa91 100644
+index c36d678267590a836402359c4f322e48a7463954..c7cbb20db408181b6a15a71924f2769056c11cf0 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -248,6 +248,7 @@ chrome_java_sources = [
+@@ -247,6 +247,7 @@ chrome_java_sources = [
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
    "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
    "java/src/org/chromium/chrome/browser/backup/KiwiFullBackupActivity.java",
@@ -23,10 +23,10 @@ index 4fd3f1d58c6c5db65d4e7daa04006e625d6f9d30..91a34a42c9423086ea59b93ca8701579
    "java/src/org/chromium/chrome/browser/backup/IntPrefBackupSerializer.java",
    "java/src/org/chromium/chrome/browser/backup/PrefBackupSerializer.java",
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
-index 5b16ce7c3abfcddc131aed235aa90904f8f09940..359c0e27b244b29882fb6bccc817dce5482fd53e 100644
+index 4d9e6e718c9f2cbc06ac77f6009386d15b291349..5f7cfe6b47d188eab9a706782ee51c50512001e8 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
-@@ -270,6 +270,11 @@ by a child template that "extends" this file.
+@@ -274,6 +274,11 @@ by a child template that "extends" this file.
              android:theme="@style/Theme.Chromium.Settings"
              android:exported="false">
          </activity>
@@ -521,10 +521,10 @@ index 0000000000000000000000000000000000000000..7c57d830bd61361bc730936269c5fe0c
 +    }
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 7bf97b8c5d2b268a3f6d0c5fe11109d586a6f524..958ec2aef8ef92461898822262798aa3ac34e73d 100644
+index aa5be13906cf016d0f84b1dedda83b9b2693544b..a3bf5187e2e470d2269f80a164e5cdbfc981bd4d 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-@@ -39,6 +39,7 @@ import org.chromium.chrome.R;
+@@ -40,6 +40,7 @@ import org.chromium.chrome.R;
  import org.chromium.chrome.browser.appearance.settings.AppearanceSettingsFragment;
  import org.chromium.chrome.browser.autofill.settings.SettingsNavigationHelper;
  import org.chromium.chrome.browser.backup.KiwiFullBackupActivity;
@@ -532,7 +532,7 @@ index 7bf97b8c5d2b268a3f6d0c5fe11109d586a6f524..958ec2aef8ef92461898822262798aa3
  import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFragment;
  import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsMediator;
  import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsReferrer;
-@@ -375,6 +376,21 @@ public class MainSettings extends ChromeBaseSettingsFragment
+@@ -401,6 +402,21 @@ public class MainSettings extends ChromeBaseSettingsFragment
                      return true;
                  });
          getPreferenceScreen().addPreference(fullBackupPreference);
@@ -555,10 +555,10 @@ index 7bf97b8c5d2b268a3f6d0c5fe11109d586a6f524..958ec2aef8ef92461898822262798aa3
          IdentityManager identityManager =
                  IdentityServicesProvider.get().getIdentityManager(getProfile());
 diff --git a/chrome/browser/android/BUILD.gn b/chrome/browser/android/BUILD.gn
-index b60a5031c66b75f85ac2530ebbf01ccd75450361..aef8f64fd535ad8f0faa89fa3a0a07b3775c4e65 100644
+index f7e828de8b15fa5c117506499a41c0b4d311b3fc..61c50ea857f8eb794a09c2089e2825524c8a4d92 100644
 --- a/chrome/browser/android/BUILD.gn
 +++ b/chrome/browser/android/BUILD.gn
-@@ -247,6 +247,7 @@ if (is_android) {
+@@ -388,6 +388,7 @@ if (is_android) {
        "background_task_scheduler/proxy_native_task.cc",
        "background_task_scheduler/proxy_native_task.h",
        "backup/chrome_backup_agent.cc",

@@ -14,7 +14,7 @@ index a5a93c31bf7798ae1762d66445fa66916b08563d..4485af157d59a8ba1e3fe95c947732c2
          if (mRegistry.mLegacyFormatKeys.contains(key)) {
              return true;
 diff --git a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java
-index f5b1e8d704063e42f32f107a5c1681bb0169c815..add6c0346ccd1f81f2be9d4615386ac6879760bf 100644
+index 47a9dc6a27a49671c2b35e07d83870db4b57037c..074f8ec7016bbf4352c751d5d96a3840ac2c331a 100644
 --- a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java
 +++ b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java
 @@ -8,12 +8,14 @@ import androidx.annotation.VisibleForTesting;
@@ -32,14 +32,17 @@ index f5b1e8d704063e42f32f107a5c1681bb0169c815..add6c0346ccd1f81f2be9d4615386ac6
  import java.util.Set;
  
  @CheckDiscard("Preference key checking should only happen on build with asserts")
-@@ -24,6 +26,7 @@ public class AllPreferenceKeyRegistries {
+@@ -23,7 +25,9 @@ public class AllPreferenceKeyRegistries {
+     static final @Nullable Set<PreferenceKeyRegistry> KNOWN_REGISTRIES =
              BuildConfig.ENABLE_ASSERTS
                      ? Set.of(
-                             ChromeSharedPreferences.REGISTRY,
+-                            ChromeSharedPreferences.REGISTRY, CachedFlagsSharedPreferences.REGISTRY)
++                            ChromeSharedPreferences.REGISTRY,
 +                            Objects.requireNonNull(SharedPrefsUtils.REGISTRY),
-                             CachedFlagsSharedPreferences.REGISTRY,
-                             MultiInstanceSharedPreferences.REGISTRY)
++                            CachedFlagsSharedPreferences.REGISTRY)
                      : null;
+ 
+     public static void initializeKnownRegistries() {
 diff --git a/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java b/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
 index e9f9abe73111dd169d6fb576c3fea841480aaf5b..7c4cdefdeba4cffcd79cf6691fe443163dad8d92 100644
 --- a/titanium/chromium_src/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
