@@ -367,7 +367,7 @@ index 0f6383f23a9cfb91084ca8f361ecb1461fe89b48..eb9facadb784aa4fd5b427959f27b407
      private final Set<Integer> mSubtypes;
      private final boolean mIsSearchType;
      private final @OmniboxSuggestionKind int mSuggestionKind;
-@@ -199,6 +201,57 @@ public class AutocompleteMatch {
+@@ -199,6 +201,56 @@ public class AutocompleteMatch {
          updatePostContentType(postContentType);
      }
  
