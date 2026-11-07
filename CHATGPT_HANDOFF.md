@@ -1,5 +1,18 @@
 # ChatGPT / Codex handoff
 
+
+## 2026-11-07 — Titanium-Kiwi 157.0.8103.38 completed and independently verified
+
+Production [42353235318](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/42353235318), commit `7c4fc332b04356c6bafec15da31571c73aaadb4f`, completed successfully. It restored exact partial checkpoint `kiwi-15738-264139f4b8d5dc63ce8240d683ef3e40818b1731-42310590826-1-continue-1` with `cache-hit=true` and matched/requested keys identical, then saved immutable completed checkpoint `kiwi-incremental-15738-7c4fc332b04356c6bafec15da31571c73aaadb4f-42353235318-1-build`. No cold/clean build, fallback, cache overwrite, out/Default deletion, or Ninja-history deletion occurred.
+
+The public [Release](https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/tag/titanium-kiwi-157.0.8103.38-42353235318-1) contains directly downloadable APK and ZIP. The actual Release assets were downloaded and independently checked. APK `Titanium-Kiwi-core-157.0.8103.38-arm64-v8a.apk` is 335544343 bytes with SHA-256 `5cb536093c69bc26311ee93dc0f92ccabebbaa5c76c13565177eb57c3d23f490`. Release ZIP SHA-256 is `896b812a19db5e15f210bec0f18bbda75bc1cbae6645d7c8535e286d4f8b8b9f`; its embedded APK has the same APK SHA-256 and the archive passes CRC validation. Independent Android apksig verification confirms APK Signature Scheme v2 and protected-content verification, one RSA signer, and certificate SHA-256 `32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0`. Independent binary-manifest parsing confirms package `io.github.nojirokaimo.titaniumkiwi`, versionName `157.0.8103.38`, and fixed versionCode `807807374`.
+
+API 30 job `128404101113` and API 36 job `128404101123` both succeeded with four explicit `Success` results for `156.79 → 157.38 → 156.79 → 157.38`, using `adb install -r` without `-d`. The source audit remains valid: all measured M157 before/after hashes, 26 strict patches and idempotent replay, JDK 25 parsing of 55 Java files, and all 65 tests without skips. M155-derived 25 features, ZIP import repair 230, settings, signing, and Photopea JIT exception are retained; removed features 220/225 remain absent.
+
+Completion defaults now restore only `kiwi-incremental-15738-7c4fc332b04356c6bafec15da31571c73aaadb4f-42353235318-1-build`. The pinned production workflow and composite action use the M157.38 Titanium/Vanadium/Chromium identities, and `update-upstream.yml` defaults to `v157.0.8103.38` with the completed M157 checkpoint and no transition identity. These completion-only commits use `[skip ci]`.
+
+Physical-device installation/browser behavior and Violentmonkey Settings “Export to ZIP” remain unverified. Do not claim the export issue is repaired without a real runtime result. This completed build monitor can be stopped after the user receives the Release links.
+
 ## 2026-11-07 — M157 production constructor failure and exact-checkpoint repair
 
 Production run [42310590826](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/42310590826) restored the requested completed M156.79 cache with cache-hit=true and an identical matched key, completed its first stage, then failed in continue-1 while compiling `AutocompleteMatch.java:211`. The M157 `AutocompleteMatch` constructor no longer accepts the extra nullable argument that patch 200 passed between the description classifications and `fillIntoEdit`.
