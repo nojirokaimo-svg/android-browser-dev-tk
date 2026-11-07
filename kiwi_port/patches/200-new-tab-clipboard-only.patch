@@ -389,7 +389,6 @@ index 0f6383f23a9cfb91084ca8f361ecb1461fe89b48..eb9facadb784aa4fd5b427959f27b407
 +                        Collections.emptyList(),
 +                        description,
 +                        List.of(new MatchClassification(0, MatchClassificationStyle.NONE)),
-+                        null,
 +                        "",
 +                        GURL.emptyGURL(),
 +                        GURL.emptyGURL(),

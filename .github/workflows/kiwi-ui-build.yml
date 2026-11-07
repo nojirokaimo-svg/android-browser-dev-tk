@@ -28,13 +28,13 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Reuse the completed M156.79 checkpoint exactly. Keep Ninja history and
-          # object/generated files; a cache miss stops the build.
-          restore-key: kiwi-incremental-15679-5e5383a3e97080ca45686f1b479091abe44903b2-41372171273-1-build
+          # Resume the exact M157 partial checkpoint saved after the constructor failure.
+          # Keep Ninja history and object/generated files; a cache miss stops the build.
+          restore-key: kiwi-15738-264139f4b8d5dc63ce8240d683ef3e40818b1731-42310590826-1-continue-1
           require-restore: "true"
-          # Transition the restored M156.79 source identity to the pinned M157 tree.
+          # The partial checkpoint already has the pinned M157 source identity.
           bootstrap-revision: ""
-          transition-from-identity: "5e9070a98b48f6b6cb239bf90b8718b91795b7c5:0202b7badff99434822ba5e32e0d738792868455:a21ce95c24ce3964416f09ae1862f53f319eb4d0:validation"
+          transition-from-identity: ""
           save-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           final-cache-key: kiwi-incremental-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           titanium-commit: 8516166ece02309125af6edc9fd80dde7470df05

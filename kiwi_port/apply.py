@@ -206,6 +206,33 @@ def file_states(source: Path) -> dict[str, str]:
     return states
 
 
+def migrate_known_m157_clipboard_constructor_fix(source: Path) -> None:
+    """Upgrade only the exact failed M157 checkpoint source to the corrected constructor call."""
+    relative = (
+        "components/omnibox/browser/android/java/src/org/chromium/components/omnibox/"
+        "AutocompleteMatch.java"
+    )
+    target = source / relative
+    old_sha256 = "75e8366462f2f5212016be67f1fb4f329cd0a31620ded50857e7141abddd11fc"
+    new_sha256 = "514e14cfa414e1b1ec3ae22e8a545f6ca080033ef34291a831ed29430b3259f9"
+    if digest(target) != old_sha256:
+        return
+    old = (
+        "                        description,\n"
+        "                        List.of(new MatchClassification(0, MatchClassificationStyle.NONE)),\n"
+        "                        null,\n"
+        "                        \"\",\n"
+        "                        GURL.emptyGURL(),\n"
+    )
+    new = old.replace("                        null,\n", "", 1)
+    text = target.read_text(encoding="utf-8")
+    if text.count(old) != 1:
+        raise RuntimeError(f"known M157 clipboard repair anchor mismatch: {relative}")
+    target.write_text(text.replace(old, new, 1), encoding="utf-8")
+    if digest(target) != new_sha256:
+        raise RuntimeError(f"known M157 clipboard repair digest mismatch: {relative}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path, help="post-Titanium Chromium src directory")
@@ -216,6 +243,7 @@ def main() -> int:
     if not (source / ".git").exists():
         raise RuntimeError(f"not a Chromium git tree: {source}")
 
+    migrate_known_m157_clipboard_constructor_fix(source)
     states = file_states(source)
     if all(state == "after" for state in states.values()):
         print("Kiwi UI feature patches are already applied.")

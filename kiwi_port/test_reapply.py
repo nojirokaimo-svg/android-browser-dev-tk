@@ -134,6 +134,21 @@ class ReapplyTest(unittest.TestCase):
         self.assertEqual(target.read_text(), 'before\nunexpected upstream content\n')
         self.assertEqual((self.src / 'b.txt').read_text(), 'before\n')
 
+    def test_m157_clipboard_constructor_argument_alignment(self):
+        patch = (HERE / 'patches' / '200-new-tab-clipboard-only.patch').read_text()
+        bad = (
+            '+                        List.of(new MatchClassification(0, MatchClassificationStyle.NONE)),\n'
+            '+                        null,\n'
+            '+                        "",\n'
+        )
+        good = (
+            '+                        List.of(new MatchClassification(0, MatchClassificationStyle.NONE)),\n'
+            '+                        "",\n'
+            '+                        GURL.emptyGURL(),\n'
+        )
+        self.assertNotIn(bad, patch)
+        self.assertIn(good, patch)
+
     def test_apply_and_idempotence(self):
         self.assertEqual(self.apply().returncode, 0)
         before = self.git('diff').stdout

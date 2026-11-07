@@ -1,5 +1,13 @@
 # ChatGPT / Codex handoff
 
+## 2026-11-07 — M157 production constructor failure and exact-checkpoint repair
+
+Production run [42310590826](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/42310590826) restored the requested completed M156.79 cache with cache-hit=true and an identical matched key, completed its first stage, then failed in continue-1 while compiling `AutocompleteMatch.java:211`. The M157 `AutocompleteMatch` constructor no longer accepts the extra nullable argument that patch 200 passed between the description classifications and `fillIntoEdit`.
+
+The repair removes only that extra `null`, updates the measured final source hash and patch checksum, and adds a regression assertion for the M157 argument sequence. A source migration runs only when the checkpoint file exactly matches old SHA-256 `75e8366462f2f5212016be67f1fb4f329cd0a31620ded50857e7141abddd11fc` and requires the corrected SHA-256 `514e14cfa414e1b1ec3ae22e8a545f6ca080033ef34291a831ed29430b3259f9`; unknown content remains a hard stop.
+
+Resume only from exact saved checkpoint `kiwi-15738-264139f4b8d5dc63ce8240d683ef3e40818b1731-42310590826-1-continue-1`, requiring cache-hit=true and an identical matched key. This checkpoint already has the M157 identity, so no upstream transition is allowed. No clean build, fallback, cache overwrite, output deletion, or Ninja-history deletion.
+
 ## Titanium-Kiwi 157.0.8103.38 production
 
 The official Titanium 157.0.8103.38 sources are pinned to Titanium `8516166ece02309125af6edc9fd80dde7470df05`, Vanadium `99a6c8285bf88edf55d7614e8ceb247350620d52`, Chromium `a733b5afbb3ba618844ff8876b89ad1a774b2f18`. The [source audit](https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/42306955076) restored the exact completed 156.79 cache, matching both cache-hit and the requested literal. Its before archive artifact `13547369179` has ZIP SHA-256 `8e7cdd41f20c98cf92ff6cc153f27606d6d3b3f2770a2306e010b4c2d06ad1eb`.
