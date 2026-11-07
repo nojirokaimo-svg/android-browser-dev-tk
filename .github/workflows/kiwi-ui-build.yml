@@ -28,12 +28,11 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          # Resume the exact M157 partial checkpoint saved after the constructor failure.
-          # The corrected unified diff and M157 constructor contract passed regression checks.
+          # Resume the exact completed M157.38 checkpoint from successful production run 42353235318.
           # Keep Ninja history and object/generated files; a cache miss stops the build.
-          restore-key: kiwi-15738-264139f4b8d5dc63ce8240d683ef3e40818b1731-42310590826-1-continue-1
+          restore-key: kiwi-incremental-15738-7c4fc332b04356c6bafec15da31571c73aaadb4f-42353235318-1-build
           require-restore: "true"
-          # The partial checkpoint already has the pinned M157 source identity.
+          # The completed checkpoint already has the pinned M157 source identity.
           bootstrap-revision: ""
           transition-from-identity: ""
           save-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
