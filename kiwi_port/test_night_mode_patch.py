@@ -164,17 +164,17 @@ class NightModePatchTest(unittest.TestCase):
         self.assertIn("mContext.getString(R.string.kiwi_clipboard_link)", patch)
         self.assertNotIn("mContext.getString(org.chromium.chrome.R.string.kiwi_clipboard_link)", patch)
 
-    def test_clipboard_candidate_uses_m154_autocomplete_match_signature(self):
+    def test_clipboard_candidate_uses_m157_autocomplete_match_signature(self):
         patch = (ROOT / "patches/200-new-tab-clipboard-only.patch").read_text()
         self.assertIn(
-            "+                        null,\n"
+            "+                        List.of(new MatchClassification(0, MatchClassificationStyle.NONE)),\n"
             "+                        \"\",\n"
             "+                        GURL.emptyGURL(),",
             patch,
         )
         self.assertNotIn(
+            "+                        List.of(new MatchClassification(0, MatchClassificationStyle.NONE)),\n"
             "+                        null,\n"
-            "+                        0,\n"
             "+                        \"\",\n"
             "+                        GURL.emptyGURL(),",
             patch,

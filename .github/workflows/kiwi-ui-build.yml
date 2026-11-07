@@ -29,7 +29,7 @@ jobs:
         uses: ./.github/actions/kiwi-build-stage
         with:
           # Resume the exact M157 partial checkpoint saved after the constructor failure.
-          # The corrected unified diff passed local git-apply and regression checks.
+          # The corrected unified diff and M157 constructor contract passed regression checks.
           # Keep Ninja history and object/generated files; a cache miss stops the build.
           restore-key: kiwi-15738-264139f4b8d5dc63ce8240d683ef3e40818b1731-42310590826-1-continue-1
           require-restore: "true"
