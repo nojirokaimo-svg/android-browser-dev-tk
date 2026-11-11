@@ -6,11 +6,11 @@ on:
       titanium_ref:
         description: Titanium branch, tag, or commit; blank uses upstream's default branch HEAD.
         required: false
-        default: "v157.0.8103.38"
+        default: "v157.0.8103.50"
       incremental_cache_key:
         description: Exact completed out/Default cache key. Cache miss stops; no cold build.
         required: false
-        default: "kiwi-incremental-15738-7c4fc332b04356c6bafec15da31571c73aaadb4f-42353235318-1-build"
+        default: "kiwi-incremental-15750-43a6a9a795c50ac98ecc87a1afb404cd69d800cc-42959641642-1-continue-1"
       transition_from_identity:
         description: Source identity stamped in that exact completed cache.
         required: false
