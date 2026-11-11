@@ -1,5 +1,18 @@
 # ChatGPT / Codex handoff
 
+## 2026-11-11 — Update to official Titanium 157.0.8103.50 and ongoing updates
+
+The user requests updating to the newest official version and continuing updates when new versions are released. Official Release v157.0.8103.50, published 2026-11-10T23:12:44Z, pins Titanium `e6bd75fbf00255be83f5a2901de97aa056506ef6`, Vanadium `68cc69d56423a24a64dcf1bc7d46bc177f547c96`, Chromium `049750111b1e5c11565c792b2aeed5541f332bad`. The Chromium tag was independently confirmed through googlesource and the GitHub mirror.
+
+Begin with the source-only audit workflow `.github/workflows/kiwi-15750-audit.yml`. It restores only completed `kiwi-incremental-15738-7c4fc332b04356c6bafec15da31571c73aaadb4f-42353235318-1-build`, requiring cache-hit=true and exact matched key, captures the actual post-Titanium .50 sources, and never compiles or saves/overwrites a checkpoint. After it succeeds, obtain its actual artifact, verify its digest and all source hashes, replay all 26 patches strictly, make only required adaptations, update measured manifest/provenance, verify idempotence/Java syntax/necessary tests, then start production. Do not claim the unchanged .38 manifest verifies .50.
+
+Production must use that exact completed .38 checkpoint with explicit transition from identity `8516166ece02309125af6edc9fd80dde7470df05:99a6c8285bf88edf55d7614e8ceb247350620d52:a733b5afbb3ba618844ff8876b89ad1a774b2f18:validation`. Continuations use only their own verified immutable stage checkpoints and no transition. No cold/clean build, gn clean, out/Default/Ninja history/existing output deletion, fallback, cache overwrite, or push/dispatch during active related runs. Cache miss/mismatch stops and is reported. Unrelated main self-hosted out/release runs do not lock Kiwi.
+
+Keep versionCode `807807374`, package `io.github.nojirokaimo.titaniumkiwi`, v2 certificate `32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0`, M155-derived 25 features, ZIP import repair 230, settings, signing and Photopea JIT exception; do not restore 220/225. Update the install fixtures to the actual signed completed .38 APK (SHA256 `5cb536093c69bc26311ee93dc0f92ccabebbaa5c76c13565177eb57c3d23f490`) and verify .38→.50→.38→.50 with adb -r without -d on API30/36 before publishing unique Release APK/ZIP. Independently download and verify the actual new Release APK/ZIP and record completed cache/defaults with [skip ci] after related runs stop. Physical device behavior and Violentmonkey ZIP export remain unverified unless real runtime evidence proves otherwise. Never reveal signing secrets.
+
+The ongoing updater should check official releases, avoid duplicate builds/notifications, continue each in-progress update to completion, and retain the same protections for later releases. Normal completion does not disable the ongoing release watcher; an exact-cache failure stops it and notifies the user.
+
+
 
 ## 2026-11-07 — Titanium-Kiwi 157.0.8103.38 completed and independently verified
 
