@@ -1,5 +1,32 @@
 # ChatGPT / Codex handoff
 
+## 2026-11-11 — M157.50 completed, independently verified, completion notification recorded
+
+Production https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/42959641642 succeeded (source commit 43a6a9a795c50ac98ecc87a1afb404cd69d800cc). Build 130322892898, continue-1 130440296448, require-apk 130580960241, API36 install 130580999284, API30 install 130580999313, publish 130582827338 all succeeded. All target runs stopped before completion-only [skip ci] updates.
+
+Release: https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/tag/titanium-kiwi-157.0.8103.50-42959641642-1
+APK: https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-157.0.8103.50-42959641642-1/Titanium-Kiwi-core-157.0.8103.50-arm64-v8a.apk
+ZIP: https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-157.0.8103.50-42959641642-1/Titanium-Kiwi-157.0.8103.50.zip
+
+Both public Release files were actually downloaded independently:
+- APK SHA-256: 601a74984a84b7e654da9ffcc36dace7dfe579e0a7f464cd2d9968b171f079c3
+- ZIP SHA-256: 9c322fd6c66ff765f25250073dfea0eada660a4e649356c3145e92a3f608cddb
+- apksigner verified the entire APK v2 signature (one signer), certificate SHA-256 32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0.
+- Independent binary manifest parse: package io.github.nojirokaimo.titaniumkiwi, versionName 157.0.8103.50, fixed versionCode 807807374.
+- Full APK/ZIP CRC integrity passed; ZIP contains one APK byte-identical by SHA-256 to the independently downloaded APK.
+- API30 and API36 logs each show all four successful installs for .38 -> .50 -> .38 -> .50 with adb install -r, without -d. These are installation checks, not proof of physical-device operation or Violentmonkey ZIP export.
+
+Exact cache evidence: initial build cache-hit=true and matched-key=expected-key=kiwi-incremental-15738-7c4fc332b04356c6bafec15da31571c73aaadb4f-42353235318-1-build. It saved kiwi-15750-43a6a9a795c50ac98ecc87a1afb404cd69d800cc-42959641642-1-build. Continue-1 restored that literal with cache-hit=true and identical matched/expected keys, then successfully saved the completed checkpoint at 2026-11-11T14:21:32.7849540Z:
+kiwi-incremental-15750-43a6a9a795c50ac98ecc87a1afb404cd69d800cc-42959641642-1-continue-1
+
+This completed .50 key is now the first-stage/manual default; the old .38 identity transition is cleared. update-upstream.yml and composite action default pins/version are aligned with .50. No cold build, cleanup, fallback, cache overwrite, or versionCode increase.
+
+Source audit evidence remains kiwi_port/audits/m155-to-15750-*: actual audit artifact 13827124147 from run 42955127764 downloaded, SHA-256 1341fa6855b065eb906668a6d87be3235907025bbbfc20362fa9d5b3c9bee3e6; 100 actual before/after hashes, 26 unchanged patches strict replay, second-pass idempotence, JDK25 syntax for 55 Java files, all 66 tests including Ninja passed without skips. M155.84 feature provenance acdde2860b6a4ee2f777920fbabaafa571cf909c remains; patch230 ZIP import, settings, signing, Photopea JIT exception and constructor fixes remain; removed 220/225 stay absent.
+
+Physical device operation and Violentmonkey Settings ZIP export remain UNVERIFIED; do not claim repaired or tested. Existing old-APK diagnostic 42959641507 is not new APK evidence.
+
+Completion links/results are being delivered by the current automation run; do not rebuild or repeat completion notification for .50. The ongoing official-release watcher stays ENABLED under the user's recurring request. Official latest checked now remains v157.0.8103.50. Next runs must first read latest HEAD/handoff and all target statuses/jobs, then check official releases and only start a strictly audited newer version. The historical entries below are superseded by this completion record.
+
 ## 2026-11-11 — M157.50 source audit verified; production prepared
 
 Audit 42955127764 succeeded: exact completed .38 checkpoint restored with cache-hit=true and identical requested/matched keys. Artifact 13827124147 was actually downloaded; ZIP SHA256 1341fa6855b065eb906668a6d87be3235907025bbbfc20362fa9d5b3c9bee3e6 matches GitHub. All 100 before hashes verified. All 26 patches apply unchanged strictly, all 100 measured final hashes match updated manifest, second replay is idempotent, JDK25 parses 55 Java files and all 66 tests pass with no skips. See kiwi_port/audits/m155-to-15750-*. The measured AndroidManifest.xml before/after hashes are the only changed source hashes; no feature patch was modified.
