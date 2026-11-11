@@ -1,9 +1,9 @@
 {
-  "titanium_commit": "8516166ece02309125af6edc9fd80dde7470df05",
-  "chromium_commit": "a733b5afbb3ba618844ff8876b89ad1a774b2f18",
-  "vanadium_commit": "99a6c8285bf88edf55d7614e8ceb247350620d52",
-  "chromium_version": "157.0.8103.38",
-  "scope": "M155-derived 25 features and ZIP import fix rebased onto audited post-Titanium M157.38 sources.",
+  "titanium_commit": "e6bd75fbf00255be83f5a2901de97aa056506ef6",
+  "chromium_commit": "049750111b1e5c11565c792b2aeed5541f332bad",
+  "vanadium_commit": "68cc69d56423a24a64dcf1bc7d46bc177f547c96",
+  "chromium_version": "157.0.8103.50",
+  "scope": "M155-derived 25 features and ZIP import fix strictly replayed onto audited post-Titanium M157.50 sources.",
   "complete_kiwi_ui_port": true,
   "files": {
     "base/android/java/src/org/chromium/base/shared_preferences/StrictPreferenceKeyChecker.java": {
@@ -51,8 +51,8 @@
       "after_sha256": "e61b10cd0fd018316a65003baa3a0ec715ca95a6d9d21b12b3282f8fab051ccd"
     },
     "chrome/android/java/AndroidManifest.xml": {
-      "before_sha256": "e7c1e4fa9f2f6984468d8c9c3c8650db857f4ba593a85120f011f01a34fd821f",
-      "after_sha256": "4946ef2126ad62d78771a3a5e386e03ee3ba1982365da9f1b579a75be5aa35c1"
+      "before_sha256": "27eb2476211b095c01b90717dbd011f73255af0f4fa993b459e3ed08d79c28d2",
+      "after_sha256": "476eee869331afeb6e97a06c490b2da81fc7a4ad5c9841561d08fec4e5f96cc8"
     },
     "chrome/android/java/res/layout/radio_button_group_tabswitcher_preference.xml": {
       "before_sha256": null,

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 mkdir -p verification-output
-old=artifacts/previous/Titanium-Kiwi-core-156.0.8078.79-arm64-v8a.apk
-new=artifacts/repair/Titanium-Kiwi-core-157.0.8103.38-arm64-v8a.apk
-printf '%s  %s\n' 8c09cf34d74fb7e2f9871600058faf9a0797d980ea0125e9ddce8a853ef4a8af "$old" | sha256sum -c -
+old=artifacts/previous/Titanium-Kiwi-core-157.0.8103.38-arm64-v8a.apk
+new=artifacts/repair/Titanium-Kiwi-core-157.0.8103.50-arm64-v8a.apk
+printf '%s  %s\n' 5cb536093c69bc26311ee93dc0f92ccabebbaa5c76c13565177eb57c3d23f490 "$old" | sha256sum -c -
 adb wait-for-device
 adb shell getprop ro.build.version.sdk > verification-output/android-api.txt
 adb shell getprop ro.product.cpu.abilist > verification-output/android-abis.txt
@@ -20,7 +20,7 @@ cat verification-output/install-previous.txt verification-output/update-repair.t
 grep -qx Success verification-output/install-previous.txt
 grep -qx Success verification-output/update-repair.txt
 
-# Test returning to the previous .79 release without adb's downgrade override.
+# Test returning to the previous .38 release without adb's downgrade override.
 adb install --no-streaming -r "$old" > verification-output/return-to-previous.txt 2>&1
 cat verification-output/return-to-previous.txt
 grep -qx Success verification-output/return-to-previous.txt

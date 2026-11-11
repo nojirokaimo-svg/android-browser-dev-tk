@@ -1,5 +1,12 @@
 # ChatGPT / Codex handoff
 
+## 2026-11-11 — M157.50 source audit verified; production prepared
+
+Audit 42955127764 succeeded: exact completed .38 checkpoint restored with cache-hit=true and identical requested/matched keys. Artifact 13827124147 was actually downloaded; ZIP SHA256 1341fa6855b065eb906668a6d87be3235907025bbbfc20362fa9d5b3c9bee3e6 matches GitHub. All 100 before hashes verified. All 26 patches apply unchanged strictly, all 100 measured final hashes match updated manifest, second replay is idempotent, JDK25 parses 55 Java files and all 66 tests pass with no skips. See kiwi_port/audits/m155-to-15750-*. The measured AndroidManifest.xml before/after hashes are the only changed source hashes; no feature patch was modified.
+
+Production workflow now pins official .50 revisions and transitions explicitly from the exact completed .38 checkpoint/identity documented below. Install tests now use the signed completed .38 fixture and require .38→.50→.38→.50 on API30/36 without -d before publishing a unique Release. Follow the production run at this commit or newer; never dispatch the audit or an older build again while active. Existing data, 25 features, ZIP import 230, signing, fixed versionCode and Photopea exception retained; 220/225 absent. APK is not yet complete. Physical device and Violentmonkey export remain unverified.
+
+
 ## 2026-11-11 — Update to official Titanium 157.0.8103.50 and ongoing updates
 
 The user requests updating to the newest official version and continuing updates when new versions are released. Official Release v157.0.8103.50, published 2026-11-10T23:12:44Z, pins Titanium `e6bd75fbf00255be83f5a2901de97aa056506ef6`, Vanadium `68cc69d56423a24a64dcf1bc7d46bc177f547c96`, Chromium `049750111b1e5c11565c792b2aeed5541f332bad`. The Chromium tag was independently confirmed through googlesource and the GitHub mirror.

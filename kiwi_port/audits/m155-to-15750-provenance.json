@@ -1,0 +1,135 @@
+{
+  "original_feature_revision": "acdde2860b6a4ee2f777920fbabaafa571cf909c",
+  "original_version": "155.0.8059.84",
+  "target_version": "157.0.8103.50",
+  "target_upstream": {
+    "titanium_commit": "e6bd75fbf00255be83f5a2901de97aa056506ef6",
+    "vanadium_commit": "68cc69d56423a24a64dcf1bc7d46bc177f547c96",
+    "chromium_commit": "049750111b1e5c11565c792b2aeed5541f332bad"
+  },
+  "previous_feature_provenance": "m155-to-15738-provenance.json",
+  "source_audit": {
+    "run_id": 42955127764,
+    "job_id": 130308291452,
+    "artifact_id": 13827124147,
+    "zip_sha256": "1341fa6855b065eb906668a6d87be3235907025bbbfc20362fa9d5b3c9bee3e6",
+    "exact_restored_cache": "kiwi-incremental-15738-7c4fc332b04356c6bafec15da31571c73aaadb4f-42353235318-1-build",
+    "cache_hit": true,
+    "matched_key_equals_requested": true
+  },
+  "verification": {
+    "strict_patches": 26,
+    "before_and_after_source_paths": 100,
+    "second_replay": "no changes",
+    "java25_sources_parsed": 55,
+    "unit_tests_passed": 66,
+    "unit_tests_skipped": 0
+  },
+  "adaptations": "All 26 existing patches apply unchanged. Only AndroidManifest.xml measured before/after hashes differ from .38. Constructor fix retained.",
+  "features": [
+    {
+      "id": "resources",
+      "sha256": "c3fd037040cac6f4d57a18d427a38c8cb3f7731987ec283d187b93ae5e63026c"
+    },
+    {
+      "id": "app-menu-actions",
+      "sha256": "7ce2f287a5a2fbd3c71a0dc1a12f1bf6b3313d23037e1a6db606c4c59521652b"
+    },
+    {
+      "id": "menu-presentation",
+      "sha256": "b373eb4d9396e7d39c98e9b9b51131c79fac8d06f9c824d9f86c8eb5ef75d4b9"
+    },
+    {
+      "id": "preference-registry",
+      "sha256": "90b1927022ed80e136763170ea86c776e58af566b8cb7da931fd5ce0442aa303"
+    },
+    {
+      "id": "night-mode-presets",
+      "sha256": "8db0536f96244a636a03e19ceded32474c86ac74c3f240fc456256335563291c"
+    },
+    {
+      "id": "runtime-night-mode",
+      "sha256": "82b251613e68804ae1a520e6f06879fe3295ef821347ee11d47ae0fdf979e230"
+    },
+    {
+      "id": "renderer-force-dark-runtime",
+      "sha256": "42df501c08df6c7e4751e55e65609af7400239fa60becf343b49239c3267e27d"
+    },
+    {
+      "id": "extension-mobile-ui",
+      "sha256": "a3753a9dcf4affe940f23f28c66f65545cc3fe4726ff9000f7700438d52b6f5e"
+    },
+    {
+      "id": "black-statusbar-full-backup",
+      "sha256": "5f736409ec4486d1d4ef66972cc48c12155e7982e9d77e863ebf79a6975cb3fb"
+    },
+    {
+      "id": "kiwi-tab-switcher",
+      "sha256": "f583648cbe6b1e622e82139fb411ff03541f9972c2b4d4fe8412a3b43d09efaa"
+    },
+    {
+      "id": "amoled-surfaces",
+      "sha256": "84bd3487eae8a94a0ee8b4fb5a6bbd53328a37b0700a1a9f14fb63b9d559f3eb"
+    },
+    {
+      "id": "kiwi-migration-extension-import",
+      "sha256": "7b59cfb737a28bc3c022deea736140e59ba82f84b7449bb9b363df6af7bc8200"
+    },
+    {
+      "id": "credentials-security",
+      "sha256": "38eb26314cc705441cecc33f62aa0267479c1ff7cbde6674f5fa19954a63d75f"
+    },
+    {
+      "id": "kiwi-settings-dark",
+      "sha256": "45bd4900d5dbc8338e7e1fc732732e94e5b144a7fcce8010d6194f44485ae5e9"
+    },
+    {
+      "id": "extension-popup-menu-fixes",
+      "sha256": "0034489c4a8a17d7cbe477feb08c494680bffcb4255e8fd6961f38765f83c969"
+    },
+    {
+      "id": "web-contents-theme-target",
+      "sha256": "d6691c04b09e2fb064d3a1eedf8b9f9ea725e13d444a443f3a72a015ffc96904"
+    },
+    {
+      "id": "context-menu-shape",
+      "sha256": "21bae2839c3548ec184380128cbf1c23adac521575763327698fe16431ed6559"
+    },
+    {
+      "id": "kiwi-omnibox-history",
+      "sha256": "91c2c695b31882c417c3e59c5575e4fa51f1b59b911ac9db0edd356081a83f04"
+    },
+    {
+      "id": "portable-full-backup",
+      "sha256": "0742e013b5dadb132de26a2cb1b23e43b9ff756e60b0a636841a30238a587d51"
+    },
+    {
+      "id": "disable-single-tab-resumption",
+      "sha256": "4572613a8b6100b64158c9bc3f2da6adc73fbb90b764b617dc1c2368b0166be0"
+    },
+    {
+      "id": "preserve-active-tab",
+      "sha256": "e61adcc8a55d663adc291adf12c391cdff09d5523213f6e4dd732001bc699302"
+    },
+    {
+      "id": "new-tab-clipboard-only",
+      "sha256": "42796dc3cf54261553c6151f181bc4b545c3295989bf7076bd4a2311167ab4cf"
+    },
+    {
+      "id": "tab-search-setting",
+      "sha256": "c435b7245b42edf7f96e4dfbb1e2d73cc9758bfd6e9e5689127c1a25415c1d3b"
+    },
+    {
+      "id": "dark-ui-surface-color",
+      "sha256": "07962d56ff3647d90980f699ffc837b14d2552f490665039a1e7780bf6a0345c"
+    },
+    {
+      "id": "independent-dark-ui-colors",
+      "sha256": "11fe60a8edd0b5b7b878dd47b2ab4978bc8b000b4d411f88e8ce45ebad1ff17a"
+    },
+    {
+      "id": "extension-zip-crx-install",
+      "sha256": "dba44698b092fdcd3f22c50c43788b3d27092125b132b6bfe9967dfd6c095a25"
+    }
+  ]
+}

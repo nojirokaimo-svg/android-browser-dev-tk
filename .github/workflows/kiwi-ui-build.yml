@@ -1,4 +1,4 @@
-name: Rebuild Titanium-Kiwi 157.0.8103.38 from M155 feature sources
+name: Rebuild Titanium-Kiwi 157.0.8103.50 from M155 feature sources
 
 on:
   workflow_dispatch:
@@ -32,15 +32,15 @@ jobs:
           # Keep Ninja history and object/generated files; a cache miss stops the build.
           restore-key: kiwi-incremental-15738-7c4fc332b04356c6bafec15da31571c73aaadb4f-42353235318-1-build
           require-restore: "true"
-          # The completed checkpoint already has the pinned M157 source identity.
+          # Explicit one-time transition from completed .38 identity to pinned .50 sources.
           bootstrap-revision: ""
-          transition-from-identity: ""
-          save-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
-          final-cache-key: kiwi-incremental-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
-          titanium-commit: 8516166ece02309125af6edc9fd80dde7470df05
-          vanadium-commit: 99a6c8285bf88edf55d7614e8ceb247350620d52
-          chromium-commit: a733b5afbb3ba618844ff8876b89ad1a774b2f18
-          chromium-version: 157.0.8103.38
+          transition-from-identity: "8516166ece02309125af6edc9fd80dde7470df05:99a6c8285bf88edf55d7614e8ceb247350620d52:a733b5afbb3ba618844ff8876b89ad1a774b2f18:validation"
+          save-key: kiwi-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
+          final-cache-key: kiwi-incremental-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
+          titanium-commit: e6bd75fbf00255be83f5a2901de97aa056506ef6
+          vanadium-commit: 68cc69d56423a24a64dcf1bc7d46bc177f547c96
+          chromium-commit: 049750111b1e5c11565c792b2aeed5541f332bad
+          chromium-version: 157.0.8103.50
           patch-mode: strict
           build-budget-minutes: "270"
 
@@ -56,14 +56,14 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
+          restore-key: kiwi-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-build
           require-restore: "true"
-          save-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
-          final-cache-key: kiwi-incremental-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
-          titanium-commit: 8516166ece02309125af6edc9fd80dde7470df05
-          vanadium-commit: 99a6c8285bf88edf55d7614e8ceb247350620d52
-          chromium-commit: a733b5afbb3ba618844ff8876b89ad1a774b2f18
-          chromium-version: 157.0.8103.38
+          save-key: kiwi-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
+          final-cache-key: kiwi-incremental-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
+          titanium-commit: e6bd75fbf00255be83f5a2901de97aa056506ef6
+          vanadium-commit: 68cc69d56423a24a64dcf1bc7d46bc177f547c96
+          chromium-commit: 049750111b1e5c11565c792b2aeed5541f332bad
+          chromium-version: 157.0.8103.50
           patch-mode: strict
           build-budget-minutes: "270"
 
@@ -79,14 +79,14 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
+          restore-key: kiwi-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-1
           require-restore: "true"
-          save-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
-          final-cache-key: kiwi-incremental-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
-          titanium-commit: 8516166ece02309125af6edc9fd80dde7470df05
-          vanadium-commit: 99a6c8285bf88edf55d7614e8ceb247350620d52
-          chromium-commit: a733b5afbb3ba618844ff8876b89ad1a774b2f18
-          chromium-version: 157.0.8103.38
+          save-key: kiwi-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
+          final-cache-key: kiwi-incremental-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
+          titanium-commit: e6bd75fbf00255be83f5a2901de97aa056506ef6
+          vanadium-commit: 68cc69d56423a24a64dcf1bc7d46bc177f547c96
+          chromium-commit: 049750111b1e5c11565c792b2aeed5541f332bad
+          chromium-version: 157.0.8103.50
           patch-mode: strict
           build-budget-minutes: "270"
 
@@ -102,14 +102,14 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
+          restore-key: kiwi-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-2
           require-restore: "true"
-          save-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
-          final-cache-key: kiwi-incremental-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
-          titanium-commit: 8516166ece02309125af6edc9fd80dde7470df05
-          vanadium-commit: 99a6c8285bf88edf55d7614e8ceb247350620d52
-          chromium-commit: a733b5afbb3ba618844ff8876b89ad1a774b2f18
-          chromium-version: 157.0.8103.38
+          save-key: kiwi-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
+          final-cache-key: kiwi-incremental-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
+          titanium-commit: e6bd75fbf00255be83f5a2901de97aa056506ef6
+          vanadium-commit: 68cc69d56423a24a64dcf1bc7d46bc177f547c96
+          chromium-commit: 049750111b1e5c11565c792b2aeed5541f332bad
+          chromium-version: 157.0.8103.50
           patch-mode: strict
           build-budget-minutes: "270"
 
@@ -125,14 +125,14 @@ jobs:
       - id: build
         uses: ./.github/actions/kiwi-build-stage
         with:
-          restore-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
+          restore-key: kiwi-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-3
           require-restore: "true"
-          save-key: kiwi-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
-          final-cache-key: kiwi-incremental-15738-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
-          titanium-commit: 8516166ece02309125af6edc9fd80dde7470df05
-          vanadium-commit: 99a6c8285bf88edf55d7614e8ceb247350620d52
-          chromium-commit: a733b5afbb3ba618844ff8876b89ad1a774b2f18
-          chromium-version: 157.0.8103.38
+          save-key: kiwi-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
+          final-cache-key: kiwi-incremental-15750-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-continue-4
+          titanium-commit: e6bd75fbf00255be83f5a2901de97aa056506ef6
+          vanadium-commit: 68cc69d56423a24a64dcf1bc7d46bc177f547c96
+          chromium-commit: 049750111b1e5c11565c792b2aeed5541f332bad
+          chromium-version: 157.0.8103.50
           patch-mode: strict
           build-budget-minutes: "270"
 
@@ -170,14 +170,14 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v4
         with:
-          name: Titanium-Kiwi-core-157.0.8103.38-arm64
+          name: Titanium-Kiwi-core-157.0.8103.50-arm64
           path: artifacts/repair
       - name: Fetch the signed previous release for overwrite testing
         run: |
           mkdir -p artifacts/previous
           curl -fL --retry 3 --max-time 240 \
-            -o artifacts/previous/Titanium-Kiwi-core-156.0.8078.79-arm64-v8a.apk \
-            https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-156.0.8078.79-repair-41372171273-1/Titanium-Kiwi-core-156.0.8078.79-arm64-v8a.apk
+            -o artifacts/previous/Titanium-Kiwi-core-157.0.8103.38-arm64-v8a.apk \
+            https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-157.0.8103.38-42353235318-1/Titanium-Kiwi-core-157.0.8103.38-arm64-v8a.apk
       - run: bash diagnostics/verify_repair_apk.sh
       - name: Enable emulator acceleration
         run: |
@@ -209,24 +209,24 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v4
         with:
-          name: Titanium-Kiwi-core-157.0.8103.38-arm64
+          name: Titanium-Kiwi-core-157.0.8103.50-arm64
           path: artifacts/repair
       - name: Publish immutable directly downloadable APK and ZIP
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -Eeuo pipefail
-          tag="titanium-kiwi-157.0.8103.38-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          tag="titanium-kiwi-157.0.8103.50-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           cd artifacts/repair
-          apk=Titanium-Kiwi-core-157.0.8103.38-arm64-v8a.apk
+          apk=Titanium-Kiwi-core-157.0.8103.50-arm64-v8a.apk
           test -s "$apk"
           sha256sum "$apk" > SHA256SUMS.txt
-          zip -q Titanium-Kiwi-157.0.8103.38.zip "$apk" SHA256SUMS.txt apk-signature.txt
+          zip -q Titanium-Kiwi-157.0.8103.50.zip "$apk" SHA256SUMS.txt apk-signature.txt
           cat > release-notes.md <<'NOTES'
-          M155由来の25機能とZIP読み込み修正を維持した157.0.8103.38です。
+          M155由来の25機能とZIP読み込み修正を維持した157.0.8103.50です。
           versionCode: 807807374、package: io.github.nojirokaimo.titaniumkiwi。
-          署名v2と既存の証明書を照合し、Android API30/36エミュレーターで156.79→157.38→156.79→157.38の上書き検査を通過しました。
+          署名v2と既存の証明書を照合し、Android API30/36エミュレーターで157.38→157.50→157.38→157.50の上書き検査を通過しました。
           実機での動作は未検証です。APKを直接ダウンロードするか、ZIPを展開して中のAPKをインストールしてください。
           NOTES
-          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'Titanium-Kiwi 157.0.8103.38' --notes-file release-notes.md "$apk" Titanium-Kiwi-157.0.8103.38.zip SHA256SUMS.txt apk-signature.txt
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'Titanium-Kiwi 157.0.8103.50' --notes-file release-notes.md "$apk" Titanium-Kiwi-157.0.8103.50.zip SHA256SUMS.txt apk-signature.txt
           echo "APK: https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/${apk}" >> "$GITHUB_STEP_SUMMARY"
