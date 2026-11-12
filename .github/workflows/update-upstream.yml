@@ -6,7 +6,7 @@ on:
       titanium_ref:
         description: Titanium branch, tag, or commit; blank uses upstream's default branch HEAD.
         required: false
-        default: "v157.0.8103.50"
+        default: "v157.0.8103.78"
       incremental_cache_key:
         description: Exact completed out/Default cache key. Cache miss stops; no cold build.
         required: false
@@ -14,7 +14,7 @@ on:
       transition_from_identity:
         description: Source identity stamped in that exact completed cache.
         required: false
-        default: ""
+        default: "e6bd75fbf00255be83f5a2901de97aa056506ef6:68cc69d56423a24a64dcf1bc7d46bc177f547c96:049750111b1e5c11565c792b2aeed5541f332bad:validation"
 
 permissions:
   contents: read
@@ -64,7 +64,7 @@ jobs:
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
-          patch-mode: best-effort
+          patch-mode: strict
           build-budget-minutes: "270"
 
   stage-2:
@@ -87,7 +87,7 @@ jobs:
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
-          patch-mode: best-effort
+          patch-mode: strict
           build-budget-minutes: "270"
 
   stage-3:
@@ -110,7 +110,7 @@ jobs:
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
-          patch-mode: best-effort
+          patch-mode: strict
           build-budget-minutes: "270"
 
   stage-4:
@@ -133,7 +133,7 @@ jobs:
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
-          patch-mode: best-effort
+          patch-mode: strict
           build-budget-minutes: "270"
 
   stage-5:
@@ -156,7 +156,7 @@ jobs:
           vanadium-commit: ${{ needs.resolve.outputs.vanadium }}
           chromium-commit: ${{ needs.resolve.outputs.chromium }}
           chromium-version: ${{ needs.resolve.outputs.version }}
-          patch-mode: best-effort
+          patch-mode: strict
           build-budget-minutes: "270"
 
   require-apk:

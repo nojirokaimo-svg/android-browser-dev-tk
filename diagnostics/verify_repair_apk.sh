@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-apk=artifacts/repair/Titanium-Kiwi-core-157.0.8103.50-arm64-v8a.apk
+apk=artifacts/repair/Titanium-Kiwi-core-157.0.8103.78-arm64-v8a.apk
 test -s "$apk"
 mkdir -p verification-output
 sdk="${ANDROID_HOME:?Android SDK is required}"
@@ -13,7 +13,7 @@ grep -Fq 'Verified using v2 scheme (APK Signature Scheme v2): true' verification
 grep -Fq 'Number of signers: 1' verification-output/apk-signature.txt
 grep -Eiq '^(Signer #1|V2 Signer):? certificate SHA-256 digest: 32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0$' verification-output/apk-signature.txt
 "$badger" dump badging "$apk" > verification-output/apk-badging.txt
-python3 kiwi_port/pin_version_code.py --badging verification-output/apk-badging.txt --version 157.0.8103.50
+python3 kiwi_port/pin_version_code.py --badging verification-output/apk-badging.txt --version 157.0.8103.78
 sha256sum "$apk" | tee verification-output/SHA256SUMS.txt
 python3 - "$apk" <<'PY'
 import sys, zipfile

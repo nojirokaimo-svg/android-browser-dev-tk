@@ -1,5 +1,13 @@
 # ChatGPT / Codex handoff
 
+## 2026-11-13 — M157.78 actual-source audit verified; production prepared
+
+Audit https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/43282550391 job 131407366676 succeeded. Artifact 13976880330 was actually downloaded; ZIP SHA-256 ff758691242b543731591ed968fc41b3d5ecee4dd61b8d86effbd853b0ba8aa2 matches GitHub digest. Logs show cache-hit=true and matched-key=expected literal kiwi-incremental-15750-43a6a9a795c50ac98ecc87a1afb404cd69d800cc-42959641642-1-continue-1.
+All 100 source before hashes were independently checked against actual tar bytes. All 26 patches were sequentially applied with git apply --check and without repair; all measured after hashes match .50. Updated manifest identifies actual .78 source pins. A fresh strict apply.py replay reports 26 applied, second replay reports already-applied; JDK25 parsed all 55 Java sources and all 66 tests passed with Ninja, zero skips. Evidence: kiwi_port/audits/m155-to-15778-*.
+Production pins/version/cache prefixes and build-script/composite defaults are .78. Initial restore is the completed .50 literal only, with explicit old .50 identity transition; later stages use their own .78 run checkpoints only. No cache deletion, overwrite, fallback or clean build. Manual upstream workflow is strict, default .78 and explicit .50 transition, and is not dispatched.
+Production diagnostics now use the actual completed .50 APK with SHA-256 601a74984a84b7e654da9ffcc36dace7dfe579e0a7f464cd2d9968b171f079c3 for API30/36 .50 -> .78 -> .50 -> .78, adb install -r and no -d. Publish remains gated on both successful installation jobs. Fixed code 807807374, package and signer unchanged.
+On resume fetch latest Actions/jobs and follow the production run created by this commit; no push/dispatch while target active. APK .78 is not completed or independently verified yet. Actual Release download/v2/manifest/ZIP integrity verification and exact completed checkpoint evidence are required before completion notice and [skip ci] default/handoff finalization. Physical-device operation and Violentmonkey Settings ZIP export remain unverified. Monitoring continues for later official releases.
+
 ## 2026-11-12 — M157.78 official release detected; source audit preparation
 
 Official release https://github.com/jqssun/android-titanium-browser/releases/tag/v157.0.8103.78 was published 2026-11-12T18:33:53Z.

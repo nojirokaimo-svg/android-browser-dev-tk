@@ -1,9 +1,9 @@
 {
-  "titanium_commit": "e6bd75fbf00255be83f5a2901de97aa056506ef6",
-  "chromium_commit": "049750111b1e5c11565c792b2aeed5541f332bad",
-  "vanadium_commit": "68cc69d56423a24a64dcf1bc7d46bc177f547c96",
-  "chromium_version": "157.0.8103.50",
-  "scope": "M155-derived 25 features and ZIP import fix strictly replayed onto audited post-Titanium M157.50 sources.",
+  "titanium_commit": "bde250ae7c7d43a7a1827a44d07841132f6db7f4",
+  "chromium_commit": "4b3d0dabb8250b6f152d2d85d79e7706e309d087",
+  "vanadium_commit": "a8b304ef63b51f0158775a9d4f90106e8fc9a721",
+  "chromium_version": "157.0.8103.78",
+  "scope": "M155-derived 25 features and ZIP import fix strictly replayed onto audited post-Titanium M157.78 sources.",
   "complete_kiwi_ui_port": true,
   "files": {
     "base/android/java/src/org/chromium/base/shared_preferences/StrictPreferenceKeyChecker.java": {
