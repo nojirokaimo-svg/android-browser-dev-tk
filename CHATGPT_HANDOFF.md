@@ -1,5 +1,13 @@
 # ChatGPT / Codex handoff
 
+## 2026-11-12 — M157.78 official release detected; source audit preparation
+
+Official release https://github.com/jqssun/android-titanium-browser/releases/tag/v157.0.8103.78 was published 2026-11-12T18:33:53Z.
+Pinned Titanium bde250ae7c7d43a7a1827a44d07841132f6db7f4; its Vanadium gitlink a8b304ef63b51f0158775a9d4f90106e8fc9a721; Chromium 157.0.8103.78 tag 4b3d0dabb8250b6f152d2d85d79e7706e309d087 (GitHub mirror and chromium.googlesource.com independently matched).
+New workflow .github/workflows/kiwi-15778-audit.yml collects actual post-Titanium source only, with audit-only=true: no compilation and no checkpoint save. Restore only completed .50 key kiwi-incremental-15750-43a6a9a795c50ac98ecc87a1afb404cd69d800cc-42959641642-1-continue-1, requiring cache-hit=true and exact matched literal.
+Current manifest/26 patches/production defaults remain verified .50 until actual .78 artifact hashes, strict sequential replay, idempotence, JDK25 Java syntax and tests are verified. No .78 APK exists yet. Keep .50 completion notification recorded; do not rebuild or notify it again.
+Next resume: fetch latest branch Actions/jobs first and follow the .78 audit; no push/dispatch while any target run active. On audit success actually download artifact and verify ZIP digest and all before hashes, then strict replay and preserve evidence in kiwi_port/audits/m155-to-15778-*. Only after verification prepare explicit .50 identity -> .78 production transition. All original cache/output preservation, signing, fixed versionCode and API30/36 round-trip requirements remain mandatory.
+
 ## 2026-11-11 — M157.50 completed, independently verified, completion notification recorded
 
 Production https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/42959641642 succeeded (source commit 43a6a9a795c50ac98ecc87a1afb404cd69d800cc). Build 130322892898, continue-1 130440296448, require-apk 130580960241, API36 install 130580999284, API30 install 130580999313, publish 130582827338 all succeeded. All target runs stopped before completion-only [skip ci] updates.
