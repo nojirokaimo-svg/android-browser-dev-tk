@@ -1,0 +1,97 @@
+{
+  "version": "157.0.8103.78",
+  "source_commit": "e53552b8a439d082c239829b50775ce36a4f6d32",
+  "run_id": 43299077020,
+  "release": "https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/tag/titanium-kiwi-157.0.8103.78-43299077020-1",
+  "apk_sha256": "42a2e1609b793409bf81c7f305261b9cc9f83cf2fee04cdba49c8d662fe08976",
+  "zip_sha256": "783c77ec1f064dac49bd7e5220aa07b11658dc73f37bb106d416e584eb261737",
+  "package": "io.github.nojirokaimo.titaniumkiwi",
+  "versionCode": 807807374,
+  "verification": {
+    "verifier": "Android official apksig 9.5.1 ApkVerifier",
+    "whole_apk_verified": true,
+    "v2": true,
+    "signers": 1,
+    "certificate_sha256": "32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0",
+    "manifest": "aapt2 9.5.1-16666295 dump badging plus pin_version_code.py",
+    "apk_crc": true,
+    "zip_crc": true,
+    "embedded_apk_identical": true
+  },
+  "checkpoint": "kiwi-incremental-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-2",
+  "source_provenance": "m155-to-15778-provenance.json",
+  "cache_log_evidence": [
+    {
+      "job": 131465087677,
+      "lines": [
+        "2026-11-12T20:20:59.0405603Z   KIWI_CACHE_HIT: true",
+        "2026-11-12T20:20:59.0406019Z   KIWI_MATCHED_CACHE_KEY: kiwi-incremental-15750-43a6a9a795c50ac98ecc87a1afb404cd69d800cc-42959641642-1-continue-1",
+        "2026-11-12T20:20:59.0406658Z   KIWI_EXPECTED_CACHE_KEY: kiwi-incremental-15750-43a6a9a795c50ac98ecc87a1afb404cd69d800cc-42959641642-1-continue-1",
+        "2026-11-13T01:14:45.6313200Z Cache saved with key: kiwi-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-build"
+      ]
+    },
+    {
+      "job": 131616989881,
+      "lines": [
+        "2026-11-13T01:16:38.2555596Z   KIWI_CACHE_HIT: true",
+        "2026-11-13T01:16:38.2555951Z   KIWI_MATCHED_CACHE_KEY: kiwi-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-build",
+        "2026-11-13T01:16:38.2556493Z   KIWI_EXPECTED_CACHE_KEY: kiwi-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-build",
+        "2026-11-13T06:12:32.2469680Z Cache saved with key: kiwi-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-1"
+      ]
+    },
+    {
+      "job": 131726023223,
+      "lines": [
+        "2026-11-13T06:14:48.6884757Z   KIWI_CACHE_HIT: true",
+        "2026-11-13T06:14:48.6885110Z   KIWI_MATCHED_CACHE_KEY: kiwi-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-1",
+        "2026-11-13T06:14:48.6885647Z   KIWI_EXPECTED_CACHE_KEY: kiwi-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-1",
+        "2026-11-13T07:14:56.9732841Z Cache saved with key: kiwi-incremental-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-2"
+      ]
+    }
+  ],
+  "install_evidence": [
+    {
+      "api": 36,
+      "job": 131749418694,
+      "lines": [
+        "2026-11-13T07:15:32.8947308Z APK package and versionCode 807807374 verified",
+        "2026-11-13T07:17:44.7946865Z artifacts/previous/Titanium-Kiwi-core-157.0.8103.50-arm64-v8a.apk: 1 file pushed, 0 skipped. 174.9 MB/s (335542043 bytes in 1.830s)",
+        "2026-11-13T07:17:44.7950011Z Performing Push Install",
+        "2026-11-13T07:17:44.7950528Z Success",
+        "2026-11-13T07:17:44.7951218Z artifacts/repair/Titanium-Kiwi-core-157.0.8103.78-arm64-v8a.apk: 1 file pushed, 0 skipped. 230.1 MB/s (335332744 bytes in 1.390s)",
+        "2026-11-13T07:17:44.7955370Z Performing Push Install",
+        "2026-11-13T07:17:44.7955767Z Success",
+        "2026-11-13T07:17:53.0016655Z artifacts/previous/Titanium-Kiwi-core-157.0.8103.50-arm64-v8a.apk: 1 file pushed, 0 skipped. 309.8 MB/s (335542043 bytes in 1.033s)",
+        "2026-11-13T07:17:53.0024144Z Performing Push Install",
+        "2026-11-13T07:17:53.0024615Z Success",
+        "2026-11-13T07:18:02.7270340Z artifacts/repair/Titanium-Kiwi-core-157.0.8103.78-arm64-v8a.apk: 1 file pushed, 0 skipped. 292.5 MB/s (335332744 bytes in 1.093s)",
+        "2026-11-13T07:18:02.7281961Z Performing Push Install",
+        "2026-11-13T07:18:02.7282851Z Success"
+      ]
+    },
+    {
+      "api": 30,
+      "job": 131749418932,
+      "lines": [
+        "2026-11-13T07:15:32.0700566Z APK package and versionCode 807807374 verified",
+        "2026-11-13T07:17:28.7447404Z artifacts/previous/Titanium-Kiwi-core-157.0.8103.50-arm64-v8a.apk: 1 file pushed, 0 skipped. 39.3 MB/s (335542043 bytes in 8.147s)",
+        "2026-11-13T07:17:28.7456938Z Performing Push Install",
+        "2026-11-13T07:17:28.7458081Z Success",
+        "2026-11-13T07:17:28.7461645Z artifacts/repair/Titanium-Kiwi-core-157.0.8103.78-arm64-v8a.apk: 1 file pushed, 0 skipped. 103.9 MB/s (335332744 bytes in 3.077s)",
+        "2026-11-13T07:17:28.7462712Z Performing Push Install",
+        "2026-11-13T07:17:28.7463364Z Success",
+        "2026-11-13T07:17:33.7671519Z artifacts/previous/Titanium-Kiwi-core-157.0.8103.50-arm64-v8a.apk: 1 file pushed, 0 skipped. 172.9 MB/s (335542043 bytes in 1.850s)",
+        "2026-11-13T07:17:33.7677165Z Performing Push Install",
+        "2026-11-13T07:17:33.7677811Z Success",
+        "2026-11-13T07:17:38.2317457Z artifacts/repair/Titanium-Kiwi-core-157.0.8103.78-arm64-v8a.apk: 1 file pushed, 0 skipped. 172.3 MB/s (335332744 bytes in 1.856s)",
+        "2026-11-13T07:17:38.2322273Z Performing Push Install",
+        "2026-11-13T07:17:38.2322877Z Success"
+      ]
+    }
+  ],
+  "install_method": "diagnostics/install_repair_apk.sh at source commit: .50 -> .78 -> .50 -> .78; three overwrite installs use adb install --no-streaming -r; no -d",
+  "limitations": [
+    "Physical-device runtime unverified",
+    "Violentmonkey Settings ZIP export unverified"
+  ]
+}

@@ -1,5 +1,27 @@
 # ChatGPT / Codex handoff
 
+## 2026-11-13 — M157.78 completed, independently verified, completion notification recorded
+
+Production https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/43299077020 succeeded, source commit e53552b8a439d082c239829b50775ce36a4f6d32. Build 131465087677, continue-1 131616989881, continue-2 131726023223, require-apk 131749374429, API36 131749418694, API30 131749418932, publish 131750537255 succeeded. Continue-3/4 and separate historical-APK diagnostic 43299077010 were skipped. All 229 target branch runs were checked; none active before completion-only [skip ci] update.
+
+Release: https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/tag/titanium-kiwi-157.0.8103.78-43299077020-1
+APK: https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-157.0.8103.78-43299077020-1/Titanium-Kiwi-core-157.0.8103.78-arm64-v8a.apk
+ZIP: https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-157.0.8103.78-43299077020-1/Titanium-Kiwi-157.0.8103.78.zip
+
+Both public Release files actually downloaded independently:
+- APK SHA-256 42a2e1609b793409bf81c7f305261b9cc9f83cf2fee04cdba49c8d662fe08976, matches GitHub Release digest and CI.
+- ZIP SHA-256 783c77ec1f064dac49bd7e5220aa07b11658dc73f37bb106d416e584eb261737, matches GitHub Release digest.
+- Android official apksig 9.5.1 ApkVerifier independently verified entire APK, v2=true, one signer, no errors; signer certificate SHA-256 32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0.
+- Independent aapt2 9.5.1-16666295 badging plus pin_version_code.py confirms package io.github.nojirokaimo.titaniumkiwi, versionName 157.0.8103.78, fixed versionCode 807807374. minSdk29/targetSdk36.
+- Full APK and Release ZIP CRC passed; exactly one ZIP embedded APK has identical SHA-256 to independently downloaded APK.
+- API30 and API36 logs each show all four Success installs for .50 -> .78 -> .50 -> .78, using actual completed .50 fixture hash 601a74984a84b7e654da9ffcc36dace7dfe579e0a7f464cd2d9968b171f079c3. All three overwrite operations use adb install -r, no -d.
+
+Exact cache chain: initial restore completed .50 literal with cache-hit=true and matched-key=expected-key. Build saved kiwi-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-build; continue-1 restored it exactly and saved kiwi-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-1; continue-2 restored that literal exactly (cache-hit=true) and saved completed cache kiwi-incremental-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-2 at 2026-11-13T07:14:56.9732841Z. Initial manual production/default upstream restore now use ONLY this completed .78 key; old identity transition cleared. Composite/build default pins remain .78 and upstream default ref v157.0.8103.78/strict. Never fall back, overwrite cache or clean outputs.
+Current source identity: bde250ae7c7d43a7a1827a44d07841132f6db7f4:a8b304ef63b51f0158775a9d4f90106e8fc9a721:4b3d0dabb8250b6f152d2d85d79e7706e309d087:validation.
+Source audit 43282550391, actual 100 before/after hashes, 26 strict patches unchanged, idempotence, JDK25 Java55 syntax and all 66 tests (Ninja, zero skips) evidence remains kiwi_port/audits/m155-to-15778-*. Detailed completion evidence: m155-to-15778-completion.json. M155 source feature origin is separate from cache lineage; preserve ZIP import230, constructor fix, settings, signature and Photopea JIT exceptions; never restore220/225.
+
+Official latest was re-fetched at completion and remains v157.0.8103.78. Do not rebuild/re-notify .78 or earlier notified versions. Continue official release checks for future versions; do not disable continuous monitoring on normal completion. Next newer version must audit real source first, explicitly transition from this completed .78 identity, update diagnostics to this actual completed .78 APK/hash, and test .78 -> newer -> .78 -> newer on API30/36 before publishing. Physical-device runtime and Violentmonkey Settings ZIP export remain UNVERIFIED; do not claim repaired.
+
 ## 2026-11-13 — M157.78 actual-source audit verified; production prepared
 
 Audit https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/43282550391 job 131407366676 succeeded. Artifact 13976880330 was actually downloaded; ZIP SHA-256 ff758691242b543731591ed968fc41b3d5ecee4dd61b8d86effbd853b0ba8aa2 matches GitHub digest. Logs show cache-hit=true and matched-key=expected literal kiwi-incremental-15750-43a6a9a795c50ac98ecc87a1afb404cd69d800cc-42959641642-1-continue-1.
