@@ -1,10 +1,10 @@
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-index 27cc2068df46ab9a3165737d84908bd0813ebd1c..9cd963e5bac9f51032eceb148e45b73003bf48a3 100644
+index ffb24f2d3f1360df36e08facbf1c1cc35ca0370e..176da6d159a004546e2cdf11553991412f0e47c2 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -433,11 +433,12 @@ class AppMenu implements OnKeyListener {
-             mListView.setVerticalScrollBarEnabled(false);
-         }
+@@ -424,11 +424,12 @@ class AppMenu implements OnKeyListener {
+         View contentView = createAppMenuContentView(context, addTopPaddingBeforeFirstRow);
+         mListView = contentView.findViewById(R.id.app_menu_list);
  
 -        if (SysUtils.isLowEndDevice()) {
 +        // Kiwi keeps the compact 8dp popup and its dark #202124 surface.
@@ -17,7 +17,7 @@ index 27cc2068df46ab9a3165737d84908bd0813ebd1c..9cd963e5bac9f51032eceb148e45b730
                  drawable.setTintMode(PorterDuff.Mode.MULTIPLY);
                  contentView.setBackground(drawable);
              }
-@@ -1025,11 +1026,42 @@ class AppMenu implements OnKeyListener {
+@@ -1015,11 +1016,42 @@ class AppMenu implements OnKeyListener {
          mMenuItemEnterAnimator.start();
      }
  

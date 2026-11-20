@@ -1,9 +1,9 @@
 diff --git a/chrome/android/java/res/xml/appearance_preferences.xml b/chrome/android/java/res/xml/appearance_preferences.xml
-index 50632d42d73aecc06bd59305defa275816674829..faecaaea302eb24338c6623facccb58ea639ebc8 100644
+index c5449e8c46162c82545028b01d9c877b08f70e25..a47c27fe8dc4caea00bc3127f76432e5b60abae1 100644
 --- a/chrome/android/java/res/xml/appearance_preferences.xml
 +++ b/chrome/android/java/res/xml/appearance_preferences.xml
-@@ -46,4 +46,8 @@ exclusive options. -->
-         android:order="4"
+@@ -58,4 +58,8 @@ exclusive options. -->
+         android:order="6"
          android:title="@string/tab_position_settings_title" />
  
 +    <Preference
@@ -12,7 +12,7 @@ index 50632d42d73aecc06bd59305defa275816674829..faecaaea302eb24338c6623facccb58e
 +
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
-index dfd8f79fed49a2dd645e51745f6761051edf6fe2..bc45705e9faad8ad121495a70d2e88d1f5e482fc 100644
+index b77b5de1b74e8460b71bf1ed56625effca918a31..191d024b6b1161f023f879aa694e5a9d84a89538 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
 @@ -4,9 +4,12 @@
@@ -28,7 +28,7 @@ index dfd8f79fed49a2dd645e51745f6761051edf6fe2..bc45705e9faad8ad121495a70d2e88d1
  
  import androidx.annotation.StringRes;
  import androidx.preference.Preference;
-@@ -45,6 +48,8 @@ import org.chromium.components.feature_engagement.EventConstants;
+@@ -47,6 +50,8 @@ import org.chromium.components.feature_engagement.EventConstants;
  import org.chromium.components.prefs.PrefChangeRegistrar;
  import org.chromium.components.prefs.PrefChangeRegistrar.PrefObserver;
  
@@ -37,9 +37,9 @@ index dfd8f79fed49a2dd645e51745f6761051edf6fe2..bc45705e9faad8ad121495a70d2e88d1
  /** Fragment to manage appearance settings. */
  @NullMarked
  public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
-@@ -81,6 +86,105 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
-         initToolbarShortcutPref();
+@@ -88,6 +93,105 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
          initBottomBarPref();
+         initHomepagePref();
          initTabPositionPref();
 +        initDarkSurfaceColorPref();
 +    }
@@ -144,10 +144,10 @@ index dfd8f79fed49a2dd645e51745f6761051edf6fe2..bc45705e9faad8ad121495a70d2e88d1
  
      @Override
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
-index f9fa10f6e0831bc685c619875d086bfc2c955e2e..e56ead8b4e72b83928cceef83cd8c177b65f0c65 100644
+index a72f18a2add57820c8db552bba7af1d69cdb748a..b79f07fc03ee8f7b53d1e1ec4db623e51fdfbe1f 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/history/HistoryManager.java
-@@ -44,6 +44,7 @@ import org.chromium.chrome.browser.ui.messages.snackbar.Snackbar;
+@@ -45,6 +45,7 @@ import org.chromium.chrome.browser.ui.messages.snackbar.Snackbar;
  import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
  import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager.SnackbarController;
  import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
@@ -155,7 +155,7 @@ index f9fa10f6e0831bc685c619875d086bfc2c955e2e..e56ead8b4e72b83928cceef83cd8c177
  import org.chromium.components.browser_ui.settings.SettingsNavigation;
  import org.chromium.components.browser_ui.widget.DateDividedAdapter.ItemViewType;
  import org.chromium.components.browser_ui.widget.gesture.BackPressHandler;
-@@ -188,6 +189,9 @@ public class HistoryManager
+@@ -189,6 +190,9 @@ public class HistoryManager
          }
  
          mRootView = new FrameLayout(mActivity);
@@ -165,7 +165,7 @@ index f9fa10f6e0831bc685c619875d086bfc2c955e2e..e56ead8b4e72b83928cceef83cd8c177
  
          final boolean isDesktopLayoutEnabled =
                  ChromeFeatureList.isEnabled(ChromeFeatureList.ANDROID_DESKTOP_HISTORY_LAYOUT);
-@@ -240,6 +244,11 @@ public class HistoryManager
+@@ -241,6 +245,11 @@ public class HistoryManager
                  mContentManager.getAdapter(),
                  mContentManager.getRecyclerView(),
                  edgeToEdgePadAdjusterGenerator);
@@ -177,7 +177,7 @@ index f9fa10f6e0831bc685c619875d086bfc2c955e2e..e56ead8b4e72b83928cceef83cd8c177
  
          if (isDesktopLayoutEnabled) {
              View navigationPane = mainView.findViewById(R.id.navigation_pane);
-@@ -274,6 +283,7 @@ public class HistoryManager
+@@ -275,6 +284,7 @@ public class HistoryManager
                                          ? R.menu.app_specific_history_manager_menu
                                          : R.menu.history_manager_menu,
                                  launchedForApp);
@@ -186,10 +186,10 @@ index f9fa10f6e0831bc685c619875d086bfc2c955e2e..e56ead8b4e72b83928cceef83cd8c177
          mToolbar.setMenuDelegate(
                  new HistoryManagerToolbar.HistoryManagerMenuDelegate() {
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-index 9cd963e5bac9f51032eceb148e45b73003bf48a3..7fbb1711a1df45b9917784a5d5c3816be942e9db 100644
+index 176da6d159a004546e2cdf11553991412f0e47c2..c8fd2b9400e403223b9c55bced5aac6ef20a7e26 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
-@@ -1027,6 +1027,8 @@ class AppMenu implements OnKeyListener {
+@@ -1017,6 +1017,8 @@ class AppMenu implements OnKeyListener {
      }
  
      private static int getKiwiMenuBackgroundColor(Context context) {

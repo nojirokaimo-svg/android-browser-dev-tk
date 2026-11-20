@@ -1,0 +1,8 @@
+2026-11-20T04:31:03.5724437Z Cache restored from key: kiwi-incremental-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-2
+2026-11-20T04:31:03.8721926Z   KIWI_CACHE_HIT: true
+2026-11-20T04:31:03.8722617Z   KIWI_MATCHED_CACHE_KEY: kiwi-incremental-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-2
+2026-11-20T04:31:03.8723746Z   KIWI_EXPECTED_CACHE_KEY: kiwi-incremental-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-2
+2026-11-20T04:31:03.9234751Z Restored exact checkpoint: kiwi-incremental-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-2
+2026-11-20T04:52:36.4864280Z Source audit only: captured pinned post-Titanium sources before Kiwi patches.
+2026-11-20T04:52:37.4841637Z [36;1mecho 'Original restored out/Default is back in place unchanged by prepare/gn gen.'[0m
+2026-11-20T04:52:37.5208651Z Original restored out/Default is back in place unchanged by prepare/gn gen.

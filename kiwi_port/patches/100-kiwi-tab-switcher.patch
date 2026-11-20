@@ -1,28 +1,28 @@
 diff --git a/chrome/android/chrome_java_resources.gni b/chrome/android/chrome_java_resources.gni
-index a3249ffce6ddaea7b024273584691bf6b32d4542..0a8ffd2e70c5756a049257147267a4f0691c6d74 100644
+index 15b254d2eb0aeaee9536a8b7a5915f5ab240ef16..860fbd0a6910395347c4007a4c2eb41fb5fcbb81 100644
 --- a/chrome/android/chrome_java_resources.gni
 +++ b/chrome/android/chrome_java_resources.gni
-@@ -559,6 +559,7 @@ chrome_java_resources = [
+@@ -564,6 +564,7 @@ chrome_java_resources = [
    "java/res/layout/powered_by_chrome_footer.xml",
    "java/res/layout/radio_button_group_bookmark_bar_preference.xml",
    "java/res/layout/radio_button_group_homepage_preference.xml",
 +  "java/res/layout/radio_button_group_tabswitcher_preference.xml",
+   "java/res/layout/radio_button_group_on_startup_preference.xml",
    "java/res/layout/reader_mode_bottom_sheet.xml",
    "java/res/layout/reader_mode_prefs_bottom_content.xml",
-   "java/res/layout/reader_mode_prefs_bottom_content_with_toggle_links.xml",
-@@ -654,6 +655,7 @@ chrome_java_resources = [
+@@ -657,6 +658,7 @@ chrome_java_resources = [
    "java/res/xml/homepage_preferences.xml",
    "java/res/xml/legal_information_preferences.xml",
    "java/res/xml/main_preferences.xml",
 +  "java/res/xml/tabswitcher_preferences.xml",
+   "java/res/xml/on_startup_preferences.xml",
    "java/res/xml/personalize_google_services_preferences.xml",
    "java/res/xml/privacy_preferences.xml",
-   "java/res/xml/search_widget_info.xml",
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 3ab41d87e192bb3ce266c314c13e428cadecf6bb..c36d678267590a836402359c4f322e48a7463954 100644
+index 1e5ede9cb4fc78272911854d5b1f66b8381df187..770a7c5122db445c88057f089c884b6ab6381b93 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -1096,6 +1096,8 @@ chrome_java_sources = [
+@@ -1092,6 +1092,8 @@ chrome_java_sources = [
  
    # LINT.ThenChange(//components/browser_ui/settings/android/java/src/org/chromium/components/browser_ui/settings/search/SettingsIndexData.java:MainSettingsClassName)
    "java/src/org/chromium/chrome/browser/settings/MultiColumnSettings.java",
@@ -123,7 +123,7 @@ index 3e6b4f0b2ede85e08eba5ea8a5729e0cbdd62a7a..f029bd054832dce1bf319f9e58e5df78
          final Size oldDefaultSize = mMediator.getDefaultGridCardSize();
          final Size newDefaultSize = new Size(cardWidthPx, cardHeightPx);
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java
-index 07ccd191d393e121e5d281f5a81bd5fc48d080fd..fa056070d286a393fc53101d386c38e3173a70f1 100644
+index a311ebb1b2ef6eaca18b5bcc3bc4e24e3a6947d6..f65d9b3909d9e7e49106417da4542b0500d67d8f 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabListMediator.java
 @@ -45,6 +45,7 @@ import androidx.recyclerview.widget.RecyclerView;
@@ -152,10 +152,10 @@ index 07ccd191d393e121e5d281f5a81bd5fc48d080fd..fa056070d286a393fc53101d386c38e3
              // The layout span count is restricted to medium on XR immersive devices to display
              // larger tab thumbnails, despite the large screen width.
 diff --git a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-index f1517bb25ce8eb811b360dad16e913af17edef44..a95a76dc6ce22d2c56e89fbef6e985150624d465 100644
+index 367cff597758750026b2367b771e6949288c7c5d..70bb1c6dfe3b26be47f82027446b7b462a129d46 100644
 --- a/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
 +++ b/chrome/android/features/tab_ui/java/src/org/chromium/chrome/browser/tasks/tab_management/TabSwitcherPaneCoordinator.java
-@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView;
+@@ -40,6 +40,7 @@ import androidx.recyclerview.widget.RecyclerView;
  import androidx.recyclerview.widget.RecyclerView.ViewHolder;
  
  import org.chromium.base.Callback;
@@ -163,7 +163,7 @@ index f1517bb25ce8eb811b360dad16e913af17edef44..a95a76dc6ce22d2c56e89fbef6e98515
  import org.chromium.base.DeviceInfo;
  import org.chromium.base.SysUtils;
  import org.chromium.base.TimeUtils.UptimeMillisTimer;
-@@ -431,6 +432,14 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
+@@ -432,6 +433,14 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
                      DeviceFormFactor.isNonMultiDisplayContextOnTablet(activity)
                              ? R.drawable.tablet_tab_switcher_empty_state_illustration
                              : R.drawable.phone_tab_switcher_empty_state_illustration_static;
@@ -178,7 +178,7 @@ index f1517bb25ce8eb811b360dad16e913af17edef44..a95a76dc6ce22d2c56e89fbef6e98515
              TabListCoordinator tabListCoordinator =
                      new TabListCoordinator(
                              mode,
-@@ -439,7 +448,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
+@@ -440,7 +449,9 @@ public class TabSwitcherPaneCoordinator implements BackPressHandler {
                              mModalDialogManager,
                              tabModelSupplier,
                              mMultiThumbnailCardProvider,
@@ -268,10 +268,10 @@ index 0000000000000000000000000000000000000000..519f03a324a7c8c7f9cd5cc193d23aba
 +    </org.chromium.components.browser_ui.widget.RadioButtonWithDescriptionLayout>
 +</LinearLayout>
 diff --git a/chrome/android/java/res/xml/main_preferences.xml b/chrome/android/java/res/xml/main_preferences.xml
-index 130534ae2cb259cf047021081ae53b7b302ccd0e..37a528b19f509829e8c0cbb620518cec854c2466 100644
+index 17f7871f0f53950cea021a4e859314d62d33d383..c5fc7947d79a3622d6036907a39b2e9cf7c95596 100644
 --- a/chrome/android/java/res/xml/main_preferences.xml
 +++ b/chrome/android/java/res/xml/main_preferences.xml
-@@ -108,6 +108,11 @@ found in the LICENSE file.
+@@ -84,6 +84,11 @@ found in the LICENSE file.
          android:key="appearance"
          android:order="23"
          android:title="@string/appearance_settings" />
@@ -281,8 +281,8 @@ index 130534ae2cb259cf047021081ae53b7b302ccd0e..37a528b19f509829e8c0cbb620518cec
 +        android:order="24"
 +        android:title="タブの切り替え" />
      <org.chromium.components.browser_ui.settings.ChromeBasePreference
-         android:fragment="org.chromium.chrome.browser.glic.GlicSettings"
-         android:key="glic"
+         android:fragment="org.chromium.chrome.browser.settings.startup.OnStartupSettingsFragment"
+         android:key="on_startup"
 diff --git a/chrome/android/java/res/xml/tabswitcher_preferences.xml b/chrome/android/java/res/xml/tabswitcher_preferences.xml
 new file mode 100644
 index 0000000000000000000000000000000000000000..a11482c2c8eb1b4ff06fda9d09a8cf11cb96c321

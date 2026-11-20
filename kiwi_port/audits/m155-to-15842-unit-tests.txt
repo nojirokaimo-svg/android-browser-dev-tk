@@ -1,0 +1,7 @@
+..................................................................
+----------------------------------------------------------------------
+Ran 66 tests in 3.001s
+
+OK
+Removed the stale M153 magic_stack edge from /tmp/tmprbpcg67_/gen/chrome/browser/auxiliary_search/java__header.d; original backed up at /tmp/tmprbpcg67_/gen/chrome/browser/auxiliary_search/java__header.d.kiwi-m153-backup
+M156 generated Java classpaths and depfiles repaired with backups; Ninja history preserved

@@ -1,5 +1,13 @@
 # ChatGPT / Codex handoff
 
+## 2026-11-20 — M158.42 actual-source audit verified; production transition prepared
+
+Audit https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/44674782781 job136083923360 succeeded. Actual downloaded artifact14602631669 ZIP SHA2566352641f74641cb95190b06ec794fd6f8f68bfe33ea482c5f036cf83a2153986 matches GitHub digest; all100 before hashes matched archive files. All26 feature patches strictly replay on actual M158.42 post-Titanium source; second replay unchanged. Nine features minimally rebased;17 patch files byte-identical. JDK25 parsed55 Java sources;66 tests including Ninja passed, zero skips. Detailed evidence m155-to-15842-*.
+Exact completed .78 restore confirmed cache-hit=true and matched/requested literal equal; proof in m155-to-15842-exact-cache.txt. Audit did not compile or save any new checkpoint.
+Production prepared for158.0.8127.42, first restore ONLY completed .78 key, explicit .78→M158.42 identity transition. Subsequent stages restore ONLY this production run's own same-identity checkpoint. Actual completed .78 APK/hash used as API30/36 fixture. Fixed versionCode807807374, package/certificate unchanged; ZIP import230 and constructor/Photopea JIT exceptions retained.
+NEXT: inspect latest production jobs/logs and exact restore. Never push/dispatch while active. On failure identify actual bounded cause, minimal repair/test, and resume only confirmed saved/available exact own-run checkpoint. Cache miss/mismatch: stop and notify, disable monitor. Running log404 BlobNotFound is temporary unpublished log, not cache loss. Do not cold/clean build or delete output/Ninja history or overwrite caches.
+After build verify actual APK/ZIP independently (full v2/cert/manifest/digest/CRC), API30/36 .78→158.42→.78→158.42 no-d, unique Release. After ALL target runs stop, update handoff/default completed cache/pins and clear old identity transition with[skip ci], align update-upstream/composite defaults. Keep monitoring after normal completion. Physical device and Violentmonkey Settings ZIP export UNVERIFIED.
+
 ## 2026-11-20 — M158.42 official release detected; actual-source audit pending
 
 Official formal release https://github.com/jqssun/android-titanium-browser/releases/tag/v158.0.8127.42 published 2026-11-20T03:54:22Z; draft=false, prerelease=false.

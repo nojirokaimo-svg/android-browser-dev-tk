@@ -1,0 +1,82 @@
+[
+  [
+    "app-menu-actions",
+    "chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "menu-presentation",
+    "chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "preference-registry",
+    "chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/AllPreferenceKeyRegistries.java",
+    "explicit M158 API/context adaptation"
+  ],
+  [
+    "black-statusbar-full-backup",
+    "chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "black-statusbar-full-backup",
+    "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "kiwi-tab-switcher",
+    "chrome/android/chrome_java_resources.gni",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "kiwi-tab-switcher",
+    "chrome/android/chrome_java_resources.gni",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "kiwi-tab-switcher",
+    "chrome/android/java/res/xml/main_preferences.xml",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "amoled-surfaces",
+    "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "amoled-surfaces",
+    "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "amoled-surfaces",
+    "chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/styles/OmniboxResourceProvider.java",
+    "M158 removed popover API; existing dropdown AMOLED override retained"
+  ],
+  [
+    "kiwi-migration-extension-import",
+    "chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "kiwi-migration-extension-import",
+    "chrome/browser/ui/webui/extensions/extensions_ui.cc",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "dark-ui-surface-color",
+    "chrome/android/java/res/xml/appearance_preferences.xml",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "dark-ui-surface-color",
+    "chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java",
+    "unchanged context shortened; every changed line retained"
+  ],
+  [
+    "independent-dark-ui-colors",
+    "chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java",
+    "unchanged context shortened; every changed line retained"
+  ]
+]

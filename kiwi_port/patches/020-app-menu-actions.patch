@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 36e1a6d517632e26895163b296caa66ab9dab8a8..24d368c31cee35ec3aefffc44da1873bb89b01ac 100644
+index cde58dcea8746460e2960081dc961011230e1a54..c7e06aeb2f552b73e11ce69f28d31f06a912201e 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -57,6 +57,7 @@ import org.chromium.base.Callback;
@@ -10,7 +10,7 @@ index 36e1a6d517632e26895163b296caa66ab9dab8a8..24d368c31cee35ec3aefffc44da1873b
  import org.chromium.base.DeviceInfo;
  import org.chromium.base.IntentUtils;
  import org.chromium.base.Log;
-@@ -211,7 +212,10 @@ import org.chromium.chrome.browser.multiwindow.UiUtils.NameWindowDialogSource;
+@@ -210,7 +211,10 @@ import org.chromium.chrome.browser.multiwindow.UiUtils.NameWindowDialogSource;
  import org.chromium.chrome.browser.native_page.NativePageAssassin;
  import org.chromium.chrome.browser.navigation_predictor.NavigationPredictorBridge;
  import org.chromium.chrome.browser.new_tab_url.DseNewTabUrlManager;
@@ -18,10 +18,10 @@ index 36e1a6d517632e26895163b296caa66ab9dab8a8..24d368c31cee35ec3aefffc44da1873b
  import org.chromium.chrome.browser.night_mode.NightModeStateProvider;
 +import org.chromium.chrome.browser.night_mode.ThemeType;
 +import org.chromium.chrome.browser.night_mode.WebContentsDarkModeController;
- import org.chromium.chrome.browser.notifications.scheduler.TipsAgent;
  import org.chromium.chrome.browser.ntp.NewTabPage;
  import org.chromium.chrome.browser.ntp.NewTabPageUma;
-@@ -4432,6 +4436,36 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+ import org.chromium.chrome.browser.ntp_customization.NtpCustomizationCoordinator;
+@@ -4501,6 +4505,36 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
              @Nullable Bundle menuItemData,
              @Nullable MotionEventInfo triggeringMotion) {
          final Tab currentTab = getActivityTab();
@@ -59,7 +59,7 @@ index 36e1a6d517632e26895163b296caa66ab9dab8a8..24d368c31cee35ec3aefffc44da1873b
          if (id == R.id.new_tab_menu_id) {
              if (!mTabModelSelector.isTabStateInitialized()) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f3149f87a 100644
+index 09617d84a768d5c2c3bb955b2abe3d39c413ccca..c5555c1950aff93e41a645b7ea97ba54f41fb99a 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 @@ -8,7 +8,9 @@ import static org.chromium.build.NullUtil.assumeNonNull;
@@ -80,7 +80,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
  import org.chromium.chrome.browser.omaha.UpdateMenuItemHelper;
  import org.chromium.chrome.browser.open_in_app.OpenInAppMenuItemProvider;
  import org.chromium.chrome.browser.preferences.Pref;
-@@ -67,6 +70,7 @@ import org.chromium.chrome.browser.tab_group_sync.TabGroupSyncServiceFactory;
+@@ -68,6 +71,7 @@ import org.chromium.chrome.browser.tab_group_sync.TabGroupSyncServiceFactory;
  import org.chromium.chrome.browser.tabmodel.TabModelSelector;
  import org.chromium.chrome.browser.task_manager.TaskManager;
  import org.chromium.chrome.browser.toolbar.ToolbarManager;
@@ -88,7 +88,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
  import org.chromium.chrome.browser.toolbar.menu_button.MenuItemState;
  import org.chromium.chrome.browser.toolbar.top.ToolbarUtils;
  import org.chromium.chrome.browser.ttc.TtcSessionCoordinator;
-@@ -100,7 +104,9 @@ import org.chromium.url.GURL;
+@@ -101,7 +105,9 @@ import org.chromium.url.GURL;
  import java.lang.annotation.Retention;
  import java.lang.annotation.RetentionPolicy;
  import java.util.ArrayList;
@@ -98,7 +98,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
  import java.util.function.BiFunction;
  import java.util.function.BooleanSupplier;
  import java.util.function.Supplier;
-@@ -280,6 +286,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -281,6 +287,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
  
      @Override
      public void destroy() {
@@ -106,7 +106,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
          super.destroy();
          mBookmarksItemBuilder.destroy();
          mHistoryItemBuilder.destroy();
-@@ -289,8 +296,57 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -290,8 +297,57 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
          }
      }
  
@@ -164,7 +164,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
          int menuGroup = getMenuGroup();
          MVCListAdapter.ModelList modelList = new MVCListAdapter.ModelList();
          if (menuGroup == MenuGroup.PAGE_MENU) {
-@@ -334,6 +390,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -335,6 +391,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                      R.id.icon_row_menu_id, iconModels, isMenuIconAtStart())));
          }
  
@@ -173,7 +173,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
          mUpdateMenuItemVisible = shouldShowUpdateMenuItem();
          Profile profile = getProfileFromTabModel();
          if (mUpdateMenuItemVisible) {
-@@ -433,7 +491,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -434,7 +492,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
  
          // Extensions
          if (shouldShowExtensionsItem()) {
@@ -182,7 +182,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
          }
  
          // Divider
-@@ -548,6 +606,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -549,6 +607,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
          // Divider Line
          AppMenuItemUtils.maybeAddDividerLine(modelList, R.id.divider_line_id);
  
@@ -192,7 +192,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
          // Settings
          modelList.add(buildSettingsItem());
  
-@@ -629,9 +690,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -630,9 +691,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
  
          AppMenuItemUtils.maybeAddDividerLine(modelList, R.id.divider_line_id);
  
@@ -205,7 +205,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
          }
  
          // Delete browsing data
-@@ -654,7 +715,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -655,7 +716,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
  
          // Extensions
          if (shouldShowExtensionsItem()) {
@@ -214,7 +214,7 @@ index 98999be0deca71dc0bc98bbc0bc6c45f78909cad..5f794a7dfd2ed2065ad89dfc5dfa015f
          }
  
          // Passwords and autofill
-@@ -1181,6 +1242,32 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -1182,6 +1243,32 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                  || (DeviceInfo.isDesktop() && shouldShowWebContentsDependentMenuItem(currentTab));
      }
  
