@@ -1,0 +1,36 @@
+name: Audit Titanium-Kiwi 158.0.8127.42 sources
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/kiwi-ui-port
+    paths:
+      - .github/workflows/kiwi-15842-audit.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: titanium-kiwi-core-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v5
+      - name: Capture upstream sources after exact completed 157.78 checkpoint restore
+        uses: ./.github/actions/kiwi-build-stage
+        with:
+          restore-key: kiwi-incremental-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-2
+          require-restore: "true"
+          audit-only: "true"
+          save-key: kiwi-15842-audit-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          titanium-commit: 9b3a181e48d2223c6482c855d1845ba51b5d0321
+          vanadium-commit: e017f70b2fbb4bfaef81a6b1c49ac51ff886aca2
+          chromium-commit: 52bdd21723d5db0c9ab11716d38feac74828cf84
+          chromium-version: 158.0.8127.42
+          patch-mode: strict

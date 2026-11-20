@@ -1,5 +1,14 @@
 # ChatGPT / Codex handoff
 
+## 2026-11-20 — M158.42 official release detected; actual-source audit pending
+
+Official formal release https://github.com/jqssun/android-titanium-browser/releases/tag/v158.0.8127.42 published 2026-11-20T03:54:22Z; draft=false, prerelease=false.
+Verified Titanium tag commit 9b3a181e48d2223c6482c855d1845ba51b5d0321; its actual Vanadium gitlink e017f70b2fbb4bfaef81a6b1c49ac51ff886aca2; Vanadium args.gn version 158.0.8127.42. Chromium tag commit 52bdd21723d5db0c9ab11716d38feac74828cf84 independently matches googlesource JSON and GitHub chromium/chromium tag API.
+New workflow kiwi-15842-audit.yml captures actual post-Titanium sources, using ONLY exact completed .78 checkpoint kiwi-incremental-15778-e53552b8a439d082c239829b50775ce36a4f6d32-43299077020-1-continue-2. Composite requires cache-hit=true AND literal matched-key=requested before preparation. audit-only=true exits before applying Kiwi patches, gn generation, compilation, identity transition or checkpoint save. The save-key input only labels the source artifact in audit mode.
+NEXT: fetch this audit run/jobs/logs. Confirm exact restore, actually download audit artifact ZIP and validate digest plus all before source hashes, strictly replay all 26 patches on actual new sources with minimal rebase, update measured manifest before/after, repeat for idempotence, JDK25 parse all 55 Java sources and run required tests including Ninja with zero skips. Do not call source checksums alone a completed port.
+Production pins/defaults remain completed .78 deliberately until successful actual-source validation. New production must explicitly transition from completed .78 identity, use actual completed .78 APK/hash install fixtures, fixed versionCode807807374, same package/certificate, API30/36 .78→new→.78→new install-r without-d, unique Release and independent complete APK/ZIP validation. Never rerun prior audit or .78 production. Normal audit progress needs no repeat notification. Keep recurring monitor enabled.
+Physical-device runtime and Violentmonkey Settings ZIP export remain UNVERIFIED.
+
 ## 2026-11-13 — M157.78 completed, independently verified, completion notification recorded
 
 Production https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/43299077020 succeeded, source commit e53552b8a439d082c239829b50775ce36a4f6d32. Build 131465087677, continue-1 131616989881, continue-2 131726023223, require-apk 131749374429, API36 131749418694, API30 131749418932, publish 131750537255 succeeded. Continue-3/4 and separate historical-APK diagnostic 43299077010 were skipped. All 229 target branch runs were checked; none active before completion-only [skip ci] update.
