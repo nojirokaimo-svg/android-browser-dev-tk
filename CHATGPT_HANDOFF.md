@@ -1,3 +1,14 @@
+## 2026-11-21 — M158.42 completed, independently verified, completion notification recorded
+
+Production https://github.com/nojirokaimo-svg/android-browser-dev-tk/actions/runs/44683744558 succeeded from source 7c90b07a378a52fa53dfb022a0413822e26cf70c. Required build/continue-1/continue-2/require/API30/API36/publish jobs all succeeded. All232 branch runs checked, none active before completion-only [skip ci] update. Separate obsolete historical diagnostic44683744597 failed on an unavailable old156.73 artifact and is unrelated; do not rerun it.
+
+Actual public Release APK and ZIP downloaded independently. APK SHA256 2eccb84ecc7584c5ebf8d1d3c7da61a4ed9ad85ca3d75587661f648f030e5646; ZIP SHA256 df09a139b65e24c8a12473109f9fd11e79ed9c06e0e04eb6768061d7f0d0ede7; both match GitHub digests. Official apksig9.5.1 verified full APK/v2, one signer, zero errors; cert 32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0. Official aapt2 9.5.1-16666295 confirmed package io.github.nojirokaimo.titaniumkiwi, versionName158.0.8127.42, fixed versionCode807807374. All APK/ZIP CRC passed; embedded APK hash identical.
+APK: https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-158.0.8127.42-44683744558-1/Titanium-Kiwi-core-158.0.8127.42-arm64-v8a.apk
+ZIP: https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-158.0.8127.42-44683744558-1/Titanium-Kiwi-158.0.8127.42.zip
+API30 and36 each passed .78→158.42→.78→158.42 (all four Success); overwrite uses install-r without-d, actual .78 fixture/hash. Actual-source audit100 hashes/26strict patches/second replay/JDK25 Java55/66 tests zero skips; all100 production after hashes match audited manifest.
+Exact initial .78 restore and own-run build→continue1→continue2 restores all cache-hit=true and matched=requested literal. Completed checkpoint kiwi-incremental-15842-7c90b07a378a52fa53dfb022a0413822e26cf70c-44683744558-1-continue-2 saved2026-11-20T17:44:32.1597589Z. Current identity 9b3a181e48d2223c6482c855d1845ba51b5d0321:e017f70b2fbb4bfaef81a6b1c49ac51ff886aca2:52bdd21723d5db0c9ab11716d38feac74828cf84:validation. Completion JSON and exact cache evidence m155-to-15842-completion*.
+Default restore now ONLY this completed M158.42 key; old identity transition cleared. update-upstream default v158.0.8127.42/strict and composite/build default pins aligned. Never rebuild/re-notify this or earlier notified versions. Continue monitoring newer official releases; next initial transition uses this completed identity/cache. Physical-device runtime and Violentmonkey Settings ZIP export UNVERIFIED.
+
 # ChatGPT / Codex handoff
 
 ## 2026-11-20 — M158.42 actual-source audit verified; production transition prepared

@@ -1,0 +1,81 @@
+{
+  "version": "158.0.8127.42",
+  "source_commit": "7c90b07a378a52fa53dfb022a0413822e26cf70c",
+  "run": 44683744558,
+  "jobs": {
+    "build": 136113030891,
+    "continue1": 136243694149,
+    "continue2": 136401841303,
+    "require": 136461661647,
+    "api30": 136461718090,
+    "api36": 136461718240,
+    "publish": 136463581124
+  },
+  "all_required_jobs": "success",
+  "release": "titanium-kiwi-158.0.8127.42-44683744558-1",
+  "apk": {
+    "url": "https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-158.0.8127.42-44683744558-1/Titanium-Kiwi-core-158.0.8127.42-arm64-v8a.apk",
+    "sha256": "2eccb84ecc7584c5ebf8d1d3c7da61a4ed9ad85ca3d75587661f648f030e5646",
+    "size": 337611028
+  },
+  "zip": {
+    "url": "https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-158.0.8127.42-44683744558-1/Titanium-Kiwi-158.0.8127.42.zip",
+    "sha256": "df09a139b65e24c8a12473109f9fd11e79ed9c06e0e04eb6768061d7f0d0ede7",
+    "size": 144140339
+  },
+  "independent_verification": {
+    "actually_downloaded_both": true,
+    "github_release_digests_match": true,
+    "apksig": "official Android apksig 9.5.1 ApkVerifier: verified=true v2=true errors=[] signers=1",
+    "certificate_sha256": "32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0",
+    "manifest_tool": "official aapt2 9.5.1-16666295",
+    "package": "io.github.nojirokaimo.titaniumkiwi",
+    "versionName": "158.0.8127.42",
+    "versionCode": 807807374,
+    "apk_all_crc": true,
+    "zip_all_crc": true,
+    "embedded_apk_sha256_matches": true
+  },
+  "source_audit": {
+    "run": 44674782781,
+    "artifact": 14602631669,
+    "zip_sha256": "6352641f74641cb95190b06ec794fd6f8f68bfe33ea482c5f036cf83a2153986",
+    "before_hashes": 100,
+    "strict_patches": 26,
+    "second_replay": "unchanged",
+    "java_sources_parsed_with_JDK25": 55,
+    "tests": 66,
+    "skips": 0,
+    "ninja_test": true,
+    "production_after_hashes": {
+      "expected": 100,
+      "actual": 100,
+      "mismatches": 0
+    }
+  },
+  "checkpoint": {
+    "key": "kiwi-incremental-15842-7c90b07a378a52fa53dfb022a0413822e26cf70c-44683744558-1-continue-2",
+    "save_log": "2026-11-20T17:44:32.1597589Z Cache saved with key: kiwi-incremental-15842-7c90b07a378a52fa53dfb022a0413822e26cf70c-44683744558-1-continue-2",
+    "identity": "9b3a181e48d2223c6482c855d1845ba51b5d0321:e017f70b2fbb4bfaef81a6b1c49ac51ff886aca2:52bdd21723d5db0c9ab11716d38feac74828cf84:validation"
+  },
+  "api_round_trip": {
+    "apis": [
+      30,
+      36
+    ],
+    "sequence": [
+      "157.0.8103.78",
+      "158.0.8127.42",
+      "157.0.8103.78",
+      "158.0.8127.42"
+    ],
+    "all_four_installs_success_each": true,
+    "overwrite": "adb install --no-streaming -r, no -d",
+    "previous_fixture_sha256": "42a2e1609b793409bf81c7f305261b9cc9f83cf2fee04cdba49c8d662fe08976"
+  },
+  "unverified": [
+    "Physical device runtime",
+    "Violentmonkey Settings ZIP export"
+  ],
+  "monitoring": "Continue for future official versions; completion of this version does not finish recurring goal"
+}
