@@ -35,16 +35,16 @@ inputs:
     default: "false"
   titanium-commit:
     required: false
-    default: "9b3a181e48d2223c6482c855d1845ba51b5d0321"
+    default: "124ac01c99f174acc8477711f132cf7c3d52d720"
   vanadium-commit:
     required: false
-    default: "e017f70b2fbb4bfaef81a6b1c49ac51ff886aca2"
+    default: "ff04c5bbe8a5f69b27f61af234d3dc84a42c3797"
   chromium-commit:
     required: false
-    default: "52bdd21723d5db0c9ab11716d38feac74828cf84"
+    default: "aa8057651dc34373e52d0a0cefd7904a11b3e130"
   chromium-version:
     required: false
-    default: "158.0.8127.42"
+    default: "158.0.8127.92"
   patch-mode:
     description: strict for pinned builds; best-effort for a newly resolved upstream.
     required: false

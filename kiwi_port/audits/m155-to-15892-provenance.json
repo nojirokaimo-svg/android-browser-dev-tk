@@ -1,0 +1,144 @@
+{
+  "original_feature_revision": "acdde2860b6a4ee2f777920fbabaafa571cf909c",
+  "previous_feature_provenance": "m155-to-15842-provenance.json",
+  "upstream": {
+    "titanium_commit": "124ac01c99f174acc8477711f132cf7c3d52d720",
+    "vanadium_commit": "ff04c5bbe8a5f69b27f61af234d3dc84a42c3797",
+    "chromium_commit": "aa8057651dc34373e52d0a0cefd7904a11b3e130",
+    "chromium_version": "158.0.8127.92"
+  },
+  "source_audit": {
+    "version": "158.0.8127.92",
+    "source_run": 45613091423,
+    "source_artifact": 15021628331,
+    "source_zip_sha256": "f1c5d66b24fe58b212bb6d701d5abf0ca6f1f97c0ad24984e595cba55e0b07ed",
+    "files": 100,
+    "features": 26,
+    "status": "actual before and after hashes, strict ordered replay, idempotence, Java syntax, and all 66 tests verified",
+    "job_id": 139201408095,
+    "exact_restored_cache": "kiwi-incremental-15842-7c90b07a378a52fa53dfb022a0413822e26cf70c-44683744558-1-continue-2",
+    "cache_hit": true,
+    "matched_key_equals_requested": true
+  },
+  "verification": {
+    "before_after_files": 100,
+    "strict_ordered_patches": 26,
+    "unchanged_patch_files": 26,
+    "second_replay_changes": 0,
+    "jdk25_sources_parsed": 55,
+    "tests_passed": 66,
+    "tests_skipped": 0
+  },
+  "features": [
+    {
+      "id": "resources",
+      "sha256": "c3fd037040cac6f4d57a18d427a38c8cb3f7731987ec283d187b93ae5e63026c"
+    },
+    {
+      "id": "app-menu-actions",
+      "sha256": "b2a08241849c4f82fea4bcfb74448500317f872118b79c202a005b8aceb2db05"
+    },
+    {
+      "id": "menu-presentation",
+      "sha256": "e94af88f58b86ba8c999633c44f9faa247e89b37d3e017563462c7fe14655380"
+    },
+    {
+      "id": "preference-registry",
+      "sha256": "121959eb73e8db9235b9a891eeba968cc260947eadfef70143fa4af67a7c061e"
+    },
+    {
+      "id": "night-mode-presets",
+      "sha256": "8db0536f96244a636a03e19ceded32474c86ac74c3f240fc456256335563291c"
+    },
+    {
+      "id": "runtime-night-mode",
+      "sha256": "82b251613e68804ae1a520e6f06879fe3295ef821347ee11d47ae0fdf979e230"
+    },
+    {
+      "id": "renderer-force-dark-runtime",
+      "sha256": "42df501c08df6c7e4751e55e65609af7400239fa60becf343b49239c3267e27d"
+    },
+    {
+      "id": "extension-mobile-ui",
+      "sha256": "a3753a9dcf4affe940f23f28c66f65545cc3fe4726ff9000f7700438d52b6f5e"
+    },
+    {
+      "id": "black-statusbar-full-backup",
+      "sha256": "878e327bc6e507710ef4ebbc7ada1a4a819fc5eb432fd7bea600fea80e3eb146"
+    },
+    {
+      "id": "kiwi-tab-switcher",
+      "sha256": "b0b6668fc1c3a2a4432c30b13753e95ad3ab8938e6b37f823f332c73336840a2"
+    },
+    {
+      "id": "amoled-surfaces",
+      "sha256": "e6045e5e5ed1f7b67e791babdfa148ab9b420b5c135d069c39b7c6a0273ffc94"
+    },
+    {
+      "id": "kiwi-migration-extension-import",
+      "sha256": "7e3fac1289ad172fb4316ef31f10bc44579ebfea76960e3699ac971b76aa280e"
+    },
+    {
+      "id": "credentials-security",
+      "sha256": "38eb26314cc705441cecc33f62aa0267479c1ff7cbde6674f5fa19954a63d75f"
+    },
+    {
+      "id": "kiwi-settings-dark",
+      "sha256": "45bd4900d5dbc8338e7e1fc732732e94e5b144a7fcce8010d6194f44485ae5e9"
+    },
+    {
+      "id": "extension-popup-menu-fixes",
+      "sha256": "0034489c4a8a17d7cbe477feb08c494680bffcb4255e8fd6961f38765f83c969"
+    },
+    {
+      "id": "web-contents-theme-target",
+      "sha256": "d6691c04b09e2fb064d3a1eedf8b9f9ea725e13d444a443f3a72a015ffc96904"
+    },
+    {
+      "id": "context-menu-shape",
+      "sha256": "21bae2839c3548ec184380128cbf1c23adac521575763327698fe16431ed6559"
+    },
+    {
+      "id": "kiwi-omnibox-history",
+      "sha256": "91c2c695b31882c417c3e59c5575e4fa51f1b59b911ac9db0edd356081a83f04"
+    },
+    {
+      "id": "portable-full-backup",
+      "sha256": "0742e013b5dadb132de26a2cb1b23e43b9ff756e60b0a636841a30238a587d51"
+    },
+    {
+      "id": "disable-single-tab-resumption",
+      "sha256": "4572613a8b6100b64158c9bc3f2da6adc73fbb90b764b617dc1c2368b0166be0"
+    },
+    {
+      "id": "preserve-active-tab",
+      "sha256": "e61adcc8a55d663adc291adf12c391cdff09d5523213f6e4dd732001bc699302"
+    },
+    {
+      "id": "new-tab-clipboard-only",
+      "sha256": "42796dc3cf54261553c6151f181bc4b545c3295989bf7076bd4a2311167ab4cf"
+    },
+    {
+      "id": "tab-search-setting",
+      "sha256": "c435b7245b42edf7f96e4dfbb1e2d73cc9758bfd6e9e5689127c1a25415c1d3b"
+    },
+    {
+      "id": "dark-ui-surface-color",
+      "sha256": "a74e65089a8b37036cee802dcf18525ce6f89c079696877587c883ea93cfd62e"
+    },
+    {
+      "id": "independent-dark-ui-colors",
+      "sha256": "4aac294ff7280c5df95eab82aaa8a15a507c14e3893c7f1a9b12b26ce415ef37"
+    },
+    {
+      "id": "extension-zip-crx-install",
+      "sha256": "dba44698b092fdcd3f22c50c43788b3d27092125b132b6bfe9967dfd6c095a25"
+    }
+  ],
+  "install_fixture": {
+    "url": "https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-158.0.8127.42-44683744558-1/Titanium-Kiwi-core-158.0.8127.42-arm64-v8a.apk",
+    "sha256": "2eccb84ecc7584c5ebf8d1d3c7da61a4ed9ad85ca3d75587661f648f030e5646"
+  },
+  "physical_device_tested": false,
+  "violentmonkey_settings_export_tested": false
+}

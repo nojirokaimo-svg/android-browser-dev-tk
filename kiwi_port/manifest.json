@@ -1,9 +1,9 @@
 {
-  "titanium_commit": "9b3a181e48d2223c6482c855d1845ba51b5d0321",
-  "chromium_commit": "52bdd21723d5db0c9ab11716d38feac74828cf84",
-  "vanadium_commit": "e017f70b2fbb4bfaef81a6b1c49ac51ff886aca2",
-  "chromium_version": "158.0.8127.42",
-  "scope": "M155-derived 25 features and ZIP import230 strictly rebased and replayed onto actual audited post-Titanium M158.42 sources.",
+  "titanium_commit": "124ac01c99f174acc8477711f132cf7c3d52d720",
+  "chromium_commit": "aa8057651dc34373e52d0a0cefd7904a11b3e130",
+  "vanadium_commit": "ff04c5bbe8a5f69b27f61af234d3dc84a42c3797",
+  "chromium_version": "158.0.8127.92",
+  "scope": "M155-derived 25 features and ZIP import patch 230 strictly replayed unchanged onto actual audited post-Titanium M158.92 sources.",
   "complete_kiwi_ui_port": true,
   "files": {
     "base/android/java/src/org/chromium/base/shared_preferences/StrictPreferenceKeyChecker.java": {
@@ -135,8 +135,8 @@
       "after_sha256": "aba83c2b19bb8d31bdb6c8fac20b6fadc8a758946d4cc3406c30417af3751978"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java": {
-      "before_sha256": "dd2000da0b0dc1dd2709c91bc8dca1111b5d10873c08b495c1a805c5dd8ed7cf",
-      "after_sha256": "5ee16ed8e2725b82ff74d661750d70b23413b91c0af0a003a13b98da684a90a1"
+      "before_sha256": "35531ef3dd783d75b9a4e9c0f0f60f55cae5efc4f24cfe746b67fe9d54420c33",
+      "after_sha256": "4ec49ad6f1f275baa6de00d26f717f71ea4ed6b60a963e32ea7664d019833c5e"
     },
     "chrome/android/java/src/org/chromium/chrome/browser/ui/system/StatusBarColorController.java": {
       "before_sha256": "338587d1553e770203e3259679692ba2f8a10bdec1b958361864753f5da352c8",
@@ -407,46 +407,14 @@
       "after_sha256": "92a2eda916ba142e9969e2107ea489b154175f76c3bcc0a0bf96b710f02b3c66"
     }
   },
-  "completed_build": {
-    "run_number": 178,
-    "run_id": 38576318413,
-    "commit": "4d72ba1aa77606a63f6f57022c2416ffc27cc31b",
-    "completed_at": "2026-10-15T02:43:29Z",
-    "artifact_id": 11945395037,
-    "artifact_zip_sha256": "dbb0ac79869bcbf3cde6b31f84ce8edfbd1fd855bc088da35093a70671211518",
-    "artifact_zip_size_bytes": 145812217,
-    "apk_sha256": "ee0eb88a5ff4613e39111e3bb3496c5f82f6fda3b93af658e57629eaa7cbadba",
-    "apk_size_bytes": 331229458,
-    "android_v2_signature_verified": true,
-    "android_v2_independently_verified": true,
-    "signer_certificate_sha256": "32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0",
-    "signer_certificate_independently_extracted": true,
-    "completed_cache_key": "kiwi-incremental-15579-4d72ba1aa77606a63f6f57022c2416ffc27cc31b-38576318413-1-continue-2",
-    "cache_saved_at": "2026-10-15T02:43:08.2993435Z",
-    "cache_saved_job_id": 116171785375,
-    "source_audit_artifact_id": 11938428426,
-    "source_audit_zip_sha256": "ca2b2e4b9738156db2293d7001879842d1503f1b31dd72f443e89359738f5ea3",
-    "source_before_artifact_id": 11899542218,
-    "source_before_zip_sha256": "1ebb8b1e4cc21eb6c84f6c98eba1201a34906b5c3156cb270140c40732fb99d6",
-    "verified_feature_patches": 25,
-    "verified_source_files": 99,
-    "strict_reapplication_verified": true,
-    "idempotence_verified": true,
-    "conflict_diagnostics_verified": true,
-    "ci_tests_passed": 43,
-    "ci_test_stages_passed": 3,
-    "local_tests_passed": 48,
-    "local_tests_skipped": 1,
-    "physical_device_tested": false,
-    "chromium_version": "155.0.8059.79"
-  },
+  "completed_build": null,
   "source_verification": {
-    "version": "155.0.8059.84",
-    "source_run": 39039364741,
-    "source_artifact": 12104226111,
-    "source_zip_sha256": "2332bdb37d389c42c2ba7126f0ffba65bf10bc53749bf8ae83917555349415a0",
-    "files": 99,
-    "features": 25,
-    "status": "actual 99 before/after hashes, strict ordered 25-patch reapplication, repeat idempotence and conflict diagnostics verified"
+    "version": "158.0.8127.92",
+    "source_run": 45613091423,
+    "source_artifact": 15021628331,
+    "source_zip_sha256": "f1c5d66b24fe58b212bb6d701d5abf0ca6f1f97c0ad24984e595cba55e0b07ed",
+    "files": 100,
+    "features": 26,
+    "status": "actual before and after hashes, strict ordered replay, idempotence, Java syntax, and all 66 tests verified"
   }
 }
