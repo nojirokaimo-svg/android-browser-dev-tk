@@ -1,0 +1,90 @@
+{
+  "version": "158.0.8127.92",
+  "source_commit": "0488733ea6617a4825e3140166ad61ac2bc241d7",
+  "run": 45729295253,
+  "jobs": {
+    "build": 139606986848,
+    "continue1": 139712034227,
+    "require": 139814537036,
+    "api30": 139814593441,
+    "api36": 139814593286,
+    "publish": 139816465289
+  },
+  "all_required_jobs": "success",
+  "release": "titanium-kiwi-158.0.8127.92-45729295253-1",
+  "published_at": "2026-11-26T09:33:36Z",
+  "apk": {
+    "url": "https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-158.0.8127.92-45729295253-1/Titanium-Kiwi-core-158.0.8127.92-arm64-v8a.apk",
+    "sha256": "55e08aa37552fd152f573d6a89e9e6a671c08565966a89820c4a108b668acd04",
+    "size": 337611028
+  },
+  "zip": {
+    "url": "https://github.com/nojirokaimo-svg/android-browser-dev-tk/releases/download/titanium-kiwi-158.0.8127.92-45729295253-1/Titanium-Kiwi-158.0.8127.92.zip",
+    "sha256": "d8f00f6e8dcb02abe56d5b14ae192cb58fff7e754e5126e3dc91fa482674aea4",
+    "size": 144151211
+  },
+  "independent_verification": {
+    "actually_downloaded_both": true,
+    "github_release_digests_match": true,
+    "apksig": "official Android apksig 9.5.1 ApkVerifier: verified=true v2=true errors=[] signers=1",
+    "certificate_sha256": "32a2fc74d731105859e5a85df16d95f102d85b22099b8064c5d8915c61dad1e0",
+    "manifest_tool": "official aapt2 build 16666295",
+    "package": "io.github.nojirokaimo.titaniumkiwi",
+    "versionName": "158.0.8127.92",
+    "versionCode": 807807374,
+    "apk_all_crc": true,
+    "zip_all_crc": true,
+    "embedded_apk_sha256_matches": true
+  },
+  "source_audit": {
+    "run": 45613091423,
+    "artifact": 15021628331,
+    "zip_sha256": "f1c5d66b24fe58b212bb6d701d5abf0ca6f1f97c0ad24984e595cba55e0b07ed",
+    "before_hashes": 100,
+    "strict_patches": 26,
+    "second_replay": "unchanged",
+    "java_sources_parsed_with_JDK25": 55,
+    "tests": 66,
+    "skips": 0,
+    "ninja_test": true,
+    "production_sources": {
+      "artifact_ids": [
+        15076623167,
+        15090638439
+      ],
+      "actual_before_and_after_paths_per_stage": 100,
+      "mismatches": 0
+    }
+  },
+  "checkpoint": {
+    "key": "kiwi-incremental-15892-0488733ea6617a4825e3140166ad61ac2bc241d7-45729295253-1-continue-1",
+    "save_log": "2026-11-26T09:29:08.0249565Z Cache saved with key: kiwi-incremental-15892-0488733ea6617a4825e3140166ad61ac2bc241d7-45729295253-1-continue-1",
+    "identity": "124ac01c99f174acc8477711f132cf7c3d52d720:ff04c5bbe8a5f69b27f61af234d3dc84a42c3797:aa8057651dc34373e52d0a0cefd7904a11b3e130:validation",
+    "restores_literal_equal_and_hit_true": true,
+    "initial_restore": "kiwi-incremental-15842-7c90b07a378a52fa53dfb022a0413822e26cf70c-44683744558-1-continue-2",
+    "continuation_restore": "kiwi-15892-0488733ea6617a4825e3140166ad61ac2bc241d7-45729295253-1-build",
+    "cache_list_created_at": "2026-11-26T09:29:07.756149Z",
+    "cache_list_size_bytes": 3444985918
+  },
+  "api_round_trip": {
+    "apis": [
+      30,
+      36
+    ],
+    "sequence": [
+      "158.0.8127.42",
+      "158.0.8127.92",
+      "158.0.8127.42",
+      "158.0.8127.92"
+    ],
+    "all_four_installs_success_each": true,
+    "overwrite": "adb install --no-streaming -r, no -d",
+    "previous_fixture_sha256": "2eccb84ecc7584c5ebf8d1d3c7da61a4ed9ad85ca3d75587661f648f030e5646",
+    "artifact_ids": [
+      15102893702,
+      15102694485
+    ]
+  },
+  "physical_device_tested": false,
+  "violentmonkey_settings_export_tested": false
+}
